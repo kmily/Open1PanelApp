@@ -4,12 +4,12 @@
 /// 包括快照的创建、恢复、管理等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/snapshot_models.dart';
 
 class SnapshotV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   SnapshotV2Api(this._client);
 

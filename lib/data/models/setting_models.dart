@@ -4,6 +4,9 @@
 /// including configuration management, preferences, etc.
 
 import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'setting_models.g.dart';
 
 /// Setting information model
 class SettingInfo extends Equatable {
@@ -117,4 +120,614 @@ class SettingCategory extends Equatable {
 
   @override
   List<Object?> get props => [name, description, settings];
+}
+
+// ==================== 系统设置相关模型 ====================
+
+/// 系统设置
+@JsonSerializable()
+class SystemSettings extends Equatable {
+  final String? siteName;
+  final String? language;
+  final String? theme;
+  final String? timeZone;
+  final String? sessionTimeout;
+  final String? defaultPassword;
+  final bool? allowAccessKey;
+  final String? complexity;
+  final int? minPasswordLength;
+
+  const SystemSettings({
+    this.siteName,
+    this.language,
+    this.theme,
+    this.timeZone,
+    this.sessionTimeout,
+    this.defaultPassword,
+    this.allowAccessKey,
+    this.complexity,
+    this.minPasswordLength,
+  });
+
+  factory SystemSettings.fromJson(Map<String, dynamic> json) => _$SystemSettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$SystemSettingsToJson(this);
+
+  @override
+  List<Object?> get props => [siteName, language, theme, timeZone, sessionTimeout, defaultPassword, allowAccessKey, complexity, minPasswordLength];
+}
+
+/// 系统信息
+@JsonSerializable()
+class SystemInfo extends Equatable {
+  final String? version;
+  final String? build;
+  final String? arch;
+  final String? os;
+  final String? goVersion;
+  final String? dockerVersion;
+  final String? uptime;
+  final int? totalMemory;
+  final int? usedMemory;
+  final int? totalDisk;
+  final int? usedDisk;
+
+  const SystemInfo({
+    this.version,
+    this.build,
+    this.arch,
+    this.os,
+    this.goVersion,
+    this.dockerVersion,
+    this.uptime,
+    this.totalMemory,
+    this.usedMemory,
+    this.totalDisk,
+    this.usedDisk,
+  });
+
+  factory SystemInfo.fromJson(Map<String, dynamic> json) => _$SystemInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$SystemInfoToJson(this);
+
+  @override
+  List<Object?> get props => [version, build, arch, os, goVersion, dockerVersion, uptime, totalMemory, usedMemory, totalDisk, usedDisk];
+}
+
+/// 系统时间
+@JsonSerializable()
+class SystemTime extends Equatable {
+  final String? time;
+  final String? timeZone;
+
+  const SystemTime({
+    this.time,
+    this.timeZone,
+  });
+
+  factory SystemTime.fromJson(Map<String, dynamic> json) => _$SystemTimeFromJson(json);
+  Map<String, dynamic> toJson() => _$SystemTimeToJson(this);
+
+  @override
+  List<Object?> get props => [time, timeZone];
+}
+
+/// 系统时间设置
+@JsonSerializable()
+class SystemTimeSet extends Equatable {
+  final String? time;
+  final String? timeZone;
+
+  const SystemTimeSet({
+    this.time,
+    this.timeZone,
+  });
+
+  factory SystemTimeSet.fromJson(Map<String, dynamic> json) => _$SystemTimeSetFromJson(json);
+  Map<String, dynamic> toJson() => _$SystemTimeSetToJson(this);
+
+  @override
+  List<Object?> get props => [time, timeZone];
+}
+
+// ==================== 安全设置相关模型 ====================
+
+/// 安全设置
+@JsonSerializable()
+class SecuritySettings extends Equatable {
+  final bool? allowIPs;
+  final List<String>? allowedIPs;
+  final String? authMethod;
+  final int? failedAttempts;
+  final int? lockTime;
+  final String? passwordPolicy;
+
+  const SecuritySettings({
+    this.allowIPs,
+    this.allowedIPs,
+    this.authMethod,
+    this.failedAttempts,
+    this.lockTime,
+    this.passwordPolicy,
+  });
+
+  factory SecuritySettings.fromJson(Map<String, dynamic> json) => _$SecuritySettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$SecuritySettingsToJson(this);
+
+  @override
+  List<Object?> get props => [allowIPs, allowedIPs, authMethod, failedAttempts, lockTime, passwordPolicy];
+}
+
+/// 安全设置更新
+@JsonSerializable()
+class SecuritySettingsUpdate extends Equatable {
+  final bool? allowIPs;
+  final List<String>? allowedIPs;
+  final String? authMethod;
+  final int? failedAttempts;
+  final int? lockTime;
+  final String? passwordPolicy;
+
+  const SecuritySettingsUpdate({
+    this.allowIPs,
+    this.allowedIPs,
+    this.authMethod,
+    this.failedAttempts,
+    this.lockTime,
+    this.passwordPolicy,
+  });
+
+  factory SecuritySettingsUpdate.fromJson(Map<String, dynamic> json) => _$SecuritySettingsUpdateFromJson(json);
+  Map<String, dynamic> toJson() => _$SecuritySettingsUpdateToJson(this);
+
+  @override
+  List<Object?> get props => [allowIPs, allowedIPs, authMethod, failedAttempts, lockTime, passwordPolicy];
+}
+
+// ==================== 面板设置相关模型 ====================
+
+/// 面板设置
+@JsonSerializable()
+class PanelSettings extends Equatable {
+  final String? title;
+  final String? logo;
+  final String? theme;
+  final String? language;
+  final String? serverName;
+  final String? serverAddr;
+  final String? port;
+  final String? ssl;
+  final String? ipv6;
+  final bool? bind;
+
+  const PanelSettings({
+    this.title,
+    this.logo,
+    this.theme,
+    this.language,
+    this.serverName,
+    this.serverAddr,
+    this.port,
+    this.ssl,
+    this.ipv6,
+    this.bind,
+  });
+
+  factory PanelSettings.fromJson(Map<String, dynamic> json) => _$PanelSettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$PanelSettingsToJson(this);
+
+  @override
+  List<Object?> get props => [title, logo, theme, language, serverName, serverAddr, port, ssl, ipv6, bind];
+}
+
+/// 面板设置更新
+@JsonSerializable()
+class PanelSettingsUpdate extends Equatable {
+  final String? title;
+  final String? logo;
+  final String? theme;
+  final String? language;
+  final String? serverName;
+  final String? serverAddr;
+  final String? port;
+  final String? ssl;
+  final String? ipv6;
+  final bool? bind;
+
+  const PanelSettingsUpdate({
+    this.title,
+    this.logo,
+    this.theme,
+    this.language,
+    this.serverName,
+    this.serverAddr,
+    this.port,
+    this.ssl,
+    this.ipv6,
+    this.bind,
+  });
+
+  factory PanelSettingsUpdate.fromJson(Map<String, dynamic> json) => _$PanelSettingsUpdateFromJson(json);
+  Map<String, dynamic> toJson() => _$PanelSettingsUpdateToJson(this);
+
+  @override
+  List<Object?> get props => [title, logo, theme, language, serverName, serverAddr, port, ssl, ipv6, bind];
+}
+
+// ==================== 用户设置相关模型 ====================
+
+/// 用户设置
+@JsonSerializable()
+class UserSettings extends Equatable {
+  final String? username;
+  final String? email;
+  final String? language;
+  final String? theme;
+  final String? timeZone;
+  final int? failedLoginAttempts;
+  final int? lockTime;
+
+  const UserSettings({
+    this.username,
+    this.email,
+    this.language,
+    this.theme,
+    this.timeZone,
+    this.failedLoginAttempts,
+    this.lockTime,
+  });
+
+  factory UserSettings.fromJson(Map<String, dynamic> json) => _$UserSettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$UserSettingsToJson(this);
+
+  @override
+  List<Object?> get props => [username, email, language, theme, timeZone, failedLoginAttempts, lockTime];
+}
+
+/// 用户设置更新
+@JsonSerializable()
+class UserSettingsUpdate extends Equatable {
+  final String? username;
+  final String? email;
+  final String? language;
+  final String? theme;
+  final String? timeZone;
+  final int? failedLoginAttempts;
+  final int? lockTime;
+
+  const UserSettingsUpdate({
+    this.username,
+    this.email,
+    this.language,
+    this.theme,
+    this.timeZone,
+    this.failedLoginAttempts,
+    this.lockTime,
+  });
+
+  factory UserSettingsUpdate.fromJson(Map<String, dynamic> json) => _$UserSettingsUpdateFromJson(json);
+  Map<String, dynamic> toJson() => _$UserSettingsUpdateToJson(this);
+
+  @override
+  List<Object?> get props => [username, email, language, theme, timeZone, failedLoginAttempts, lockTime];
+}
+
+// ==================== 通知设置相关模型 ====================
+
+/// 通知设置
+@JsonSerializable()
+class NotificationSettings extends Equatable {
+  final bool? emailEnabled;
+  final String? emailServer;
+  final String? emailPort;
+  final String? emailUsername;
+  final String? emailPassword;
+  final String? emailFrom;
+  final bool? webhookEnabled;
+  final String? webhookUrl;
+
+  const NotificationSettings({
+    this.emailEnabled,
+    this.emailServer,
+    this.emailPort,
+    this.emailUsername,
+    this.emailPassword,
+    this.emailFrom,
+    this.webhookEnabled,
+    this.webhookUrl,
+  });
+
+  factory NotificationSettings.fromJson(Map<String, dynamic> json) => _$NotificationSettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$NotificationSettingsToJson(this);
+
+  @override
+  List<Object?> get props => [emailEnabled, emailServer, emailPort, emailUsername, emailPassword, emailFrom, webhookEnabled, webhookUrl];
+}
+
+/// 通知设置更新
+@JsonSerializable()
+class NotificationSettingsUpdate extends Equatable {
+  final bool? emailEnabled;
+  final String? emailServer;
+  final String? emailPort;
+  final String? emailUsername;
+  final String? emailPassword;
+  final String? emailFrom;
+  final bool? webhookEnabled;
+  final String? webhookUrl;
+
+  const NotificationSettingsUpdate({
+    this.emailEnabled,
+    this.emailServer,
+    this.emailPort,
+    this.emailUsername,
+    this.emailPassword,
+    this.emailFrom,
+    this.webhookEnabled,
+    this.webhookUrl,
+  });
+
+  factory NotificationSettingsUpdate.fromJson(Map<String, dynamic> json) => _$NotificationSettingsUpdateFromJson(json);
+  Map<String, dynamic> toJson() => _$NotificationSettingsUpdateToJson(this);
+
+  @override
+  List<Object?> get props => [emailEnabled, emailServer, emailPort, emailUsername, emailPassword, emailFrom, webhookEnabled, webhookUrl];
+}
+
+// ==================== 备份设置相关模型 ====================
+
+/// 备份设置
+@JsonSerializable()
+class BackupSettings extends Equatable {
+  final String? backupDir;
+  final String? backupType;
+  final String? backupRetention;
+  final bool? backupEnabled;
+  final String? backupSchedule;
+
+  const BackupSettings({
+    this.backupDir,
+    this.backupType,
+    this.backupRetention,
+    this.backupEnabled,
+    this.backupSchedule,
+  });
+
+  factory BackupSettings.fromJson(Map<String, dynamic> json) => _$BackupSettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$BackupSettingsToJson(this);
+
+  @override
+  List<Object?> get props => [backupDir, backupType, backupRetention, backupEnabled, backupSchedule];
+}
+
+/// 备份设置更新
+@JsonSerializable()
+class BackupSettingsUpdate extends Equatable {
+  final String? backupDir;
+  final String? backupType;
+  final String? backupRetention;
+  final bool? backupEnabled;
+  final String? backupSchedule;
+
+  const BackupSettingsUpdate({
+    this.backupDir,
+    this.backupType,
+    this.backupRetention,
+    this.backupEnabled,
+    this.backupSchedule,
+  });
+
+  factory BackupSettingsUpdate.fromJson(Map<String, dynamic> json) => _$BackupSettingsUpdateFromJson(json);
+  Map<String, dynamic> toJson() => _$BackupSettingsUpdateToJson(this);
+
+  @override
+  List<Object?> get props => [backupDir, backupType, backupRetention, backupEnabled, backupSchedule];
+}
+
+// ==================== 主题设置相关模型 ====================
+
+/// 主题设置
+@JsonSerializable()
+class ThemeSettings extends Equatable {
+  final String? theme;
+  final String? primaryColor;
+  final String? backgroundColor;
+  final String? textColor;
+
+  const ThemeSettings({
+    this.theme,
+    this.primaryColor,
+    this.backgroundColor,
+    this.textColor,
+  });
+
+  factory ThemeSettings.fromJson(Map<String, dynamic> json) => _$ThemeSettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$ThemeSettingsToJson(this);
+
+  @override
+  List<Object?> get props => [theme, primaryColor, backgroundColor, textColor];
+}
+
+/// 主题设置更新
+@JsonSerializable()
+class ThemeSettingsUpdate extends Equatable {
+  final String? theme;
+  final String? primaryColor;
+  final String? backgroundColor;
+  final String? textColor;
+
+  const ThemeSettingsUpdate({
+    this.theme,
+    this.primaryColor,
+    this.backgroundColor,
+    this.textColor,
+  });
+
+  factory ThemeSettingsUpdate.fromJson(Map<String, dynamic> json) => _$ThemeSettingsUpdateFromJson(json);
+  Map<String, dynamic> toJson() => _$ThemeSettingsUpdateToJson(this);
+
+  @override
+  List<Object?> get props => [theme, primaryColor, backgroundColor, textColor];
+}
+
+// ==================== 语言设置相关模型 ====================
+
+/// 语言设置
+@JsonSerializable()
+class LanguageSettings extends Equatable {
+  final String? language;
+  final String? region;
+
+  const LanguageSettings({
+    this.language,
+    this.region,
+  });
+
+  factory LanguageSettings.fromJson(Map<String, dynamic> json) => _$LanguageSettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$LanguageSettingsToJson(this);
+
+  @override
+  List<Object?> get props => [language, region];
+}
+
+/// 语言设置
+@JsonSerializable()
+class LanguageSet extends Equatable {
+  final String? language;
+  final String? region;
+
+  const LanguageSet({
+    this.language,
+    this.region,
+  });
+
+  factory LanguageSet.fromJson(Map<String, dynamic> json) => _$LanguageSetFromJson(json);
+  Map<String, dynamic> toJson() => _$LanguageSetToJson(this);
+
+  @override
+  List<Object?> get props => [language, region];
+}
+
+// ==================== NTP同步相关模型 ====================
+
+/// NTP同步设置
+@JsonSerializable()
+class NTPSync extends Equatable {
+  final bool? enabled;
+  final String? server;
+  final String? interval;
+  final String? timezone;
+
+  const NTPSync({
+    this.enabled,
+    this.server,
+    this.interval,
+    this.timezone,
+  });
+
+  factory NTPSync.fromJson(Map<String, dynamic> json) => _$NTPSyncFromJson(json);
+  Map<String, dynamic> toJson() => _$NTPSyncToJson(this);
+
+  @override
+  List<Object?> get props => [enabled, server, interval, timezone];
+}
+
+// ==================== 时区信息相关模型 ====================
+
+/// 时区信息
+@JsonSerializable()
+class TimezoneInfo extends Equatable {
+  final String? zone;
+  final String? offset;
+
+  const TimezoneInfo({
+    this.zone,
+    this.offset,
+  });
+
+  factory TimezoneInfo.fromJson(Map<String, dynamic> json) => _$TimezoneInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$TimezoneInfoToJson(this);
+
+  @override
+  List<Object?> get props => [zone, offset];
+}
+
+/// 语言信息
+@JsonSerializable()
+class LanguageInfo extends Equatable {
+  final String? code;
+  final String? name;
+  final String? nativeName;
+
+  const LanguageInfo({
+    this.code,
+    this.name,
+    this.nativeName,
+  });
+
+  factory LanguageInfo.fromJson(Map<String, dynamic> json) => _$LanguageInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$LanguageInfoToJson(this);
+
+  @override
+  List<Object?> get props => [code, name, nativeName];
+}
+
+/// 主题信息
+@JsonSerializable()
+class ThemeInfo extends Equatable {
+  final String? name;
+  final String? displayName;
+  final String? primaryColor;
+  final String? backgroundColor;
+
+  const ThemeInfo({
+    this.name,
+    this.displayName,
+    this.primaryColor,
+    this.backgroundColor,
+  });
+
+  factory ThemeInfo.fromJson(Map<String, dynamic> json) => _$ThemeInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$ThemeInfoToJson(this);
+
+  @override
+  List<Object?> get props => [name, displayName, primaryColor, backgroundColor];
+}
+
+// ==================== 设置导入导出相关模型 ====================
+
+/// 设置导出
+@JsonSerializable()
+class SettingsExport extends Equatable {
+  final String? data;
+  final String? timestamp;
+  final String? version;
+
+  const SettingsExport({
+    this.data,
+    this.timestamp,
+    this.version,
+  });
+
+  factory SettingsExport.fromJson(Map<String, dynamic> json) => _$SettingsExportFromJson(json);
+  Map<String, dynamic> toJson() => _$SettingsExportToJson(this);
+
+  @override
+  List<Object?> get props => [data, timestamp, version];
+}
+
+/// 设置导入
+@JsonSerializable()
+class SettingsImport extends Equatable {
+  final String? data;
+  final bool? overwrite;
+
+  const SettingsImport({
+    this.data,
+    this.overwrite,
+  });
+
+  factory SettingsImport.fromJson(Map<String, dynamic> json) => _$SettingsImportFromJson(json);
+  Map<String, dynamic> toJson() => _$SettingsImportToJson(this);
+
+  @override
+  List<Object?> get props => [data, overwrite];
 }

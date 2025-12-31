@@ -4,13 +4,13 @@
 /// 包括运行环境的创建、删除、更新、查询等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/runtime_models.dart';
 import '../../data/models/common_models.dart';
 
 class RuntimeV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   RuntimeV2Api(this._client);
 

@@ -4,13 +4,13 @@
 /// 包括进程的查询、启动、停止、重启等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/process_models.dart';
 import '../../data/models/common_models.dart';
 
 class ProcessV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   ProcessV2Api(this._client);
 

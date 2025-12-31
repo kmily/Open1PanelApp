@@ -4,11 +4,11 @@
 /// 包括OpenResty的安装、配置、管理等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../models/openresty_models.dart';
 
 class OpenRestyV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   OpenRestyV2Api(this._client);
 

@@ -380,6 +380,139 @@ Map<String, dynamic> _$AppstoreUpdateRequestToJson(
       'defaultDomain': instance.defaultDomain,
     };
 
+AppInstallInfo _$AppInstallInfoFromJson(Map<String, dynamic> json) =>
+    AppInstallInfo(
+      appId: json['appId'] as String?,
+      appName: json['appName'] as String,
+      appVersion: json['appVersion'] as String,
+      description: json['description'] as String?,
+      icon: json['icon'] as String?,
+      status: json['status'] as String?,
+      createdAt: json['createdAt'] as String?,
+      id: (json['id'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$AppInstallInfoToJson(AppInstallInfo instance) =>
+    <String, dynamic>{
+      'appId': instance.appId,
+      'appName': instance.appName,
+      'appVersion': instance.appVersion,
+      'description': instance.description,
+      'icon': instance.icon,
+      'status': instance.status,
+      'createdAt': instance.createdAt,
+      'id': instance.id,
+    };
+
+AppListResponse _$AppListResponseFromJson(Map<String, dynamic> json) =>
+    AppListResponse(
+      apps: (json['apps'] as List<dynamic>)
+          .map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      total: (json['total'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$AppListResponseToJson(AppListResponse instance) =>
+    <String, dynamic>{
+      'apps': instance.apps,
+      'total': instance.total,
+    };
+
+AppUpdateResponse _$AppUpdateResponseFromJson(Map<String, dynamic> json) =>
+    AppUpdateResponse(
+      updates: (json['updates'] as List<dynamic>)
+          .map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      total: (json['total'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$AppUpdateResponseToJson(AppUpdateResponse instance) =>
+    <String, dynamic>{
+      'updates': instance.updates,
+      'total': instance.total,
+    };
+
+AppInstallCreateRequest _$AppInstallCreateRequestFromJson(
+        Map<String, dynamic> json) =>
+    AppInstallCreateRequest(
+      appId: json['appId'] as String,
+      version: json['version'] as String,
+      type: json['type'] as String,
+      params: json['params'] as Map<String, dynamic>?,
+    );
+
+Map<String, dynamic> _$AppInstallCreateRequestToJson(
+        AppInstallCreateRequest instance) =>
+    <String, dynamic>{
+      'appId': instance.appId,
+      'version': instance.version,
+      'type': instance.type,
+      'params': instance.params,
+    };
+
+AppInstalledCheckRequest _$AppInstalledCheckRequestFromJson(
+        Map<String, dynamic> json) =>
+    AppInstalledCheckRequest(
+      appId: json['appId'] as String,
+      version: json['version'] as String,
+      type: json['type'] as String,
+    );
+
+Map<String, dynamic> _$AppInstalledCheckRequestToJson(
+        AppInstalledCheckRequest instance) =>
+    <String, dynamic>{
+      'appId': instance.appId,
+      'version': instance.version,
+      'type': instance.type,
+    };
+
+AppInstalledIgnoreUpgradeRequest _$AppInstalledIgnoreUpgradeRequestFromJson(
+        Map<String, dynamic> json) =>
+    AppInstalledIgnoreUpgradeRequest(
+      appInstallId: (json['appInstallId'] as num).toInt(),
+      reason: json['reason'] as String,
+    );
+
+Map<String, dynamic> _$AppInstalledIgnoreUpgradeRequestToJson(
+        AppInstalledIgnoreUpgradeRequest instance) =>
+    <String, dynamic>{
+      'appInstallId': instance.appInstallId,
+      'reason': instance.reason,
+    };
+
+AppInstalledOperateRequest _$AppInstalledOperateRequestFromJson(
+        Map<String, dynamic> json) =>
+    AppInstalledOperateRequest(
+      installId: (json['installId'] as num).toInt(),
+      operation: json['operation'] as String,
+      force: json['force'] as bool?,
+      params: json['params'] as Map<String, dynamic>?,
+    );
+
+Map<String, dynamic> _$AppInstalledOperateRequestToJson(
+        AppInstalledOperateRequest instance) =>
+    <String, dynamic>{
+      'installId': instance.installId,
+      'operation': instance.operation,
+      'force': instance.force,
+      'params': instance.params,
+    };
+
+AppVersion _$AppVersionFromJson(Map<String, dynamic> json) => AppVersion(
+      version: json['version'] as String,
+      description: json['description'] as String?,
+      releaseDate: json['releaseDate'] as String?,
+      isPrerelease: json['isPrerelease'] as bool?,
+    );
+
+Map<String, dynamic> _$AppVersionToJson(AppVersion instance) =>
+    <String, dynamic>{
+      'version': instance.version,
+      'description': instance.description,
+      'releaseDate': instance.releaseDate,
+      'isPrerelease': instance.isPrerelease,
+    };
+
 PageResult<T> _$PageResultFromJson<T>(
   Map<String, dynamic> json,
   T Function(Object? json) fromJsonT,

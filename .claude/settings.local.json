@@ -8,7 +8,9 @@
       "Bash(flutter analyze:*)",
       "Bash(flutter pub get:*)",
       "Bash(flutter packages pub run build_runner build:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(powershell:*)",
+      "mcp__Open1PanelMobile__read_project_oas_wfnfd9"
     ],
     "deny": [],
     "ask": []

@@ -4,12 +4,12 @@
 /// 包括终端连接、命令执行、会话管理等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/terminal_models.dart';
 
 class TerminalV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   TerminalV2Api(this._client);
 

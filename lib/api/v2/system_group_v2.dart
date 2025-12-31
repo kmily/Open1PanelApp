@@ -5,12 +5,12 @@
 /// 包括组的创建、删除、查询和更新操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/system_group_models.dart';
 
 class SystemGroupV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   SystemGroupV2Api(this._client);
 

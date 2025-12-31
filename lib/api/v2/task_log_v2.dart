@@ -4,11 +4,11 @@
 /// 包括任务日志的查询、统计、清理等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../models/task_log_models.dart';
 
 class TaskLogV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   TaskLogV2Api(this._client);
 

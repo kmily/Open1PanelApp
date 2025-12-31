@@ -4,13 +4,13 @@
 /// 包括系统监控、性能指标、主机状态等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/monitoring_models.dart';
 import '../../data/models/common_models.dart';
 
 class DashboardV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   DashboardV2Api(this._client);
 

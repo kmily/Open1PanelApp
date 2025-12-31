@@ -4,12 +4,12 @@
 /// 包括备份账户的创建、删除、更新、查询等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/backup_account_models.dart';
 
 class BackupAccountV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   BackupAccountV2Api(this._client);
 
@@ -223,6 +223,202 @@ class BackupAccountV2Api {
         requestOptions: _client.dio.options,
       );
     }
+  }
+
+  /// 刷新备份令牌
+  ///
+  /// 刷新备份账户的访问令牌
+  /// @param request 备份账户配置
+  /// @return 刷新结果
+  Future<Response> refreshBackupToken(BackupOperate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/backups/refresh/token'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 分页搜索备份账户
+  ///
+  /// 分页搜索备份账户列表
+  /// @param search 搜索请求
+  /// @return 备份账户分页列表
+  Future<Response<PageResult<BackupAccountInfo>>> searchBackupAccounts(BackupAccountSearch search) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/backups/search'),
+      data: search.toJson(),
+    );
+    return Response(
+      data: PageResult.fromJson(
+        response.data as Map<String, dynamic>,
+        (json) => BackupAccountInfo.fromJson(json as Map<String, dynamic>),
+      ),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 从备份账户列出文件
+  ///
+  /// 列出备份账户中的文件
+  /// @param request 文件搜索请求
+  /// @return 文件列表
+  Future<Response<List<BackupFile>>> listBackupFiles(BackupFileSearch request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/backups/search/files'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: (response.data as List?)
+          ?.map((item) => BackupFile.fromJson(item as Map<String, dynamic>))
+          .toList() ?? [],
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 更新备份账户
+  ///
+  /// 更新指定的备份账户配置
+  /// @param request 更新请求
+  /// @return 更新结果
+  Future<Response> updateBackupAccount(BackupOperate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/backups/update'),
+      data: request.toJson(),
+    );
+  }
+
+  // Core Backup APIs
+  /// 创建核心备份账户
+  ///
+  /// 创建新的核心备份账户
+  /// @param request 备份账户配置
+  /// @return 创建结果
+  Future<Response> createCoreBackupAccount(BackupOperate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/backups'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 获取存储桶列表
+  ///
+  /// 获取对象存储的存储桶列表
+  /// @param request 备份账户配置
+  /// @return 存储桶列表
+  Future<Response<List<String>>> getBuckets(BackupOperate request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/core/backups/buckets'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: (response.data as List?)?.cast<String>() ?? [],
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 获取备份账户基础信息
+  ///
+  /// 根据客户端类型获取备份账户基础信息
+  /// @param clientType 客户端类型
+  /// @return 基础信息
+  Future<Response<Map<String, dynamic>>> getBackupClientInfo(String clientType) async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/core/backups/client/$clientType'),
+    );
+    return Response(
+      data: response.data as Map<String, dynamic>,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 删除核心备份账户
+  ///
+  /// 删除指定的核心备份账户
+  /// @param request 删除请求
+  /// @return 删除结果
+  Future<Response> deleteCoreBackupAccount(OperateByID request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/backups/del'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 刷新核心备份令牌
+  ///
+  /// 刷新核心备份账户的访问令牌
+  /// @param request 备份账户配置
+  /// @return 刷新结果
+  Future<Response> refreshCoreBackupToken(BackupOperate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/backups/refresh/token'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 更新核心备份账户
+  ///
+  /// 更新指定的核心备份账户配置
+  /// @param request 更新请求
+  /// @return 更新结果
+  Future<Response> updateCoreBackupAccount(BackupOperate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/backups/update'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 删除备份记录
+  ///
+  /// 删除指定的备份记录
+  /// @param request 删除请求
+  /// @return 删除结果
+  Future<Response> deleteBackupRecord(OperateByID request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/backups/record/del'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 获取备份记录详情
+  ///
+  /// 获取指定备份记录的详细信息
+  /// @param id 备份记录ID
+  /// @return 备份记录详情
+  Future<Response<BackupRecord>> getBackupRecordDetail(int id) async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/backups/record/$id'),
+    );
+    return Response(
+      data: BackupRecord.fromJson(response.data as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 验证备份文件
+  ///
+  /// 验证备份文件的完整性
+  /// @param request 验证请求
+  /// @return 验证结果
+  Future<Response<Map<String, dynamic>>> verifyBackupFile(BackupVerifyRequest request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/backups/verify'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: response.data as Map<String, dynamic>,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
   }
 }
 

@@ -4,11 +4,11 @@
 /// 包括系统更新、应用更新、版本管理等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../models/update_models.dart';
 
 class UpdateV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   UpdateV2Api(this._client);
 

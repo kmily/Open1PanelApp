@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 import '../../../core/config/api_config.dart';
-import '../../../core/network/api_client.dart';
+import '../../../core/network/dio_client.dart';
 
 class ApiTestPage extends StatefulWidget {
   const ApiTestPage({Key? key}) : super(key: key);

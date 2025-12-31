@@ -4,13 +4,13 @@
 /// 包括定时任务的创建、删除、更新、查询等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/cronjob_models.dart';
 import '../../data/models/common_models.dart';
 
 class CronjobV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   CronjobV2Api(this._client);
 

@@ -4,12 +4,12 @@
 /// 包括数据库的创建、删除、备份、恢复、查询等操作。
 
 import 'package:dio/dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/database_models.dart';
 
 class DatabaseV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   DatabaseV2Api(this._client);
 

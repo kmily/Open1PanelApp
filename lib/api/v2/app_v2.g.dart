@@ -19,13 +19,14 @@ class _AppV2Api implements AppV2Api {
   String? baseUrl;
 
   @override
-  Future<InvalidType> installApp(InvalidType request) async {
+  Future<AppInstallInfo> installApp(AppInstallCreateRequest request) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = request;
+    final _data = <String, dynamic>{};
+    _data.addAll(request.toJson());
     final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<InvalidType>(Options(
+        .fetch<Map<String, dynamic>>(_setStreamType<AppInstallInfo>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
@@ -41,7 +42,7 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = InvalidType.fromJson(_result.data!);
+    final value = AppInstallInfo.fromJson(_result.data!);
     return value;
   }
 
@@ -94,13 +95,14 @@ class _AppV2Api implements AppV2Api {
   }
 
   @override
-  Future<InvalidType> searchApps(InvalidType request) async {
+  Future<AppSearchResponse> searchApps(AppSearchRequest request) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = request;
+    final _data = <String, dynamic>{};
+    _data.addAll(request.toJson());
     final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<InvalidType>(Options(
+        .fetch<Map<String, dynamic>>(_setStreamType<AppSearchResponse>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
@@ -116,18 +118,18 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = InvalidType.fromJson(_result.data!);
+    final value = AppSearchResponse.fromJson(_result.data!);
     return value;
   }
 
   @override
-  Future<InvalidType> getAppList() async {
+  Future<AppListResponse> getAppList() async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<InvalidType>(Options(
+        .fetch<Map<String, dynamic>>(_setStreamType<AppListResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -143,12 +145,12 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = InvalidType.fromJson(_result.data!);
+    final value = AppListResponse.fromJson(_result.data!);
     return value;
   }
 
   @override
-  Future<InvalidType> getAppDetail(
+  Future<AppItem> getAppDetail(
     String appId,
     String version,
     String type,
@@ -157,8 +159,8 @@ class _AppV2Api implements AppV2Api {
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
-    final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<InvalidType>(Options(
+    final _result =
+        await _dio.fetch<Map<String, dynamic>>(_setStreamType<AppItem>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -174,18 +176,18 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = InvalidType.fromJson(_result.data!);
+    final value = AppItem.fromJson(_result.data!);
     return value;
   }
 
   @override
-  Future<InvalidType> getAppDetails(String id) async {
+  Future<AppItem> getAppDetails(String id) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
-    final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<InvalidType>(Options(
+    final _result =
+        await _dio.fetch<Map<String, dynamic>>(_setStreamType<AppItem>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -201,18 +203,18 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = InvalidType.fromJson(_result.data!);
+    final value = AppItem.fromJson(_result.data!);
     return value;
   }
 
   @override
-  Future<InvalidType> checkAppUpdate() async {
+  Future<AppUpdateResponse> checkAppUpdate() async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<InvalidType>(Options(
+        .fetch<Map<String, dynamic>>(_setStreamType<AppUpdateResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -228,18 +230,18 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = InvalidType.fromJson(_result.data!);
+    final value = AppUpdateResponse.fromJson(_result.data!);
     return value;
   }
 
   @override
-  Future<List<InvalidType>> getIgnoredApps() async {
+  Future<List<AppInstallInfo>> getIgnoredApps() async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio
-        .fetch<List<dynamic>>(_setStreamType<List<InvalidType>>(Options(
+        .fetch<List<dynamic>>(_setStreamType<List<AppInstallInfo>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -256,19 +258,21 @@ class _AppV2Api implements AppV2Api {
               baseUrl,
             ))));
     var value = _result.data!
-        .map((dynamic i) => InvalidType.fromJson(i as Map<String, dynamic>))
+        .map((dynamic i) => AppInstallInfo.fromJson(i as Map<String, dynamic>))
         .toList();
     return value;
   }
 
   @override
-  Future<InvalidType> checkAppInstall(InvalidType request) async {
+  Future<AppInstalledCheckResponse> checkAppInstall(
+      AppInstalledCheckRequest request) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = request;
-    final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<InvalidType>(Options(
+    final _data = <String, dynamic>{};
+    _data.addAll(request.toJson());
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<AppInstalledCheckResponse>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
@@ -284,18 +288,19 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = InvalidType.fromJson(_result.data!);
+    final value = AppInstalledCheckResponse.fromJson(_result.data!);
     return value;
   }
 
   @override
-  Future<Map<String, dynamic>> getAppInstallConfig(String appInstallId) async {
+  Future<Response<Map<String, dynamic>>> getAppInstallConfig(
+      String appInstallId) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<Map<String, dynamic>>(Options(
+        _setStreamType<Response<Map<String, dynamic>>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -311,8 +316,7 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    var value = _result.data!.map((k, dynamic v) =>
-        MapEntry(k, dynamic.fromJson(v as Map<String, dynamic>)));
+    final value = Response<Map<String, dynamic>>.fromJson(_result.data!);
     return value;
   }
 
@@ -342,13 +346,13 @@ class _AppV2Api implements AppV2Api {
   }
 
   @override
-  Future<Map<String, dynamic>> getAppConnInfo(String key) async {
+  Future<Response<Map<String, dynamic>>> getAppConnInfo(String key) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<Map<String, dynamic>>(Options(
+        _setStreamType<Response<Map<String, dynamic>>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -364,19 +368,19 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    var value = _result.data!.map((k, dynamic v) =>
-        MapEntry(k, dynamic.fromJson(v as Map<String, dynamic>)));
+    final value = Response<Map<String, dynamic>>.fromJson(_result.data!);
     return value;
   }
 
   @override
-  Future<Map<String, dynamic>> checkAppUninstall(String appInstallId) async {
+  Future<Response<Map<String, dynamic>>> checkAppUninstall(
+      String appInstallId) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<Map<String, dynamic>>(Options(
+        _setStreamType<Response<Map<String, dynamic>>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -392,17 +396,17 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    var value = _result.data!.map((k, dynamic v) =>
-        MapEntry(k, dynamic.fromJson(v as Map<String, dynamic>)));
+    final value = Response<Map<String, dynamic>>.fromJson(_result.data!);
     return value;
   }
 
   @override
-  Future<void> ignoreAppUpdate(InvalidType request) async {
+  Future<void> ignoreAppUpdate(AppInstalledIgnoreUpgradeRequest request) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = request;
+    final _data = <String, dynamic>{};
+    _data.addAll(request.toJson());
     await _dio.fetch<void>(_setStreamType<void>(Options(
       method: 'POST',
       headers: _headers,
@@ -422,13 +426,13 @@ class _AppV2Api implements AppV2Api {
   }
 
   @override
-  Future<List<InvalidType>> getInstalledApps() async {
+  Future<List<AppInstallInfo>> getInstalledApps() async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio
-        .fetch<List<dynamic>>(_setStreamType<List<InvalidType>>(Options(
+        .fetch<List<dynamic>>(_setStreamType<List<AppInstallInfo>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -445,7 +449,7 @@ class _AppV2Api implements AppV2Api {
               baseUrl,
             ))));
     var value = _result.data!
-        .map((dynamic i) => InvalidType.fromJson(i as Map<String, dynamic>))
+        .map((dynamic i) => AppInstallInfo.fromJson(i as Map<String, dynamic>))
         .toList();
     return value;
   }
@@ -478,11 +482,12 @@ class _AppV2Api implements AppV2Api {
   }
 
   @override
-  Future<void> operateApp(InvalidType request) async {
+  Future<void> operateApp(AppInstalledOperateRequest request) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = request;
+    final _data = <String, dynamic>{};
+    _data.addAll(request.toJson());
     await _dio.fetch<void>(_setStreamType<void>(Options(
       method: 'POST',
       headers: _headers,
@@ -502,13 +507,14 @@ class _AppV2Api implements AppV2Api {
   }
 
   @override
-  Future<Map<String, dynamic>> getAppInstallParams(String appInstallId) async {
+  Future<Response<Map<String, dynamic>>> getAppInstallParams(
+      String appInstallId) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<Map<String, dynamic>>(Options(
+        _setStreamType<Response<Map<String, dynamic>>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -524,19 +530,20 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    var value = _result.data!.map((k, dynamic v) =>
-        MapEntry(k, dynamic.fromJson(v as Map<String, dynamic>)));
+    final value = Response<Map<String, dynamic>>.fromJson(_result.data!);
     return value;
   }
 
   @override
-  Future<InvalidType> searchInstalledApps(InvalidType request) async {
+  Future<PageResult<AppInstallInfo>> searchInstalledApps(
+      AppInstalledSearchRequest request) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = request;
-    final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<InvalidType>(Options(
+    final _data = <String, dynamic>{};
+    _data.addAll(request.toJson());
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<PageResult<AppInstallInfo>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
@@ -552,7 +559,10 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = InvalidType.fromJson(_result.data!);
+    final value = PageResult<AppInstallInfo>.fromJson(
+      _result.data!,
+      (json) => AppInstallInfo.fromJson(json as Map<String, dynamic>),
+    );
     return value;
   }
 
@@ -581,13 +591,13 @@ class _AppV2Api implements AppV2Api {
   }
 
   @override
-  Future<List<InvalidType>> getAppUpdateVersions(String appInstallId) async {
+  Future<List<AppVersion>> getAppUpdateVersions(String appInstallId) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio
-        .fetch<List<dynamic>>(_setStreamType<List<InvalidType>>(Options(
+        .fetch<List<dynamic>>(_setStreamType<List<AppVersion>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -604,19 +614,19 @@ class _AppV2Api implements AppV2Api {
               baseUrl,
             ))));
     var value = _result.data!
-        .map((dynamic i) => InvalidType.fromJson(i as Map<String, dynamic>))
+        .map((dynamic i) => AppVersion.fromJson(i as Map<String, dynamic>))
         .toList();
     return value;
   }
 
   @override
-  Future<List<InvalidType>> getAppServices(String key) async {
+  Future<List<AppServiceResponse>> getAppServices(String key) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio
-        .fetch<List<dynamic>>(_setStreamType<List<InvalidType>>(Options(
+        .fetch<List<dynamic>>(_setStreamType<List<AppServiceResponse>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -633,19 +643,20 @@ class _AppV2Api implements AppV2Api {
               baseUrl,
             ))));
     var value = _result.data!
-        .map((dynamic i) => InvalidType.fromJson(i as Map<String, dynamic>))
+        .map((dynamic i) =>
+            AppServiceResponse.fromJson(i as Map<String, dynamic>))
         .toList();
     return value;
   }
 
   @override
-  Future<InvalidType> getAppstoreConfig() async {
+  Future<AppstoreConfigResponse> getAppstoreConfig() async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
-    final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<InvalidType>(Options(
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<AppstoreConfigResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -661,16 +672,17 @@ class _AppV2Api implements AppV2Api {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = InvalidType.fromJson(_result.data!);
+    final value = AppstoreConfigResponse.fromJson(_result.data!);
     return value;
   }
 
   @override
-  Future<void> updateAppstoreConfig(InvalidType request) async {
+  Future<void> updateAppstoreConfig(AppstoreUpdateRequest request) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = request;
+    final _data = <String, dynamic>{};
+    _data.addAll(request.toJson());
     await _dio.fetch<void>(_setStreamType<void>(Options(
       method: 'POST',
       headers: _headers,

@@ -4,11 +4,11 @@
 /// 包括网站分组的创建、删除、更新、查询等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../models/website_group_models.dart';
 
 class WebsiteGroupV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   WebsiteGroupV2Api(this._client);
 

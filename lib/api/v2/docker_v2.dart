@@ -4,12 +4,12 @@
 /// 包括Docker的安装、配置、容器管理、镜像管理等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/docker_models.dart';
 
 class DockerV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   DockerV2Api(this._client);
 

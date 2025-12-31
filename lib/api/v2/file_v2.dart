@@ -4,12 +4,12 @@
 /// 包括文件的上传、下载、删除、编辑、查询等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/file_models.dart';
 
 class FileV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   FileV2Api(this._client);
 

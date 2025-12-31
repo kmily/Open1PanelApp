@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import '../../data/models/app_models.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 
 part 'app_v2.g.dart';
@@ -57,7 +57,7 @@ abstract class AppV2Api {
 
   /// 获取应用安装配置
   @GET('/api/v2/apps/installed/conf/{appInstallId}')
-  Future<Map<String, dynamic>> getAppInstallConfig(@Path('appInstallId') String appInstallId);
+  Future<Response<Map<String, dynamic>>> getAppInstallConfig(@Path('appInstallId') String appInstallId);
 
   /// 更新应用安装配置
   @PUT('/api/v2/apps/installed/config/update')
@@ -65,11 +65,11 @@ abstract class AppV2Api {
 
   /// 获取应用连接信息
   @GET('/api/v2/apps/installed/conninfo/{key}')
-  Future<Map<String, dynamic>> getAppConnInfo(@Path('key') String key);
+  Future<Response<Map<String, dynamic>>> getAppConnInfo(@Path('key') String key);
 
   /// 检查应用卸载
   @GET('/api/v2/apps/installed/delete/check/{appInstallId}')
-  Future<Map<String, dynamic>> checkAppUninstall(@Path('appInstallId') String appInstallId);
+  Future<Response<Map<String, dynamic>>> checkAppUninstall(@Path('appInstallId') String appInstallId);
 
   /// 忽略应用更新
   @POST('/api/v2/apps/installed/ignore')
@@ -89,7 +89,7 @@ abstract class AppV2Api {
 
   /// 获取应用安装参数
   @GET('/api/v2/apps/installed/params/{appInstallId}')
-  Future<Map<String, dynamic>> getAppInstallParams(@Path('appInstallId') String appInstallId);
+  Future<Response<Map<String, dynamic>>> getAppInstallParams(@Path('appInstallId') String appInstallId);
 
   /// 搜索已安装应用
   @POST('/api/v2/apps/installed/search')

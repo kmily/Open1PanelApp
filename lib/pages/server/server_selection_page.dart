@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import '../../core/config/api_config.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/services/logger/logger_service.dart';
 
 class ServerSelectionPage extends StatefulWidget {

@@ -4,13 +4,13 @@
 /// 包括系统日志、应用日志、安全日志等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/logs_models.dart';
 import '../../data/models/common_models.dart';
 
 class LogsV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   LogsV2Api(this._client);
 

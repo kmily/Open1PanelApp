@@ -482,7 +482,7 @@ class SettingV2Api {
   /// 更新基础目录配置
   /// @param dirPath 基础目录路径
   /// @return 更新结果
-  Future<Response<void>> updateBaseDir(@Body() Map<String, dynamic> request) async {
+  Future<Response<void>> updateBaseDir(Map<String, dynamic> request) async {
     final response = await _client.put(
       ApiConstants.buildApiPath('/settings/basedir'),
       data: request,
@@ -500,7 +500,7 @@ class SettingV2Api {
   /// 更新绑定相关设置
   /// @param request 绑定更新请求
   /// @return 更新结果
-  Future<Response<void>> updateBindSettings(@Body() Map<String, dynamic> request) async {
+  Future<Response<void>> updateBindSettings( Map<String, dynamic> request) async {
     final response = await _client.put(
       ApiConstants.buildApiPath('/settings/bind/update'),
       data: request,
@@ -518,7 +518,7 @@ class SettingV2Api {
   /// 更新系统密码设置
   /// @param request 密码更新请求
   /// @return 更新结果
-  Future<Response<void>> updatePasswordSettings(@Body() Map<String, dynamic> request) async {
+  Future<Response<void>> updatePasswordSettings( Map<String, dynamic> request) async {
     final response = await _client.put(
       ApiConstants.buildApiPath('/settings/password/update'),
       data: request,
@@ -536,7 +536,7 @@ class SettingV2Api {
   /// 更新系统端口设置
   /// @param request 端口更新请求
   /// @return 更新结果
-  Future<Response<void>> updatePortSettings(@Body() Map<String, dynamic> request) async {
+  Future<Response<void>> updatePortSettings( Map<String, dynamic> request) async {
     final response = await _client.put(
       ApiConstants.buildApiPath('/settings/port/update'),
       data: request,
@@ -554,7 +554,7 @@ class SettingV2Api {
   /// 更新系统代理设置
   /// @param request 代理更新请求
   /// @return 更新结果
-  Future<Response<void>> updateProxySettings(@Body() Map<String, dynamic> request) async {
+  Future<Response<void>> updateProxySettings( Map<String, dynamic> request) async {
     final response = await _client.put(
       ApiConstants.buildApiPath('/settings/proxy/update'),
       data: request,
@@ -588,7 +588,7 @@ class SettingV2Api {
   /// 更新用户界面设置
   /// @param request 界面更新请求
   /// @return 更新结果
-  Future<Response<void>> updateInterfaceSettings(@Body() Map<String, dynamic> request) async {
+  Future<Response<void>> updateInterfaceSettings( Map<String, dynamic> request) async {
     final response = await _client.put(
       ApiConstants.buildApiPath('/settings/interface'),
       data: request,
@@ -606,7 +606,7 @@ class SettingV2Api {
   /// 更新系统菜单设置
   /// @param request 菜单更新请求
   /// @return 更新结果
-  Future<Response<void>> updateMenuSettings(@Body() Map<String, dynamic> request) async {
+  Future<Response<void>> updateMenuSettings( Map<String, dynamic> request) async {
     final response = await _client.put(
       ApiConstants.buildApiPath('/settings/menu/update'),
       data: request,
@@ -624,7 +624,7 @@ class SettingV2Api {
   /// 搜索终端设置
   /// @param request 搜索请求
   /// @return 搜索结果
-  Future<Response<List<SettingInfo>>> searchTerminalSettings(@Body() Map<String, dynamic> request) async {
+  Future<Response<List<SettingInfo>>> searchTerminalSettings( Map<String, dynamic> request) async {
     final response = await _client.post(
       ApiConstants.buildApiPath('/settings/terminal/search'),
       data: request,
@@ -644,7 +644,7 @@ class SettingV2Api {
   /// 更新终端设置
   /// @param request 终端更新请求
   /// @return 更新结果
-  Future<Response<void>> updateTerminalSettings(@Body() Map<String, dynamic> request) async {
+  Future<Response<void>> updateTerminalSettings( Map<String, dynamic> request) async {
     final response = await _client.put(
       ApiConstants.buildApiPath('/settings/terminal/update'),
       data: request,
@@ -662,7 +662,7 @@ class SettingV2Api {
   /// 更新SSL证书设置
   /// @param request SSL更新请求
   /// @return 更新结果
-  Future<Response<void>> updateSSLSettings(@Body() Map<String, dynamic> request) async {
+  Future<Response<void>> updateSSLSettings( Map<String, dynamic> request) async {
     final response = await _client.put(
       ApiConstants.buildApiPath('/settings/ssl/update'),
       data: request,
@@ -696,7 +696,7 @@ class SettingV2Api {
   /// 下载SSL证书文件
   /// @param request SSL下载请求
   /// @return 下载结果
-  Future<Response<String>> downloadSSLCertificate(@Body() Map<String, dynamic> request) async {
+  Future<Response<String>> downloadSSLCertificate( Map<String, dynamic> request) async {
     final response = await _client.post(
       ApiConstants.buildApiPath('/settings/ssl/download'),
       data: request,
@@ -714,7 +714,7 @@ class SettingV2Api {
   /// 处理许可证过期
   /// @param request 过期处理请求
   /// @return 处理结果
-  Future<Response<void>> handleLicenseExpire(@Body() Map<String, dynamic> request) async {
+  Future<Response<void>> handleLicenseExpire( Map<String, dynamic> request) async {
     final response = await _client.put(
       ApiConstants.buildApiPath('/settings/expire/handle'),
       data: request,
@@ -748,7 +748,7 @@ class SettingV2Api {
   /// 执行系统验证操作
   /// @param request 验证请求
   /// @return 验证结果
-  Future<Response<Map<String, dynamic>>> systemVerify(@Body() Map<String, dynamic> request) async {
+  Future<Response<Map<String, dynamic>>> systemVerify( Map<String, dynamic> request) async {
     final response = await _client.post(
       ApiConstants.buildApiPath('/settings/verify'),
       data: request,
@@ -766,7 +766,7 @@ class SettingV2Api {
   /// 验证许可证过期码
   /// @param request 过期码验证请求
   /// @return 验证结果
-  Future<Response<Map<String, dynamic>>> verifyExpireCode(@Body() Map<String, dynamic> request) async {
+  Future<Response<Map<String, dynamic>>> verifyExpireCode( Map<String, dynamic> request) async {
     final response = await _client.post(
       ApiConstants.buildApiPath('/settings/expire/code'),
       data: request,
@@ -784,7 +784,7 @@ class SettingV2Api {
   /// 升级过期版本
   /// @param request 过期升级请求
   /// @return 升级结果
-  Future<Response<void>> upgradeExpireVersion(@Body() Map<String, dynamic> request) async {
+  Future<Response<void>> upgradeExpireVersion( Map<String, dynamic> request) async {
     final response = await _client.post(
       ApiConstants.buildApiPath('/settings/expire/upgrade'),
       data: request,
@@ -802,7 +802,7 @@ class SettingV2Api {
   /// 执行设置向导操作
   /// @param request 向导请求
   /// @return 向导结果
-  Future<Response<Map<String, dynamic>>> wizardSettings(@Body() Map<String, dynamic> request) async {
+  Future<Response<Map<String, dynamic>>> wizardSettings( Map<String, dynamic> request) async {
     final response = await _client.post(
       ApiConstants.buildApiPath('/settings/wizard'),
       data: request,

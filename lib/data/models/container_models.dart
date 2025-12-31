@@ -863,3 +863,791 @@ enum ContainerPruneType {
     );
   }
 }
+
+/// Container Compose 模型
+class ContainerCompose extends Equatable {
+  final String id;
+  final String name;
+  final String? path;
+  final String? version;
+  final String? status;
+  final String? createTime;
+  final String? updateTime;
+  final List<String>? networks;
+  final List<String>? volumes;
+  final List<String>? services;
+
+  const ContainerCompose({
+    required this.id,
+    required this.name,
+    this.path,
+    this.version,
+    this.status,
+    this.createTime,
+    this.updateTime,
+    this.networks,
+    this.volumes,
+    this.services,
+  });
+
+  factory ContainerCompose.fromJson(Map<String, dynamic> json) {
+    return ContainerCompose(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      path: json['path'] as String?,
+      version: json['version'] as String?,
+      status: json['status'] as String?,
+      createTime: json['createTime'] as String?,
+      updateTime: json['updateTime'] as String?,
+      networks: (json['networks'] as List?)?.cast<String>(),
+      volumes: (json['volumes'] as List?)?.cast<String>(),
+      services: (json['services'] as List?)?.cast<String>(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'path': path,
+      'version': version,
+      'status': status,
+      'createTime': createTime,
+      'updateTime': updateTime,
+      'networks': networks,
+      'volumes': volumes,
+      'services': services,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        path,
+        version,
+        status,
+        createTime,
+        updateTime,
+        networks,
+        volumes,
+        services,
+      ];
+}
+
+/// Container Compose 创建请求模型
+class ContainerComposeCreate extends Equatable {
+  final String name;
+  final String path;
+  final String? version;
+  final List<String>? networks;
+  final List<String>? volumes;
+  final List<String>? services;
+
+  const ContainerComposeCreate({
+    required this.name,
+    required this.path,
+    this.version,
+    this.networks,
+    this.volumes,
+    this.services,
+  });
+
+  factory ContainerComposeCreate.fromJson(Map<String, dynamic> json) {
+    return ContainerComposeCreate(
+      name: json['name'] as String,
+      path: json['path'] as String,
+      version: json['version'] as String?,
+      networks: (json['networks'] as List?)?.cast<String>(),
+      volumes: (json['volumes'] as List?)?.cast<String>(),
+      services: (json['services'] as List?)?.cast<String>(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'path': path,
+      'version': version,
+      'networks': networks,
+      'volumes': volumes,
+      'services': services,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        name,
+        path,
+        version,
+        networks,
+        volumes,
+        services,
+      ];
+}
+
+/// Container Compose 更新请求模型
+class ContainerComposeUpdate extends Equatable {
+  final String id;
+  final String name;
+  final String? path;
+  final String? version;
+  final List<String>? networks;
+  final List<String>? volumes;
+  final List<String>? services;
+
+  const ContainerComposeUpdate({
+    required this.id,
+    required this.name,
+    this.path,
+    this.version,
+    this.networks,
+    this.volumes,
+    this.services,
+  });
+
+  factory ContainerComposeUpdate.fromJson(Map<String, dynamic> json) {
+    return ContainerComposeUpdate(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      path: json['path'] as String?,
+      version: json['version'] as String?,
+      networks: (json['networks'] as List?)?.cast<String>(),
+      volumes: (json['volumes'] as List?)?.cast<String>(),
+      services: (json['services'] as List?)?.cast<String>(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'path': path,
+      'version': version,
+      'networks': networks,
+      'volumes': volumes,
+      'services': services,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        path,
+        version,
+        networks,
+        volumes,
+        services,
+      ];
+}
+
+/// Container Compose 搜索请求模型
+class ContainerComposeSearch extends Equatable {
+  final int page;
+  final int pageSize;
+  final String? name;
+  final String? status;
+  final String? search;
+
+  const ContainerComposeSearch({
+    required this.page,
+    required this.pageSize,
+    this.name,
+    this.status,
+    this.search,
+  });
+
+  factory ContainerComposeSearch.fromJson(Map<String, dynamic> json) {
+    return ContainerComposeSearch(
+      page: json['page'] as int,
+      pageSize: json['pageSize'] as int,
+      name: json['name'] as String?,
+      status: json['status'] as String?,
+      search: json['search'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'page': page,
+      'pageSize': pageSize,
+      'name': name,
+      'status': status,
+      'search': search,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        page,
+        pageSize,
+        name,
+        status,
+      ];
+}
+
+/// Container Compose 操作请求模型
+class ContainerComposeOperate extends Equatable {
+  final List<int>? ids;
+  final String? id;
+  final String operation;
+  final bool? force;
+
+  const ContainerComposeOperate({
+    this.ids,
+    this.id,
+    required this.operation,
+    this.force,
+  });
+
+  factory ContainerComposeOperate.fromJson(Map<String, dynamic> json) {
+    return ContainerComposeOperate(
+      ids: (json['ids'] as List?)?.cast<int>(),
+      id: json['id'] as String?,
+      operation: json['operation'] as String,
+      force: json['force'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ids': ids,
+      'id': id,
+      'operation': operation,
+      'force': force,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        ids,
+        id,
+        operation,
+        force,
+      ];
+}
+
+/// Container Compose 日志模型
+class ContainerComposeLog extends Equatable {
+  final String id;
+  final String composeName;
+  final String? level;
+  final String message;
+  final String? createTime;
+  final String? containerName;
+  final String? operation;
+
+  const ContainerComposeLog({
+    required this.id,
+    required this.composeName,
+    this.level,
+    this.message,
+    this.createTime,
+    this.containerName,
+    this.operation,
+  });
+
+  factory ContainerComposeLog.fromJson(Map<String, dynamic> json) {
+    return ContainerComposeLog(
+      id: json['id'] as String,
+      composeName: json['composeName'] as String,
+      level: json['level'] as String?,
+      message: json['message'] as String?,
+      createTime: json['createTime'] as String?,
+      containerName: json['containerName'] as String?,
+      operation: json['operation'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'composeName': composeName,
+      'level': level,
+      'message': message,
+      'createTime': createTime,
+      'containerName': containerName,
+      'operation': operation,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        id,
+        composeName,
+        level,
+        message,
+        createTime,
+        containerName,
+        operation,
+      ];
+}
+
+/// Container Compose 配置模型
+class ContainerComposeConfig extends Equatable {
+  final String id;
+  final String name;
+  final String? path;
+  final String? version;
+  final String? description;
+  final bool? workDir;
+  final bool? autoRemove;
+  final List<String>? networks;
+  final List<String>? volumes;
+  final List<String>? services;
+
+  const ContainerComposeConfig({
+    required this.id,
+    required this.name,
+    this.path,
+    this.version,
+    this.description,
+    this.workDir,
+    this.autoRemove,
+    this.networks,
+    this.volumes,
+    this.services,
+  });
+
+  factory ContainerComposeConfig.fromJson(Map<String, dynamic> json) {
+    return ContainerComposeConfig(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      path: json['path'] as String?,
+      version: json['version'] as String?,
+      description: json['description'] as String?,
+      workDir: json['workDir'] as bool?,
+      autoRemove: json['autoRemove'] as bool?,
+      networks: (json['networks'] as List?)?.cast<String>(),
+      volumes: (json['volumes'] as List?)?.cast<String>(),
+      services: (json['services'] as List?)?.cast<String>(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'path': path,
+      'version': version,
+      'description': description,
+      'workDir': workDir,
+      'autoRemove': autoRemove,
+      'networks': networks,
+      'volumes': volumes,
+      'services': services,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        path,
+        version,
+        description,
+        workDir,
+        autoRemove,
+        networks,
+        volumes,
+        services,
+      ];
+}
+
+/// 容器命令创建模型
+class ContainerCreateByCommand extends Equatable {
+  final String command;
+  final String? name;
+
+  const ContainerCreateByCommand({
+    required this.command,
+    this.name,
+  });
+
+  factory ContainerCreateByCommand.fromJson(Map<String, dynamic> json) {
+    return ContainerCreateByCommand(
+      command: json['command'] as String,
+      name: json['name'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'command': command,
+      'name': name,
+    };
+  }
+
+  @override
+  List<Object?> get props => [command, name];
+}
+
+/// 容器检查请求模型
+class InspectReq extends Equatable {
+  final String name;
+
+  const InspectReq({
+    required this.name,
+  });
+
+  factory InspectReq.fromJson(Map<String, dynamic> json) {
+    return InspectReq(
+      name: json['name'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+    };
+  }
+
+  @override
+  List<Object?> get props => [name];
+}
+
+/// 镜像构建模型
+class ImageBuild extends Equatable {
+  final String contextDir;
+  final String? dockerfile;
+  final List<String>? tags;
+  final String? buildArgs;
+  final bool? pull;
+  final bool? noCache;
+  final bool? rm;
+  final String? label;
+
+  const ImageBuild({
+    required this.contextDir,
+    this.dockerfile,
+    this.tags,
+    this.buildArgs,
+    this.pull,
+    this.noCache,
+    this.rm,
+    this.label,
+  });
+
+  factory ImageBuild.fromJson(Map<String, dynamic> json) {
+    return ImageBuild(
+      contextDir: json['contextDir'] as String,
+      dockerfile: json['dockerfile'] as String?,
+      tags: (json['tags'] as List?)?.cast<String>(),
+      buildArgs: json['buildArgs'] as String?,
+      pull: json['pull'] as bool?,
+      noCache: json['noCache'] as bool?,
+      rm: json['rm'] as bool?,
+      label: json['label'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'contextDir': contextDir,
+      'dockerfile': dockerfile,
+      'tags': tags,
+      'buildArgs': buildArgs,
+      'pull': pull,
+      'noCache': noCache,
+      'rm': rm,
+      'label': label,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        contextDir,
+        dockerfile,
+        tags,
+        buildArgs,
+        pull,
+        noCache,
+        rm,
+        label,
+      ];
+}
+
+/// 镜像加载模型
+class ImageLoad extends Equatable {
+  final String filePath;
+  final bool? quiet;
+
+  const ImageLoad({
+    required this.filePath,
+    this.quiet,
+  });
+
+  factory ImageLoad.fromJson(Map<String, dynamic> json) {
+    return ImageLoad(
+      filePath: json['filePath'] as String,
+      quiet: json['quiet'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'filePath': filePath,
+      'quiet': quiet,
+    };
+  }
+
+  @override
+  List<Object?> get props => [filePath, quiet];
+}
+
+/// 镜像拉取模型
+class ImagePull extends Equatable {
+  final String image;
+  final String? tag;
+  final bool? allTags;
+  final String? platform;
+
+  const ImagePull({
+    required this.image,
+    this.tag,
+    this.allTags,
+    this.platform,
+  });
+
+  factory ImagePull.fromJson(Map<String, dynamic> json) {
+    return ImagePull(
+      image: json['image'] as String,
+      tag: json['tag'] as String?,
+      allTags: json['allTags'] as bool?,
+      platform: json['platform'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'image': image,
+      'tag': tag,
+      'allTags': allTags,
+      'platform': platform,
+    };
+  }
+
+  @override
+  List<Object?> get props => [image, tag, allTags, platform];
+}
+
+/// 镜像推送模型
+class ImagePush extends Equatable {
+  final String image;
+  final String? tag;
+  final String? registry;
+
+  const ImagePush({
+    required this.image,
+    this.tag,
+    this.registry,
+  });
+
+  factory ImagePush.fromJson(Map<String, dynamic> json) {
+    return ImagePush(
+      image: json['image'] as String,
+      tag: json['tag'] as String?,
+      registry: json['registry'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'image': image,
+      'tag': tag,
+      'registry': registry,
+    };
+  }
+
+  @override
+  List<Object?> get props => [image, tag, registry];
+}
+
+/// 镜像保存模型
+class ImageSave extends Equatable {
+  final List<String> images;
+  final String filePath;
+
+  const ImageSave({
+    required this.images,
+    required this.filePath,
+  });
+
+  factory ImageSave.fromJson(Map<String, dynamic> json) {
+    return ImageSave(
+      images: (json['images'] as List?)?.cast<String>() ?? [],
+      filePath: json['filePath'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'images': images,
+      'filePath': filePath,
+    };
+  }
+
+  @override
+  List<Object?> get props => [images, filePath];
+}
+
+/// 镜像标记模型
+class ImageTag extends Equatable {
+  final String sourceImage;
+  final String targetImage;
+  final String? tag;
+
+  const ImageTag({
+    required this.sourceImage,
+    required this.targetImage,
+    this.tag,
+  });
+
+  factory ImageTag.fromJson(Map<String, dynamic> json) {
+    return ImageTag(
+      sourceImage: json['sourceImage'] as String,
+      targetImage: json['targetImage'] as String,
+      tag: json['tag'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sourceImage': sourceImage,
+      'targetImage': targetImage,
+      'tag': tag,
+    };
+  }
+
+  @override
+  List<Object?> get props => [sourceImage, targetImage, tag];
+}
+
+/// 网络创建模型
+class NetworkCreate extends Equatable {
+  final String name;
+  final String? driver;
+  final bool? internal;
+  final bool? attachable;
+  final List<String>? ipam;
+  final Map<String, String>? labels;
+  final bool? enableIPv6;
+
+  const NetworkCreate({
+    required this.name,
+    this.driver,
+    this.internal,
+    this.attachable,
+    this.ipam,
+    this.labels,
+    this.enableIPv6,
+  });
+
+  factory NetworkCreate.fromJson(Map<String, dynamic> json) {
+    return NetworkCreate(
+      name: json['name'] as String,
+      driver: json['driver'] as String?,
+      internal: json['internal'] as bool?,
+      attachable: json['attachable'] as bool?,
+      ipam: (json['ipam'] as List?)?.cast<String>(),
+      labels: (json['labels'] as Map<String, dynamic>)?.cast<String, String>(),
+      enableIPv6: json['enableIPv6'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'driver': driver,
+      'internal': internal,
+      'attachable': attachable,
+      'ipam': ipam,
+      'labels': labels,
+      'enableIPv6': enableIPv6,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        name,
+        driver,
+        internal,
+        attachable,
+        ipam,
+        labels,
+        enableIPv6,
+      ];
+}
+
+/// 卷创建模型
+class VolumeCreate extends Equatable {
+  final String name;
+  final String? driver;
+  final Map<String, String>? driverOpts;
+  final Map<String, String>? labels;
+
+  const VolumeCreate({
+    required this.name,
+    this.driver,
+    this.driverOpts,
+    this.labels,
+  });
+
+  factory VolumeCreate.fromJson(Map<String, dynamic> json) {
+    return VolumeCreate(
+      name: json['name'] as String,
+      driver: json['driver'] as String?,
+      driverOpts: (json['driverOpts'] as Map<String, dynamic>)?.cast<String, String>(),
+      labels: (json['labels'] as Map<String, dynamic>)?.cast<String, String>(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'driver': driver,
+      'driverOpts': driverOpts,
+      'labels': labels,
+    };
+  }
+
+  @override
+  List<Object?> get props => [name, driver, driverOpts, labels];
+}
+
+/// 容器清理报告模型
+class ContainerPruneReport extends Equatable {
+  final int? deletedCount;
+  final int? spaceReclaimed;
+  final List<String>? deletedItems;
+  final String? message;
+
+  const ContainerPruneReport({
+    this.deletedCount,
+    this.spaceReclaimed,
+    this.deletedItems,
+    this.message,
+  });
+
+  factory ContainerPruneReport.fromJson(Map<String, dynamic> json) {
+    return ContainerPruneReport(
+      deletedCount: json['deletedCount'] as int?,
+      spaceReclaimed: json['spaceReclaimed'] as int?,
+      deletedItems: (json['deletedItems'] as List?)?.cast<String>(),
+      message: json['message'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'deletedCount': deletedCount,
+      'spaceReclaimed': spaceReclaimed,
+      'deletedItems': deletedItems,
+      'message': message,
+    };
+  }
+
+  @override
+  List<Object?> get props => [deletedCount, spaceReclaimed, deletedItems, message];
+}

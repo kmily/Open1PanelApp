@@ -4,13 +4,13 @@
 /// 包括主机监控、资源监控、性能监控等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/monitoring_models.dart';
 import '../../data/models/common_models.dart';
 
 class MonitorV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   MonitorV2Api(this._client);
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import '../../core/config/api_config.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 
 class ServerConfigPage extends StatefulWidget {
   const ServerConfigPage({Key? key}) : super(key: key);

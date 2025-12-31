@@ -4,13 +4,13 @@
 /// 包括Compose项目的创建、删除、启动、停止、查询等操作。
 
 import 'package:dio/dio.dart';
-import '../../core/network/api_client.dart';
+import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/container_models.dart';
 import '../../data/models/common_models.dart';
 
 class ContainerComposeV2Api {
-  final ApiClient _client;
+  final DioClient _client;
 
   ContainerComposeV2Api(this._client);
 
