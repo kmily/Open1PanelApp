@@ -13,238 +13,88 @@ class SnapshotV2Api {
 
   SnapshotV2Api(this._client);
 
-  /// 获取快照列表
-  /// 
-  /// 获取所有快照列表
-  /// @param page 页码（可选，默认为1）
-  /// @param pageSize 每页数量（可选，默认为10）
-  /// @return 快照列表
-  Future<Response> getSnapshots({
-    int page = 1,
-    int pageSize = 10,
-  }) async {
-    final data = {
-      'page': page,
-      'pageSize': pageSize,
-    };
-    return await _client.post('/snapshots/search', data: data);
-  }
-
   /// 创建快照
-  /// 
-  /// 创建系统快照
-  /// @param name 快照名称
-  /// @param description 快照描述（可选）
-  /// @param includeData 是否包含数据（可选，默认为false）
-  /// @return 创建结果
-  Future<Response> createSnapshot({
-    required String name,
-    String? description,
-    bool includeData = false,
-  }) async {
-    final data = {
-      'name': name,
-      if (description != null) 'description': description,
-      'includeData': includeData,
-    };
-    return await _client.post('/snapshots', data: data);
-  }
-
-  /// 恢复快照
-  /// 
-  /// 从指定快照恢复系统
-  /// @param id 快照ID
-  /// @return 恢复结果
-  Future<Response> restoreSnapshot(int id) async {
-    return await _client.post('/snapshots/$id/restore');
+  Future<Response<void>> createSnapshot(SnapshotCreate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot'),
+      data: request.toJson(),
+    );
   }
 
   /// 删除快照
-  /// 
-  /// 删除指定的快照
-  /// @param id 快照ID
-  /// @return 删除结果
-  Future<Response> deleteSnapshot(int id) async {
-    return await _client.delete('/snapshots/$id');
+  Future<Response<void>> deleteSnapshot(SnapshotDelete request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/del'),
+      data: request.toJson(),
+    );
   }
 
-  /// 批量删除快照
-  /// 
-  /// 批量删除指定的快照
-  /// @param ids 快照ID列表
-  /// @return 删除结果
-  Future<Response> deleteSnapshots(List<int> ids) async {
-    final data = {
-      'ids': ids,
-    };
-    return await _client.post('/snapshots/batch/delete', data: data);
-  }
-
-  /// 获取快照详情
-  /// 
-  /// 获取指定快照的详细信息
-  /// @param id 快照ID
-  /// @return 快照详情
-  Future<Response> getSnapshotDetail(int id) async {
-    return await _client.get('/snapshots/$id');
-  }
-
-  /// 获取快照状态
-  /// 
-  /// 获取指定快照的状态
-  /// @param id 快照ID
-  /// @return 快照状态
-  Future<Response> getSnapshotStatus(int id) async {
-    return await _client.get('/snapshots/$id/status');
-  }
-
-  /// 获取快照日志
-  /// 
-  /// 获取指定快照的日志
-  /// @param id 快照ID
-  /// @param lines 日志行数（可选，默认为100）
-  /// @return 快照日志
-  Future<Response> getSnapshotLogs(int id, {int lines = 100}) async {
-    final data = {
-      'lines': lines,
-    };
-    return await _client.post('/snapshots/$id/logs', data: data);
-  }
-
-  /// 下载快照
-  /// 
-  /// 下载指定的快照
-  /// @param id 快照ID
-  /// @return 下载结果
-  Future<Response> downloadSnapshot(int id) async {
-    return await _client.get('/snapshots/$id/download');
+  /// 更新快照描述
+  Future<Response<void>> updateSnapshotDescription(SnapshotDescriptionUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/description/update'),
+      data: request.toJson(),
+    );
   }
 
   /// 导入快照
-  /// 
-  /// 导入快照
-  /// @param filePath 快照文件路径
-  /// @return 导入结果
-  Future<Response> importSnapshot(String filePath) async {
-    final data = {
-      'filePath': filePath,
-    };
-    return await _client.post('/snapshots/import', data: data);
+  Future<Response<void>> importSnapshot(SnapshotImport request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/import'),
+      data: request.toJson(),
+    );
   }
 
-  /// 获取快照配置
-  /// 
-  /// 获取快照配置信息
-  /// @return 快照配置
-  Future<Response> getSnapshotConfig() async {
-    return await _client.get('/snapshots/config');
+  /// 加载快照
+  Future<Response<Map<String, dynamic>>> loadSnapshot() async {
+    final response = await _client.get<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/settings/snapshot/load'),
+    );
+    return Response(
+      data: response.data?['data'] as Map<String, dynamic>? ?? {},
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
   }
 
-  /// 更新快照配置
-  /// 
-  /// 更新快照配置
-  /// @param config 快照配置
-  /// @return 更新结果
-  Future<Response> updateSnapshotConfig(Map<String, dynamic> config) async {
-    return await _client.post('/snapshots/config', data: config);
+  /// 恢复快照
+  Future<Response<void>> recoverSnapshot(SnapshotRecover request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/recover'),
+      data: request.toJson(),
+    );
   }
 
-  /// 获取快照统计信息
-  /// 
-  /// 获取快照统计信息
-  /// @return 统计信息
-  Future<Response> getSnapshotStats() async {
-    return await _client.get('/snapshots/stats');
+  /// 重建快照
+  Future<Response<void>> recreateSnapshot() async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/recreate'),
+    );
   }
 
-  /// 获取快照存储信息
-  /// 
-  /// 获取快照存储信息
-  /// @return 存储信息
-  Future<Response> getSnapshotStorage() async {
-    return await _client.get('/snapshots/storage');
+  /// 回滚快照
+  Future<Response<void>> rollbackSnapshot(SnapshotRollback request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/rollback'),
+      data: request.toJson(),
+    );
   }
 
-  /// 清理快照
-  /// 
-  /// 清理快照
-  /// @param days 保留天数
-  /// @return 清理结果
-  Future<Response> cleanSnapshots(int days) async {
-    final data = {
-      'days': days,
-    };
-    return await _client.post('/snapshots/clean', data: data);
-  }
-
-  /// 创建定时快照
-  /// 
-  /// 创建定时快照任务
-  /// @param name 任务名称
-  /// @param cronExpression cron表达式
-  /// @param description 任务描述（可选）
-  /// @param includeData 是否包含数据（可选，默认为false）
-  /// @param maxCount 最大保留数量（可选）
-  /// @return 创建结果
-  Future<Response> createScheduledSnapshot({
-    required String name,
-    required String cronExpression,
-    String? description,
-    bool includeData = false,
-    int? maxCount,
-  }) async {
-    final data = {
-      'name': name,
-      'cronExpression': cronExpression,
-      if (description != null) 'description': description,
-      'includeData': includeData,
-      if (maxCount != null) 'maxCount': maxCount,
-    };
-    return await _client.post('/snapshots/scheduled', data: data);
-  }
-
-  /// 获取定时快照列表
-  /// 
-  /// 获取定时快照任务列表
-  /// @return 定时快照列表
-  Future<Response> getScheduledSnapshots() async {
-    return await _client.get('/snapshots/scheduled');
-  }
-
-  /// 更新定时快照
-  /// 
-  /// 更新定时快照任务
-  /// @param id 任务ID
-  /// @param config 任务配置
-  /// @return 更新结果
-  Future<Response> updateScheduledSnapshot(int id, Map<String, dynamic> config) async {
-    return await _client.post('/snapshots/scheduled/$id', data: config);
-  }
-
-  /// 删除定时快照
-  /// 
-  /// 删除定时快照任务
-  /// @param id 任务ID
-  /// @return 删除结果
-  Future<Response> deleteScheduledSnapshot(int id) async {
-    return await _client.delete('/snapshots/scheduled/$id');
-  }
-
-  /// 启动定时快照
-  /// 
-  /// 启动定时快照任务
-  /// @param id 任务ID
-  /// @return 启动结果
-  Future<Response> startScheduledSnapshot(int id) async {
-    return await _client.post('/snapshots/scheduled/$id/start');
-  }
-
-  /// 停止定时快照
-  /// 
-  /// 停止定时快照任务
-  /// @param id 任务ID
-  /// @return 停止结果
-  Future<Response> stopScheduledSnapshot(int id) async {
-    return await _client.post('/snapshots/scheduled/$id/stop');
+  /// 搜索快照
+  Future<Response<PageResult<SnapshotInfo>>> searchSnapshots(SearchWithPage request) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/settings/snapshot/search'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: PageResult.fromJson(
+        response.data?['data'] as Map<String, dynamic>? ?? {},
+        (dynamic item) => SnapshotInfo.fromJson(item as Map<String, dynamic>),
+      ),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
   }
 }

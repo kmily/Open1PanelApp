@@ -352,11 +352,13 @@ class ContainerV2Api {
 
   /// 获取所有镜像
   Future<Response<List<Map<String, dynamic>>>> getAllImages() async {
-    final response = await _client.get<List<dynamic>>(
+    final response = await _client.get<Map<String, dynamic>>(
       ApiConstants.buildApiPath('/containers/image/all'),
     );
+    final data = response.data!;
+    final list = data['data'] as List?;
     return Response(
-      data: _Parser.extractRawListData(response),
+      data: list?.map((item) => item as Map<String, dynamic>).toList() ?? [],
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
