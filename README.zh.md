@@ -109,7 +109,10 @@
 3. **配置1Panel服务器**
    - 在应用设置中添加服务器配置
    - 确保1Panel服务器已启用API访问
-   - 从1Panel管理面板获取API密钥
+   - 从1Panel管理面板获取API密钥（设置 → API接口）
+   - **认证方式**: 使用API密钥 + 时间戳（MD5令牌），无需用户名密码
+     - 令牌格式: `MD5("1panel" + apiKey + timestamp)`
+     - 请求头: `1Panel-Token` 和 `1Panel-Timestamp`
 
 4. **运行应用**
    ```bash
@@ -257,9 +260,16 @@ flutter packages pub run build_runner build
 
 ## 📄 文档
 
-- [1Panel API文档](docs/1PanelOpenAPI/1PanelV2.md)
-- [项目开发指南](Project_Rules/)
-- [网络架构指南](docs/example/dio/)
+### 用户文档
+- [部署指南](docs/zh-CN/DEPLOY.md) - 构建和部署应用
+- [用户指南](docs/zh-CN/GUIDE.md) - 完整用户手册
+- [测试指南](docs/zh-CN/TESTING.md) - 测试文档
+
+### API 文档
+- [1Panel V2 API 规范](docs/1PanelOpenAPI/1PanelV2OpenAPI.json) - Swagger/OpenAPI 规范
+
+### 开发文档
+- [开发文档](docs/development/)
 
 ## 🤝 贡献
 
@@ -271,7 +281,21 @@ flutter packages pub run build_runner build
 
 ## 📄 许可证
 
-本项目遵循LICENSE文件中指定的许可证条款。
+本项目采用 **GNU 通用公共许可证 v3.0 (GPL-3.0)**。
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+### GPL-3.0 意味着什么？
+
+- ✅ **自由使用** - 将此软件用于任何目的
+- ✅ **自由学习** - 访问和学习源代码
+- ✅ **自由分享** - 重新分发软件副本
+- ✅ **自由修改** - 修改并分发您的修改
+- ⚠️ **必须公开源码** - 如果您分发本软件或其衍生作品，必须提供源代码
+- ⚠️ **相同许可证** - 衍生作品必须采用 GPL-3.0 许可证
+- ⚠️ **记录变更** - 必须记录您对软件所做的更改
+
+详见 [LICENSE](LICENSE) 文件获取完整许可证文本。
 
 ## 🔗 相关项目
 

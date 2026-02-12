@@ -182,7 +182,10 @@ After comprehensive analysis and implementation of the 1Panel V2 API, this proje
 3. **Configure your 1Panel server**
    - Add server configuration in the app settings
    - Ensure API access is enabled on your 1Panel server
-   - Get your API key from the 1Panel admin panel
+   - Get your API key from the 1Panel admin panel (Settings → API Interface)
+   - **Authentication**: Uses API Key + Timestamp (MD5 token), no username/password required
+     - Token format: `MD5("1panel" + apiKey + timestamp)`
+     - Headers: `1Panel-Token` and `1Panel-Timestamp`
 
 4. **Run the application**
    ```bash
@@ -352,9 +355,16 @@ The app integrates with 1Panel V2 API using:
 
 ## 📄 Documentation
 
-- [1Panel API Documentation](docs/1PanelOpenAPI/1PanelV2.md)
-- [Project Development Guidelines](Project_Rules/)
-- [Network Architecture Guide](docs/example/dio/)
+### User Documentation
+- [Deployment Guide](docs/en/DEPLOY.md) - Build and deploy the app
+- [User Guide](docs/en/GUIDE.md) - Complete user manual
+- [Testing Guide](docs/en/TESTING.md) - Testing documentation
+
+### API Documentation
+- [1Panel V2 API Specification](docs/1PanelOpenAPI/1PanelV2OpenAPI.json) - Swagger/OpenAPI specification
+
+### Development Documentation
+- [Development Docs](docs/development/)
 
 ## 🤝 Contributing
 
@@ -366,7 +376,21 @@ The app integrates with 1Panel V2 API using:
 
 ## 📄 License
 
-This project is licensed under the terms specified in the LICENSE file.
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+### What does GPL-3.0 mean?
+
+- ✅ **Free to use** - Use this software for any purpose
+- ✅ **Free to study** - Access and study the source code
+- ✅ **Free to share** - Redistribute copies of the software
+- ✅ **Free to modify** - Modify and distribute your modifications
+- ⚠️ **Must disclose source** - If you distribute this software or derivatives, you must provide the source code
+- ⚠️ **Same license** - Derivative works must be licensed under GPL-3.0
+- ⚠️ **State changes** - You must document changes you make to the software
+
+See [LICENSE](LICENSE) for the full license text.
 
 ## 🔗 Related Projects
 
