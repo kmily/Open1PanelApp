@@ -1,125 +1,252 @@
 import 'package:dio/dio.dart';
-import 'package:retrofit/retrofit.dart';
 import '../../data/models/app_models.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 
-part 'app_v2.g.dart';
-
 /// 1Panel V2 API - 应用管理接口
-@RestApi()
-abstract class AppV2Api {
-  factory AppV2Api(Dio dio, {String baseUrl}) = _AppV2Api;
+class AppV2Api {
+  final Dio _dio;
+
+  AppV2Api(this._dio);
 
   /// 安装应用
-  @POST('/api/v2/apps/install')
-  Future<AppInstallInfo> installApp(@Body() AppInstallCreateRequest request);
+  Future<AppInstallInfo> installApp(AppInstallCreateRequest request) async {
+    final response = await _dio.post<dynamic>(
+      ApiConstants.buildApiPath('/apps/install'),
+      data: request.toJson(),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return AppInstallInfo.fromJson(data['data'] as Map<String, dynamic>);
+  }
 
   /// 卸载应用
-  @DELETE('/api/v2/apps/uninstall/{appInstallId}')
-  Future<void> uninstallApp(@Path('appInstallId') String appInstallId);
+  Future<void> uninstallApp(String appInstallId) async {
+    await _dio.delete(
+      ApiConstants.buildApiPath('/apps/uninstall/$appInstallId'),
+    );
+  }
 
   /// 更新应用
-  @PUT('/api/v2/apps/update/{appInstallId}')
-  Future<void> updateApp(@Path('appInstallId') String appInstallId);
+  Future<void> updateApp(String appInstallId) async {
+    await _dio.put(
+      ApiConstants.buildApiPath('/apps/update/$appInstallId'),
+    );
+  }
 
   /// 搜索应用
-  @POST('/api/v2/apps/search')
-  Future<AppSearchResponse> searchApps(@Body() AppSearchRequest request);
+  Future<AppSearchResponse> searchApps(AppSearchRequest request) async {
+    final response = await _dio.post<dynamic>(
+      ApiConstants.buildApiPath('/apps/search'),
+      data: request.toJson(),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return AppSearchResponse.fromJson(data['data'] as Map<String, dynamic>);
+  }
 
   /// 获取应用列表
-  @GET('/api/v2/apps/list')
-  Future<AppListResponse> getAppList();
+  Future<AppListResponse> getAppList() async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/list'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return AppListResponse.fromJson(data['data'] as Map<String, dynamic>);
+  }
 
   /// 获取应用详情
-  @GET('/api/v2/apps/detail/{appId}/{version}/{type}')
-  Future<AppItem> getAppDetail(
-    @Path('appId') String appId,
-    @Path('version') String version,
-    @Path('type') String type,
-  );
+  Future<AppItem> getAppDetail(String appId, String version, String type) async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/detail/$appId/$version/$type'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return AppItem.fromJson(data['data'] as Map<String, dynamic>);
+  }
 
   /// 获取应用详情（通过ID）
-  @GET('/api/v2/apps/details/{id}')
-  Future<AppItem> getAppDetails(@Path('id') String id);
+  Future<AppItem> getAppDetails(String id) async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/details/$id'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return AppItem.fromJson(data['data'] as Map<String, dynamic>);
+  }
 
   /// 检查应用更新
-  @GET('/api/v2/apps/checkupdate')
-  Future<AppUpdateResponse> checkAppUpdate();
+  Future<AppUpdateResponse> checkAppUpdate() async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/checkupdate'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return AppUpdateResponse.fromJson(data['data'] as Map<String, dynamic>);
+  }
 
   /// 获取忽略更新的应用列表
-  @GET('/api/v2/apps/ignored')
-  Future<List<AppInstallInfo>> getIgnoredApps();
+  Future<List<AppInstallInfo>> getIgnoredApps() async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/ignored'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    final list = data['data'] as List;
+    return list.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList();
+  }
 
   /// 检查应用安装
-  @POST('/api/v2/apps/installed/check')
-  Future<AppInstalledCheckResponse> checkAppInstall(@Body() AppInstalledCheckRequest request);
+  Future<AppInstalledCheckResponse> checkAppInstall(AppInstalledCheckRequest request) async {
+    final response = await _dio.post<dynamic>(
+      ApiConstants.buildApiPath('/apps/installed/check'),
+      data: request.toJson(),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return AppInstalledCheckResponse.fromJson(data['data'] as Map<String, dynamic>);
+  }
 
   /// 获取应用安装配置
-  @GET('/api/v2/apps/installed/conf/{appInstallId}')
-  Future<Response<Map<String, dynamic>>> getAppInstallConfig(@Path('appInstallId') String appInstallId);
+  Future<Map<String, dynamic>> getAppInstallConfig(String appInstallId) async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/installed/conf/$appInstallId'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return data['data'] as Map<String, dynamic>;
+  }
 
   /// 更新应用安装配置
-  @PUT('/api/v2/apps/installed/config/update')
-  Future<void> updateAppInstallConfig(@Body() Map<String, dynamic> request);
+  Future<void> updateAppInstallConfig(Map<String, dynamic> request) async {
+    await _dio.put(
+      ApiConstants.buildApiPath('/apps/installed/config/update'),
+      data: request,
+    );
+  }
 
   /// 获取应用连接信息
-  @GET('/api/v2/apps/installed/conninfo/{key}')
-  Future<Response<Map<String, dynamic>>> getAppConnInfo(@Path('key') String key);
+  Future<Map<String, dynamic>> getAppConnInfo(String key) async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/installed/conninfo/$key'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return data['data'] as Map<String, dynamic>;
+  }
 
   /// 检查应用卸载
-  @GET('/api/v2/apps/installed/delete/check/{appInstallId}')
-  Future<Response<Map<String, dynamic>>> checkAppUninstall(@Path('appInstallId') String appInstallId);
+  Future<Map<String, dynamic>> checkAppUninstall(String appInstallId) async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/installed/delete/check/$appInstallId'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return data['data'] as Map<String, dynamic>;
+  }
 
   /// 忽略应用更新
-  @POST('/api/v2/apps/installed/ignore')
-  Future<void> ignoreAppUpdate(@Body() AppInstalledIgnoreUpgradeRequest request);
+  Future<void> ignoreAppUpdate(AppInstalledIgnoreUpgradeRequest request) async {
+    await _dio.post(
+      ApiConstants.buildApiPath('/apps/installed/ignore'),
+      data: request.toJson(),
+    );
+  }
 
   /// 获取已安装应用列表
-  @GET('/api/v2/apps/installed/list')
-  Future<List<AppInstallInfo>> getInstalledApps();
+  Future<List<AppInstallInfo>> getInstalledApps() async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/installed/list'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    final list = data['data'] as List;
+    return list.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList();
+  }
 
   /// 加载应用端口
-  @POST('/api/v2/apps/installed/loadport')
-  Future<int> loadAppPort(@Body() Map<String, dynamic> request);
+  Future<int> loadAppPort(Map<String, dynamic> request) async {
+    final response = await _dio.post<dynamic>(
+      ApiConstants.buildApiPath('/apps/installed/loadport'),
+      data: request,
+    );
+    final data = response.data as Map<String, dynamic>;
+    return data['data'] as int;
+  }
 
   /// 应用操作（启动、停止、重启）
-  @POST('/api/v2/apps/installed/op')
-  Future<void> operateApp(@Body() AppInstalledOperateRequest request);
+  Future<void> operateApp(AppInstalledOperateRequest request) async {
+    await _dio.post(
+      ApiConstants.buildApiPath('/apps/installed/op'),
+      data: request.toJson(),
+    );
+  }
 
   /// 获取应用安装参数
-  @GET('/api/v2/apps/installed/params/{appInstallId}')
-  Future<Response<Map<String, dynamic>>> getAppInstallParams(@Path('appInstallId') String appInstallId);
+  Future<Map<String, dynamic>> getAppInstallParams(String appInstallId) async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/installed/params/$appInstallId'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return data['data'] as Map<String, dynamic>;
+  }
 
   /// 搜索已安装应用
-  @POST('/api/v2/apps/installed/search')
-  Future<PageResult<AppInstallInfo>> searchInstalledApps(@Body() AppInstalledSearchRequest request);
+  Future<PageResult<AppInstallInfo>> searchInstalledApps(AppInstalledSearchRequest request) async {
+    final response = await _dio.post<dynamic>(
+      ApiConstants.buildApiPath('/apps/installed/search'),
+      data: request.toJson(),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return PageResult.fromJson(
+      data['data'] as Map<String, dynamic>,
+      (dynamic item) => AppInstallInfo.fromJson(item as Map<String, dynamic>),
+    );
+  }
 
   /// 同步应用状态
-  @POST('/api/v2/apps/installed/sync')
-  Future<void> syncAppStatus();
+  Future<void> syncAppStatus() async {
+    await _dio.post(
+      ApiConstants.buildApiPath('/apps/installed/sync'),
+    );
+  }
 
   /// 获取应用更新版本列表
-  @GET('/api/v2/apps/installed/update/versions/{appInstallId}')
-  Future<List<AppVersion>> getAppUpdateVersions(@Path('appInstallId') String appInstallId);
+  Future<List<AppVersion>> getAppUpdateVersions(String appInstallId) async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/installed/update/versions/$appInstallId'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    final list = data['data'] as List;
+    return list.map((e) => AppVersion.fromJson(e as Map<String, dynamic>)).toList();
+  }
 
   /// 获取应用服务列表
-  @GET('/api/v2/apps/services/{key}')
-  Future<List<AppServiceResponse>> getAppServices(@Path('key') String key);
+  Future<List<AppServiceResponse>> getAppServices(String key) async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/services/$key'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    final list = data['data'] as List;
+    return list.map((e) => AppServiceResponse.fromJson(e as Map<String, dynamic>)).toList();
+  }
 
   /// 获取应用商店配置
-  @GET('/api/v2/apps/store/config')
-  Future<AppstoreConfigResponse> getAppstoreConfig();
+  Future<AppstoreConfigResponse> getAppstoreConfig() async {
+    final response = await _dio.get<dynamic>(
+      ApiConstants.buildApiPath('/apps/store/config'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return AppstoreConfigResponse.fromJson(data['data'] as Map<String, dynamic>);
+  }
 
   /// 更新应用商店配置
-  @POST('/api/v2/apps/store/update')
-  Future<void> updateAppstoreConfig(@Body() AppstoreUpdateRequest request);
+  Future<void> updateAppstoreConfig(AppstoreUpdateRequest request) async {
+    await _dio.post(
+      ApiConstants.buildApiPath('/apps/store/update'),
+      data: request.toJson(),
+    );
+  }
 
   /// 同步本地应用列表
-  @POST('/api/v2/apps/sync/local')
-  Future<void> syncLocalApps();
+  Future<void> syncLocalApps() async {
+    await _dio.post(
+      ApiConstants.buildApiPath('/apps/sync/local'),
+    );
+  }
 
   /// 同步远程应用列表
-  @POST('/api/v2/apps/sync/remote')
-  Future<void> syncRemoteApps();
+  Future<void> syncRemoteApps() async {
+    await _dio.post(
+      ApiConstants.buildApiPath('/apps/sync/remote'),
+    );
+  }
 }

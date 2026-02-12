@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'config/app_router.dart';
-import 'core/config/api_config.dart';
-import 'core/services/logger/logger_service.dart';
-import 'core/network/dio_client.dart';
-import 'api/v2/ai_v2.dart';
-import 'features/ai/ai_provider.dart';
+import 'package:onepanelapp_app/config/app_router.dart';
+import 'package:onepanelapp_app/core/services/app_settings_controller.dart';
+import 'package:onepanelapp_app/core/theme/app_theme.dart';
+import 'package:onepanelapp_app/l10n/generated/app_localizations.dart';
 
 void main() {
-  // 初始化日志服务
-  appLogger.init();
-
-  // 记录应用启动日志
-  appLogger.i('App 启动');
-
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => AppSettingsController()..load(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -22,104 +20,29 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _initializeProviders(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasData) {
-            return snapshot.data!;
-          } else {
-            return MaterialApp(
-              home: Scaffold(
-                body: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                      const SizedBox(height: 16),
-                      const Text('无法加载配置'),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          // 重新加载应用
-                          runApp(const MyApp());
-                        },
-                        child: const Text('重试'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }
-        } else {
-          return MaterialApp(
-            home: Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text('正在初始化...'),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }
-      },
-    );
-  }
-
-  Future<Widget> _initializeProviders() async {
-    try {
-      // 获取当前配置
-      final config = await ApiConfigManager.getCurrentConfig();
-
-      if (config == null) {
-        // 如果没有配置，返回一个不包含AIProvider的应用
+    return Consumer<AppSettingsController>(
+      builder: (context, settings, _) {
         return MaterialApp(
           title: '1Panel Open',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            useMaterial3: true,
-          ),
-          initialRoute: '/',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.getLightTheme(),
+          darkTheme: AppTheme.getDarkTheme(),
+          themeMode: settings.themeMode,
+          locale: settings.locale,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            Locale('zh'),
+          ],
           onGenerateRoute: AppRouter.generateRoute,
+          initialRoute: AppRoutes.splash,
         );
-      }
-
-      // 创建API客户端
-      final apiClient = DioClient(
-        baseUrl: config.url,
-        apiKey: config.apiKey,
-      );
-
-      // 创建AIV2Api实例
-      final aiV2Api = AIV2Api(apiClient);
-
-      // 创建包含Provider的应用
-      return MultiProvider(
-        providers: [
-          // 创建AIProvider实例
-          ChangeNotifierProvider(
-            create: (context) => AIProvider(aiV2Api),
-          ),
-        ],
-        child: MaterialApp(
-          title: '1Panel Open',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            useMaterial3: true,
-          ),
-          initialRoute: '/',
-          onGenerateRoute: AppRouter.generateRoute,
-        ),
-      );
-    } catch (e) {
-      appLogger.e('初始化Provider失败: $e');
-      rethrow;
-    }
+      },
+    );
   }
 }

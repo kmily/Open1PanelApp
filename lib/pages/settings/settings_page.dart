@@ -1,47 +1,149 @@
 import 'package:flutter/material.dart';
-import 'api_config_page.dart';
-import 'api_test_page.dart';
+import 'package:provider/provider.dart';
+import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
+import 'package:onepanelapp_app/core/services/app_settings_controller.dart';
+import 'package:onepanelapp_app/core/services/onboarding_service.dart';
+import 'package:onepanelapp_app/core/theme/app_design_tokens.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
-
-  @override
-  _SettingsPageState createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
-  int _currentIndex = 0;
-
-  final List<Widget> _pages = [
-    const ApiConfigPage(),
-    const ApiTestPage(),
-  ];
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('设置'),
-      ),
-      body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'API配置',
+      appBar: AppBar(title: Text(l10n.settingsPageTitle)),
+      body: ListView(
+        padding: AppDesignTokens.pagePadding,
+        children: [
+          Text(l10n.settingsGeneral,
+              style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: AppDesignTokens.spacingSm),
+          Card(
+            child: Padding(
+              padding: AppDesignTokens.pagePadding,
+              child: Consumer<AppSettingsController>(
+                builder: (context, settings, _) {
+                  return Column(
+                    children: [
+                      _ThemeSelector(settings: settings),
+                      const Divider(height: 24),
+                      _LanguageSelector(settings: settings),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.api),
-            label: 'API测试',
+          const SizedBox(height: AppDesignTokens.spacingLg),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.dns_outlined),
+                  title: Text(l10n.settingsServerManagement),
+                  onTap: () => Navigator.pushNamed(context, '/server'),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.slideshow_outlined),
+                  title: Text(l10n.settingsResetOnboarding),
+                  onTap: () async {
+                    await OnboardingService().resetAll();
+                    if (!context.mounted) {
+                      return;
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.settingsResetOnboardingDone)),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.info_outline),
+                  title: Text(l10n.settingsAbout),
+                  onTap: () {
+                    showAboutDialog(
+                      context: context,
+                      applicationName: l10n.appName,
+                      applicationVersion: '1.0.0',
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ThemeSelector extends StatelessWidget {
+  const _ThemeSelector({required this.settings});
+
+  final AppSettingsController settings;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Row(
+      children: [
+        Expanded(child: Text(l10n.settingsTheme)),
+        DropdownButton<ThemeMode>(
+          value: settings.themeMode,
+          onChanged: (value) {
+            if (value != null) {
+              settings.updateThemeMode(value);
+            }
+          },
+          items: [
+            DropdownMenuItem(
+                value: ThemeMode.system, child: Text(l10n.themeSystem)),
+            DropdownMenuItem(
+                value: ThemeMode.light, child: Text(l10n.themeLight)),
+            DropdownMenuItem(
+                value: ThemeMode.dark, child: Text(l10n.themeDark)),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _LanguageSelector extends StatelessWidget {
+  const _LanguageSelector({required this.settings});
+
+  final AppSettingsController settings;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final value = settings.locale?.languageCode ?? 'system';
+
+    return Row(
+      children: [
+        Expanded(child: Text(l10n.settingsLanguage)),
+        DropdownButton<String>(
+          value: value,
+          onChanged: (next) {
+            switch (next) {
+              case 'zh':
+                settings.updateLocale(const Locale('zh'));
+                break;
+              case 'en':
+                settings.updateLocale(const Locale('en'));
+                break;
+              default:
+                settings.updateLocale(null);
+            }
+          },
+          items: [
+            DropdownMenuItem(value: 'system', child: Text(l10n.languageSystem)),
+            DropdownMenuItem(value: 'zh', child: Text(l10n.languageZh)),
+            DropdownMenuItem(value: 'en', child: Text(l10n.languageEn)),
+          ],
+        ),
+      ],
     );
   }
 }

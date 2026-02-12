@@ -1,170 +1,80 @@
-/// 应用主题配置
-/// 
-/// 此文件定义应用的主题样式，基于Material You Design 3设计规范。
-/// 包含颜色系统、排版、形状等主题配置。
-
 import 'package:flutter/material.dart';
+import 'app_design_tokens.dart';
 
-/// 1Panel的品牌蓝色作为主色调
 class AppTheme {
-  static const Color primaryBrandColor = Color(0xFF0854C1);
-  static const Color secondaryBrandColor = Color(0xFF03DAC6);
-  static const Color accentColor = Color(0xFFFF4081);
-  static const Color warningColor = Color(0xFFFFC107);
-  static const Color successColor = Color(0xFF4CAF50);
-  static const Color errorColor = Color(0xFFF44336);
+  const AppTheme._();
 
-  /// 获取浅色主题
   static ThemeData getLightTheme() {
-    return ThemeData(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryBrandColor,
-        brightness: Brightness.light,
-      ),
-      useMaterial3: true,
-      appBarTheme: const AppBarTheme(
-        centerTitle: true,
-        elevation: 0,
-      ),
-      cardTheme: CardThemeData(
-        elevation: 1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          minimumSize: const Size(double.infinity, 48),
-        ),
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          minimumSize: const Size(double.infinity, 48),
-        ),
-      ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          minimumSize: const Size(double.infinity, 48),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        filled: true,
-        fillColor: Colors.grey.withValues(alpha: 0.1),
-      ),
-      navigationBarTheme: NavigationBarThemeData(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        indicatorColor: primaryBrandColor.withValues(alpha: 0.1),
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-      ),
-      navigationRailTheme: NavigationRailThemeData(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        indicatorColor: primaryBrandColor.withValues(alpha: 0.1),
-      ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-      ),
-      dialogTheme: DialogThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
-      ),
-      chipTheme: ChipThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
+    final scheme = ColorScheme.fromSeed(
+      seedColor: AppDesignTokens.brand,
+      brightness: Brightness.light,
     );
+
+    return _buildTheme(scheme);
   }
 
-  /// 获取深色主题
   static ThemeData getDarkTheme() {
+    final scheme = ColorScheme.fromSeed(
+      seedColor: AppDesignTokens.brand,
+      brightness: Brightness.dark,
+    );
+
+    return _buildTheme(scheme);
+  }
+
+  static ThemeData _buildTheme(ColorScheme scheme) {
     return ThemeData(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryBrandColor,
-        brightness: Brightness.dark,
-      ),
       useMaterial3: true,
-      appBarTheme: const AppBarTheme(
-        centerTitle: true,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: scheme.surface,
+      appBarTheme: AppBarTheme(
+        centerTitle: false,
         elevation: 0,
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.onSurface,
       ),
       cardTheme: CardThemeData(
-        elevation: 1,
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusLg),
+          side: BorderSide(color: scheme.outlineVariant),
         ),
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
+      navigationBarTheme: NavigationBarThemeData(
+        elevation: 1,
+        indicatorColor: scheme.primaryContainer,
+        backgroundColor: scheme.surface,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusMd),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusMd),
+          borderSide: BorderSide(color: scheme.outlineVariant),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDesignTokens.radiusMd),
           ),
-          minimumSize: const Size(double.infinity, 48),
+          minimumSize: const Size(0, 44),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDesignTokens.radiusMd),
           ),
-          minimumSize: const Size(double.infinity, 48),
-        ),
-      ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          minimumSize: const Size(double.infinity, 48),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        filled: true,
-        fillColor: Colors.grey.withValues(alpha: 0.1),
-      ),
-      navigationBarTheme: NavigationBarThemeData(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        indicatorColor: primaryBrandColor.withValues(alpha: 0.1),
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-      ),
-      navigationRailTheme: NavigationRailThemeData(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        indicatorColor: primaryBrandColor.withValues(alpha: 0.1),
-      ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-      ),
-      dialogTheme: DialogThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
+          minimumSize: const Size(0, 44),
         ),
       ),
       chipTheme: ChipThemeData(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusSm),
         ),
       ),
     );
