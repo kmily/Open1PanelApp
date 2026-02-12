@@ -731,3 +731,81 @@ class SettingsImport extends Equatable {
   @override
   List<Object?> get props => [data, overwrite];
 }
+
+// ==================== MFA相关模型 ====================
+
+/// MFA凭证
+@JsonSerializable()
+class MfaCredential extends Equatable {
+  final String code;
+  final String interval;
+  final String secret;
+
+  const MfaCredential({
+    required this.code,
+    required this.interval,
+    required this.secret,
+  });
+
+  factory MfaCredential.fromJson(Map<String, dynamic> json) => _$MfaCredentialFromJson(json);
+  Map<String, dynamic> toJson() => _$MfaCredentialToJson(this);
+
+  @override
+  List<Object?> get props => [code, interval, secret];
+}
+
+/// MFA OTP响应
+@JsonSerializable()
+class MfaOtp extends Equatable {
+  final String? qrImage;
+  final String? secret;
+
+  const MfaOtp({
+    this.qrImage,
+    this.secret,
+  });
+
+  factory MfaOtp.fromJson(Map<String, dynamic> json) => _$MfaOtpFromJson(json);
+  Map<String, dynamic> toJson() => _$MfaOtpToJson(this);
+
+  @override
+  List<Object?> get props => [qrImage, secret];
+}
+
+/// MFA绑定请求
+@JsonSerializable()
+class MfaBindRequest extends Equatable {
+  final String code;
+  final String interval;
+  final String secret;
+
+  const MfaBindRequest({
+    required this.code,
+    required this.interval,
+    required this.secret,
+  });
+
+  factory MfaBindRequest.fromJson(Map<String, dynamic> json) => _$MfaBindRequestFromJson(json);
+  Map<String, dynamic> toJson() => _$MfaBindRequestToJson(this);
+
+  @override
+  List<Object?> get props => [code, interval, secret];
+}
+
+/// MFA状态
+@JsonSerializable()
+class MfaStatus extends Equatable {
+  final bool enabled;
+  final String? secret;
+
+  const MfaStatus({
+    required this.enabled,
+    this.secret,
+  });
+
+  factory MfaStatus.fromJson(Map<String, dynamic> json) => _$MfaStatusFromJson(json);
+  Map<String, dynamic> toJson() => _$MfaStatusToJson(this);
+
+  @override
+  List<Object?> get props => [enabled, secret];
+}

@@ -814,4 +814,78 @@ class SettingV2Api {
       requestOptions: response.requestOptions,
     );
   }
+
+  // ==================== MFA相关API ====================
+
+  /// 加载MFA信息
+  ///
+  /// 加载MFA密钥和二维码
+  /// @param request MFA凭证请求
+  /// @return MFA OTP信息
+  Future<Response<MfaOtp>> loadMfaInfo(MfaCredential request) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/core/settings/mfa'),
+      data: request.toJson(),
+    );
+    final data = response.data!;
+    return Response(
+      data: MfaOtp.fromJson(data['data'] as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 绑定MFA
+  ///
+  /// 绑定MFA认证
+  /// @param request MFA绑定请求
+  /// @return 绑定结果
+  Future<Response<void>> bindMfa(MfaBindRequest request) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/core/settings/mfa/bind'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: null,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 获取MFA状态
+  ///
+  /// 获取当前用户的MFA启用状态
+  /// @return MFA状态
+  Future<Response<MfaStatus>> getMfaStatus() async {
+    final response = await _client.get<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/core/settings/mfa/status'),
+    );
+    final data = response.data!;
+    return Response(
+      data: MfaStatus.fromJson(data['data'] as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 解绑MFA
+  ///
+  /// 解绑MFA认证
+  /// @param request 解绑请求（包含验证码）
+  /// @return 解绑结果
+  Future<Response<void>> unbindMfa(Map<String, dynamic> request) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/core/settings/mfa/unbind'),
+      data: request,
+    );
+    return Response(
+      data: null,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
 }

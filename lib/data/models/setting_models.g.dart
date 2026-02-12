@@ -453,3 +453,51 @@ Map<String, dynamic> _$SettingsImportToJson(SettingsImport instance) =>
       'data': instance.data,
       'overwrite': instance.overwrite,
     };
+
+MfaCredential _$MfaCredentialFromJson(Map<String, dynamic> json) =>
+    MfaCredential(
+      code: json['code'] as String,
+      interval: json['interval'] as String,
+      secret: json['secret'] as String,
+    );
+
+Map<String, dynamic> _$MfaCredentialToJson(MfaCredential instance) =>
+    <String, dynamic>{
+      'code': instance.code,
+      'interval': instance.interval,
+      'secret': instance.secret,
+    };
+
+MfaOtp _$MfaOtpFromJson(Map<String, dynamic> json) => MfaOtp(
+      qrImage: json['qrImage'] as String?,
+      secret: json['secret'] as String?,
+    );
+
+Map<String, dynamic> _$MfaOtpToJson(MfaOtp instance) => <String, dynamic>{
+      'qrImage': instance.qrImage,
+      'secret': instance.secret,
+    };
+
+MfaBindRequest _$MfaBindRequestFromJson(Map<String, dynamic> json) =>
+    MfaBindRequest(
+      code: json['code'] as String,
+      interval: json['interval'] as String,
+      secret: json['secret'] as String,
+    );
+
+Map<String, dynamic> _$MfaBindRequestToJson(MfaBindRequest instance) =>
+    <String, dynamic>{
+      'code': instance.code,
+      'interval': instance.interval,
+      'secret': instance.secret,
+    };
+
+MfaStatus _$MfaStatusFromJson(Map<String, dynamic> json) => MfaStatus(
+      enabled: json['enabled'] as bool,
+      secret: json['secret'] as String?,
+    );
+
+Map<String, dynamic> _$MfaStatusToJson(MfaStatus instance) => <String, dynamic>{
+      'enabled': instance.enabled,
+      'secret': instance.secret,
+    };
