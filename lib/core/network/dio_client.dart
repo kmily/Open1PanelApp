@@ -10,7 +10,6 @@ import 'interceptors/retry_interceptor.dart';
 /// 基于Dio的HTTP客户端 - 支持1Panel API认证
 class DioClient {
   final Dio _dio;
-  final AppLogger _logger = AppLogger();
   late AuthInterceptor _authInterceptor;
 
   DioClient({String? baseUrl, String? apiKey})
@@ -48,35 +47,66 @@ class DioClient {
     _dio.interceptors.add(RetryInterceptor());
   }
 
-  /// 执行请求并统一处理错误
-  Future<T> _executeRequest<T>(
+  /// 安全日志输出
+  void _safeLog(String level, String message) {
+    try {
+      final logger = AppLogger();
+      switch (level) {
+        case 'd':
+          logger.d(message);
+          break;
+        case 'e':
+          logger.e(message);
+          break;
+        case 'w':
+          logger.w(message);
+          break;
+        default:
+          logger.i(message);
+      }
+    } catch (e) {
+      // 忽略日志错误
+      print('[$level] $message');
+    }
+  }
+
+  /// 执行请求并统一处理错误 - 返回完整Response对象
+  Future<Response<T>> _executeRequest<T>(
     Future<Response<T>> Function() requestFunction,
   ) async {
     try {
       final response = await requestFunction();
-      return response.data!;
+      return response;
     } on DioException catch (e) {
+      _safeLog('e', '[network] DioException: ${e.type}, message: ${e.message}, response: ${e.response?.data}');
       throw _convertException(e);
+    } catch (e) {
+      _safeLog('e', '[network] Unexpected error: $e');
+      throw NetworkConnectionException('请求失败: $e');
     }
   }
 
   /// 转换DioException为自定义异常
   Exception _convertException(DioException e) {
     final statusCode = e.response?.statusCode;
+    final errorMessage = e.message ?? e.toString();
+    final responseData = e.response?.data;
+
+    _safeLog('d', '[network] Converting exception: type=${e.type}, statusCode=$statusCode, message=$errorMessage');
 
     if (e.type == DioExceptionType.connectionError ||
         e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.sendTimeout ||
         e.type == DioExceptionType.receiveTimeout) {
       return NetworkConnectionException(
-        '网络连接失败: ${e.message}',
+        '网络连接失败: $errorMessage',
         requestOptions: e.requestOptions,
       );
     }
 
     if (statusCode == 401) {
       return AuthException(
-        '认证失败',
+        '认证失败: ${responseData ?? errorMessage}',
         requestOptions: e.requestOptions,
         statusCode: statusCode,
       );
@@ -84,21 +114,29 @@ class DioClient {
 
     if (statusCode != null && statusCode >= 500) {
       return ServerException(
-        '服务器错误: ${e.message}',
+        '服务器错误($statusCode): $errorMessage',
+        requestOptions: e.requestOptions,
+        statusCode: statusCode,
+      );
+    }
+
+    if (statusCode != null && statusCode >= 400) {
+      return HttpException(
+        'HTTP错误($statusCode): ${responseData ?? errorMessage}',
         requestOptions: e.requestOptions,
         statusCode: statusCode,
       );
     }
 
     return HttpException(
-      '请求失败: ${e.message}',
+      '请求失败: $errorMessage',
       requestOptions: e.requestOptions,
       statusCode: statusCode,
     );
   }
 
-  /// GET请求
-  Future<T> get<T>(
+  /// GET请求 - 返回完整Response对象
+  Future<Response<T>> get<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
@@ -110,8 +148,8 @@ class DioClient {
     ));
   }
 
-  /// POST请求
-  Future<T> post<T>(
+  /// POST请求 - 返回完整Response对象
+  Future<Response<T>> post<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
@@ -125,8 +163,8 @@ class DioClient {
     ));
   }
 
-  /// PUT请求
-  Future<T> put<T>(
+  /// PUT请求 - 返回完整Response对象
+  Future<Response<T>> put<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
@@ -140,8 +178,8 @@ class DioClient {
     ));
   }
 
-  /// DELETE请求
-  Future<T> delete<T>(
+  /// DELETE请求 - 返回完整Response对象
+  Future<Response<T>> delete<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
@@ -155,8 +193,8 @@ class DioClient {
     ));
   }
 
-  /// PATCH请求
-  Future<T> patch<T>(
+  /// PATCH请求 - 返回完整Response对象
+  Future<Response<T>> patch<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
@@ -171,7 +209,7 @@ class DioClient {
   }
 
   /// 文件上传
-  Future<T> upload<T>(
+  Future<Response<T>> upload<T>(
     String path,
     FormData formData, {
     ProgressCallback? onSendProgress,
@@ -207,7 +245,7 @@ class DioClient {
   /// 更新认证信息
   void updateAuth(String? apiKey) {
     _authInterceptor.updateApiKey(apiKey);
-    _logger.d('[network] Auth updated with new API key');
+    _safeLog('d', '[network] Auth updated with new API key');
   }
 
   /// 获取Dio实例（用于高级用法）

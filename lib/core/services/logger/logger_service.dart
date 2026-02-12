@@ -9,11 +9,15 @@ class AppLogger {
   factory AppLogger() => _instance;
   AppLogger._internal();
 
-  late Logger _logger;
+  Logger? _logger;
   static const String _defaultPackageName = '[core.services]';
+  bool _initialized = false;
 
   /// 初始化日志服务
   void init() {
+    if (_initialized) return;
+    _initialized = true;
+    
     // 根据构建模式设置日志级别
     Level logLevel;
     
@@ -40,6 +44,13 @@ class AppLogger {
       level: logLevel,
       filter: _CustomLogFilter(),
     );
+  }
+
+  /// 确保日志器已初始化
+  void _ensureInitialized() {
+    if (_logger == null) {
+      init();
+    }
   }
 
   /// 输出Trace级别日志
@@ -78,79 +89,9 @@ class AppLogger {
     _logMessage(Level.fatal, '【Open1PanelMobile】$message', error: error, stackTrace: stackTrace);
   }
 
-  /// 输出带包名的Trace级别日志
-  void tWithPackage(String packageName, dynamic message, {dynamic error, StackTrace? stackTrace}) {
-    if (!kReleaseMode) {
-      _logMessage(Level.trace, '【Open1PanelMobile】[$packageName] $message', error: error, stackTrace: stackTrace);
-    }
-  }
-
-  /// 输出带包名的Debug级别日志
-  void dWithPackage(String packageName, dynamic message, {dynamic error, StackTrace? stackTrace}) {
-    if (!kReleaseMode) {
-      _logMessage(Level.debug, '【Open1PanelMobile】[$packageName] $message', error: error, stackTrace: stackTrace);
-    }
-  }
-
-  /// 输出带包名的Info级别日志
-  void iWithPackage(String packageName, dynamic message, {dynamic error, StackTrace? stackTrace}) {
-    if (!kReleaseMode) {
-      _logMessage(Level.info, '【Open1PanelMobile】[$packageName] $message', error: error, stackTrace: stackTrace);
-    }
-  }
-
-  /// 输出带包名的Warning级别日志
-  void wWithPackage(String packageName, dynamic message, {dynamic error, StackTrace? stackTrace}) {
-    _logMessage(Level.warning, '【Open1PanelMobile】[$packageName] $message', error: error, stackTrace: stackTrace);
-  }
-
-  /// 输出带包名的Error级别日志
-  void eWithPackage(String packageName, dynamic message, {dynamic error, StackTrace? stackTrace}) {
-    _logMessage(Level.error, '【Open1PanelMobile】[$packageName] $message', error: error, stackTrace: stackTrace);
-  }
-
-  /// 输出带包名的Fatal级别日志
-  void fWithPackage(String packageName, dynamic message, {dynamic error, StackTrace? stackTrace}) {
-    _logMessage(Level.fatal, '【Open1PanelMobile】[$packageName] $message', error: error, stackTrace: stackTrace);
-  }
-
-  /// 统一日志输出方法，包含过滤逻辑
   void _logMessage(Level level, dynamic message, {dynamic error, StackTrace? stackTrace}) {
-    final messageStr = message.toString();
-    
-    // 检查是否需要过滤此日志
-    if (LoggerConfig.shouldFilterLog(messageStr)) {
-      return;
-    }
-    
-    // 如果消息不包含包名，则添加默认包名
-    final formattedMessage = messageStr.startsWith('[') && messageStr.contains(']') 
-        ? messageStr 
-        : '$_defaultPackageName $messageStr';
-    
-    // 根据日志级别调用相应的日志方法
-    switch (level) {
-      case Level.trace:
-        _logger.t(formattedMessage, error: error, stackTrace: stackTrace);
-        break;
-      case Level.debug:
-        _logger.d(formattedMessage, error: error, stackTrace: stackTrace);
-        break;
-      case Level.info:
-        _logger.i(formattedMessage, error: error, stackTrace: stackTrace);
-        break;
-      case Level.warning:
-        _logger.w(formattedMessage, error: error, stackTrace: stackTrace);
-        break;
-      case Level.error:
-        _logger.e(formattedMessage, error: error, stackTrace: stackTrace);
-        break;
-      case Level.fatal:
-        _logger.f(formattedMessage, error: error, stackTrace: stackTrace);
-        break;
-      default:
-        _logger.i(formattedMessage, error: error, stackTrace: stackTrace);
-    }
+    _ensureInitialized();
+    _logger?.log(level, message, error: error, stackTrace: stackTrace);
   }
 }
 
@@ -158,15 +99,11 @@ class AppLogger {
 class _CustomLogFilter extends LogFilter {
   @override
   bool shouldLog(LogEvent event) {
-    // 检查是否需要过滤此日志
-    if (LoggerConfig.shouldFilterLog(event.message.toString())) {
-      return false;
+    // 在Release模式下只输出warning及以上级别
+    if (kReleaseMode) {
+      return event.level.index >= Level.warning.index;
     }
-    
-    // 默认返回true，允许所有未被过滤的日志
+    // 在其他模式下输出所有日志
     return true;
   }
 }
-
-/// 全局日志实例
-final appLogger = AppLogger();

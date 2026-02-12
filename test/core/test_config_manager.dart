@@ -13,7 +13,7 @@ class TestConfigManager {
   static final TestConfigManager _instance = TestConfigManager._internal();
   static TestConfigManager get instance => _instance;
 
-  late final Map<String, String> _config;
+  Map<String, String> _config = {};
   bool _initialized = false;
 
   TestConfigManager._internal();
@@ -108,12 +108,19 @@ class TestConfigManager {
 }
 
 class TestEnvironment {
-  static late final TestConfigManager config;
+  static TestConfigManager? _config;
 
   static Future<void> initialize() async {
-    config = TestConfigManager.instance;
-    await config.initialize();
-    config.validate();
+    _config = TestConfigManager.instance;
+    await _config!.initialize();
+    _config!.validate();
+  }
+
+  static TestConfigManager get config {
+    if (_config == null) {
+      throw StateError('TestEnvironment not initialized. Call TestEnvironment.initialize() first.');
+    }
+    return _config!;
   }
 
   static String get baseUrl => config.getString('PANEL_BASE_URL', defaultValue: 'http://localhost:9999');
@@ -151,6 +158,9 @@ class TestEnvironment {
   }
 
   static String? skipNoApiKey() {
+    if (_config == null || !_config!.isInitialized) {
+      return 'TestEnvironment not initialized';
+    }
     if (apiKey.isEmpty || apiKey == 'your_api_key_here') {
       return 'API key not configured (set PANEL_API_KEY in .env)';
     }
