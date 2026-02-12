@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import '../../services/logger_service.dart';
+import '../../services/logger/logger_service.dart';
 
 /// 简化的日志拦截器
 class LoggingInterceptor extends Interceptor {
   final bool enabled;
-  final Logger _logger = appLogger;
+  final AppLogger _logger = AppLogger();
 
   LoggingInterceptor([this.enabled = true]);
 

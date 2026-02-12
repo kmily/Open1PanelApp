@@ -295,6 +295,38 @@ class AppInstalledCheckResponse {
   Map<String, dynamic> toJson() => _$AppInstalledCheckResponseToJson(this);
 }
 
+/// 应用已安装检查请求模型
+@JsonSerializable()
+class AppInstalledCheckRequest {
+  final String appId;
+  final String version;
+  final String type;
+
+  AppInstalledCheckRequest({
+    required this.appId,
+    required this.version,
+    required this.type,
+  });
+
+  factory AppInstalledCheckRequest.fromJson(Map<String, dynamic> json) => _$AppInstalledCheckRequestFromJson(json);
+  Map<String, dynamic> toJson() => _$AppInstalledCheckRequestToJson(this);
+}
+
+/// 应用已安装忽略更新请求模型
+@JsonSerializable()
+class AppInstalledIgnoreUpgradeRequest {
+  final int appInstallId;
+  final String reason;
+
+  AppInstalledIgnoreUpgradeRequest({
+    required this.appInstallId,
+    required this.reason,
+  });
+
+  factory AppInstalledIgnoreUpgradeRequest.fromJson(Map<String, dynamic> json) => _$AppInstalledIgnoreUpgradeRequestFromJson(json);
+  Map<String, dynamic> toJson() => _$AppInstalledIgnoreUpgradeRequestToJson(this);
+}
+
 /// 应用安装操作请求模型
 @JsonSerializable()
 class AppInstalledOperateRequest {
@@ -461,76 +493,6 @@ class AppUpdateResponse {
 
   factory AppUpdateResponse.fromJson(Map<String, dynamic> json) => _$AppUpdateResponseFromJson(json);
   Map<String, dynamic> toJson() => _$AppUpdateResponseToJson(this);
-}
-
-/// 应用安装创建请求模型
-@JsonSerializable()
-class AppInstallCreateRequest {
-  final String appId;
-  final String version;
-  final String type;
-  final Map<String, dynamic>? params;
-
-  AppInstallCreateRequest({
-    required this.appId,
-    required this.version,
-    required this.type,
-    this.params,
-  });
-
-  factory AppInstallCreateRequest.fromJson(Map<String, dynamic> json) => _$AppInstallCreateRequestFromJson(json);
-  Map<String, dynamic> toJson() => _$AppInstallCreateRequestToJson(this);
-}
-
-/// 应用已安装检查请求模型
-@JsonSerializable()
-class AppInstalledCheckRequest {
-  final String appId;
-  final String version;
-  final String type;
-
-  AppInstalledCheckRequest({
-    required this.appId,
-    required this.version,
-    required this.type,
-  });
-
-  factory AppInstalledCheckRequest.fromJson(Map<String, dynamic> json) => _$AppInstalledCheckRequestFromJson(json);
-  Map<String, dynamic> toJson() => _$AppInstalledCheckRequestToJson(this);
-}
-
-/// 应用已安装忽略更新请求模型
-@JsonSerializable()
-class AppInstalledIgnoreUpgradeRequest {
-  final int appInstallId;
-  final String reason;
-
-  AppInstalledIgnoreUpgradeRequest({
-    required this.appInstallId,
-    required this.reason,
-  });
-
-  factory AppInstalledIgnoreUpgradeRequest.fromJson(Map<String, dynamic> json) => _$AppInstalledIgnoreUpgradeRequestFromJson(json);
-  Map<String, dynamic> toJson() => _$AppInstalledIgnoreUpgradeRequestToJson(this);
-}
-
-/// 应用已安装操作请求模型
-@JsonSerializable()
-class AppInstalledOperateRequest {
-  final int installId;
-  final String operation;
-  final bool? force;
-  final Map<String, dynamic>? params;
-
-  AppInstalledOperateRequest({
-    required this.installId,
-    required this.operation,
-    this.force,
-    this.params,
-  });
-
-  factory AppInstalledOperateRequest.fromJson(Map<String, dynamic> json) => _$AppInstalledOperateRequestFromJson(json);
-  Map<String, dynamic> toJson() => _$AppInstalledOperateRequestToJson(this);
 }
 
 /// 应用版本模型

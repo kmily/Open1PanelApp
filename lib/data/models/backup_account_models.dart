@@ -358,7 +358,7 @@ class CommonRecover extends CommonBackup {
     super.name,
     super.secret,
     super.taskID,
-    super.type,
+    super.type = '',
     this.backupRecordID,
     this.file,
     this.downloadAccountID,

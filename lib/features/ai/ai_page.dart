@@ -73,7 +73,7 @@ class OllamaModelPage extends StatelessWidget {
     } catch (e) {
       appLogger.eWithPackage('ai.model', '获取AIProvider失败: $e');
       final localizations = AppLocalizations.of(context)!;
-      return _buildErrorPage(localizations.configLoadError);
+      return _buildErrorPage(localizations.configLoadError, context);
     }
   }
 
@@ -225,7 +225,8 @@ class OllamaModelPage extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorPage(String errorMessage) {
+  Widget _buildErrorPage(String errorMessage, BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       body: Center(
         child: Column(
@@ -516,212 +517,34 @@ class GpuInfoPage extends StatelessWidget {
 }
 
 /// 域名绑定页面
-class DomainBindingPage extends StatefulWidget {
+class DomainBindingPage extends StatelessWidget {
   const DomainBindingPage({super.key});
-
-  @override
-  State<DomainBindingPage> createState() => _DomainBindingPageState();
-}
-
-class _DomainBindingPageState extends State<DomainBindingPage> {
-  final ApiService _apiService = ApiService();
-  List<DomainBinding> _domainBindings = [];
-  bool _isLoading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadDomainBindings();
-  }
-
-  Future<void> _loadDomainBindings() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final response = await _apiService.get('/ai/domain-bindings');
-      setState(() {
-        _domainBindings = (response['data'] as List)
-            .map((item) => DomainBinding.fromJson(item))
-            .toList();
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(localizations.domainBinding),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null
-              ? _buildErrorPage(context, localizations)
-              : _buildDomainBindingList(context, localizations),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showBindDomainDialog(context, localizations),
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  Widget _buildErrorPage(BuildContext context, AppLocalizations localizations) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(_error ?? localizations.unknownError),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _loadDomainBindings,
-            child: Text(localizations.retry),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDomainBindingList(BuildContext context, AppLocalizations localizations) {
-    if (_domainBindings.isEmpty) {
-      return Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(localizations.notFound + ' ' + localizations.domainBinding),
+            const Icon(Icons.domain, size: 64, color: Colors.grey),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => _showBindDomainDialog(context, localizations),
-              child: Text(localizations.domainBinding),
+            Text(
+              '域名绑定功能开发中',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '请使用AIProvider中的bindDomain方法',
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
         ),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: _domainBindings.length,
-      itemBuilder: (context, index) {
-        final binding = _domainBindings[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: ListTile(
-            title: Text(binding.domain),
-            subtitle: Text('${localizations.appId}: ${binding.appId}'),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () => _showDeleteBindingDialog(context, binding, localizations),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showBindDomainDialog(BuildContext context, AppLocalizations localizations) {
-    final TextEditingController _domainController = TextEditingController();
-    final TextEditingController _appIdController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(localizations.domainBinding),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _domainController,
-              decoration: InputDecoration(
-                labelText: localizations.domain,
-                hintText: 'example.com',
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _appIdController,
-              decoration: InputDecoration(
-                labelText: '${localizations.appId} *',
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(localizations.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final domain = _domainController.text.trim();
-              final appId = _appIdController.text.trim();
-
-              if (domain.isEmpty || appId.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(localizations.requiredFields)),
-                );
-                return;
-              }
-
-              try {
-                await _apiService.post('/ai/domain-bindings', {
-                  'domain': domain,
-                  'app_id': appId,
-                });
-                Navigator.pop(context);
-                _loadDomainBindings();
-              } catch (e) {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(e.toString())),
-                );
-              }
-            },
-            child: Text(localizations.bind),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDeleteBindingDialog(
-      BuildContext context, DomainBinding binding, AppLocalizations localizations) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(localizations.delete),
-        content: Text('${localizations.confirm} ${localizations.delete} ${binding.domain}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(localizations.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              try {
-                await _apiService.delete('/ai/domain-bindings/${binding.id}');
-                Navigator.pop(context);
-                _loadDomainBindings();
-              } catch (e) {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(e.toString())),
-                );
-              }
-            },
-            child: Text(localizations.delete),
-          ),
-        ],
       ),
     );
   }

@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
-import '../../services/logger_service.dart';
+import '../../services/logger/logger_service.dart';
 
 /// 简化的重试拦截器
 class RetryInterceptor extends Interceptor {
   final int maxRetries;
   final List<Duration> retryDelays;
-  final Logger _logger = appLogger;
+  final AppLogger _logger = AppLogger();
 
   RetryInterceptor({
     this.maxRetries = 3,
@@ -33,10 +33,10 @@ class RetryInterceptor extends Interceptor {
       );
 
       try {
-        final response = await Dio(newOptions).fetch(newOptions);
+        final response = await Dio().fetch(newOptions);
         handler.resolve(response);
         return;
-      } catch (e) {
+      } on DioException catch (e) {
         handler.next(e);
         return;
       }

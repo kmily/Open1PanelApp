@@ -39,12 +39,12 @@ class _ServerConfigPageState extends State<ServerConfigPage> {
     });
 
     try {
-      final apiClient = ApiClient(
+      final apiClient = DioClient(
         baseUrl: _urlController.text,
         apiKey: _apiKeyController.text,
       );
 
-      final response = await apiClient.dio.get('/dashboard/base/os');
+      final response = await apiClient.get('/dashboard/base/os');
       
       setState(() {
         _testResult = '连接成功!\n\n状态码: ${response.statusCode}\n\n响应数据:\n${_formatJson(response.data)}';

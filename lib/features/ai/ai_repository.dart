@@ -23,18 +23,18 @@ class AIRepository {
   /// @param websiteId 网站ID
   /// @return 绑定结果
   Future<Response> bindDomain({
-    required String appInstallId,
-    String? domain,
-    List<String>? ipList,
-    String? sslId,
-    String? websiteId,
+    required int appInstallID,
+    required String domain,
+    String? ipList,
+    int? sslID,
+    int? websiteID,
   }) async {
     final request = OllamaBindDomain(
-      appInstallId: appInstallId,
+      appInstallID: appInstallID,
       domain: domain,
       ipList: ipList,
-      sslId: sslId,
-      websiteId: websiteId,
+      sslID: sslID,
+      websiteID: websiteID,
     );
     return await _api.bindDomain(request);
   }
@@ -42,12 +42,12 @@ class AIRepository {
   /// 获取绑定域名
   /// 
   /// 获取当前AI服务绑定的域名信息
-  /// @param appInstallId 应用安装ID
+  /// @param appInstallID 应用安装ID
   /// @return 域名信息
   Future<OllamaBindDomainRes> getBindDomain({
-    required String appInstallId,
+    required int appInstallID,
   }) async {
-    final request = OllamaBindDomainReq(appInstallId: appInstallId);
+    final request = OllamaBindDomainReq(appInstallID: appInstallID);
     final response = await _api.getBindDomain(request);
     return response.data!;
   }
@@ -65,15 +65,15 @@ class AIRepository {
   /// 
   /// 创建一个新的Ollama模型
   /// @param name 模型名称
-  /// @param taskId 任务ID
+  /// @param taskID 任务ID
   /// @return 创建结果
   Future<Response> createOllamaModel({
     required String name,
-    String? taskId,
+    String? taskID,
   }) async {
     final request = OllamaModelName(
       name: name,
-      taskId: taskId,
+      taskID: taskID,
     );
     return await _api.createOllamaModel(request);
   }
@@ -82,15 +82,15 @@ class AIRepository {
   /// 
   /// 关闭指定Ollama模型的连接
   /// @param name 模型名称
-  /// @param taskId 任务ID
+  /// @param taskID 任务ID
   /// @return 操作结果
   Future<Response> closeOllamaModel({
     required String name,
-    String? taskId,
+    String? taskID,
   }) async {
     final request = OllamaModelName(
       name: name,
-      taskId: taskId,
+      taskID: taskID,
     );
     return await _api.closeOllamaModel(request);
   }
@@ -113,36 +113,36 @@ class AIRepository {
   }
 
   /// 加载Ollama模型
-  /// 
+  ///
   /// 加载指定的Ollama模型
   /// @param name 模型名称
-  /// @param taskId 任务ID
+  /// @param taskID 任务ID
   /// @return 加载结果
   Future<String> loadOllamaModel({
     required String name,
-    String? taskId,
+    String? taskID,
   }) async {
     final request = OllamaModelName(
       name: name,
-      taskId: taskId,
+      taskID: taskID,
     );
     final response = await _api.loadOllamaModel(request);
     return response.data!;
   }
 
   /// 重新创建Ollama模型
-  /// 
+  ///
   /// 重新创建指定的Ollama模型
   /// @param name 模型名称
-  /// @param taskId 任务ID
+  /// @param taskID 任务ID
   /// @return 创建结果
   Future<Response> recreateOllamaModel({
     required String name,
-    String? taskId,
+    String? taskID,
   }) async {
     final request = OllamaModelName(
       name: name,
-      taskId: taskId,
+      taskID: taskID,
     );
     return await _api.recreateOllamaModel(request);
   }

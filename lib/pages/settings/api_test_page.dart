@@ -64,13 +64,12 @@ class _ApiTestPageState extends State<ApiTestPage> {
     });
 
     try {
-      final apiClient = ApiClientManager().getClient(
-        'test',
-        _currentConfig!.url,
-        _currentConfig!.apiKey,
+      final apiClient = DioClient(
+        baseUrl: _currentConfig!.url,
+        apiKey: _currentConfig!.apiKey,
       );
 
-      final response = await apiClient.dio.get(_selectedEndpoint);
+      final response = await apiClient.get(_selectedEndpoint);
       
       setState(() {
         _testResult = '请求成功!\n\n状态码: ${response.statusCode}\n\n响应数据:\n${_formatJson(response.data)}';

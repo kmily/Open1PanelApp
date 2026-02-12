@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
-import '../../services/logger_service.dart';
+import '../../services/logger/logger_service.dart';
 import '../../config/api_constants.dart';
 
 /// 1Panel API认证拦截器 - 严格按照服务器端认证要求实现
 class AuthInterceptor extends Interceptor {
-  final Logger _logger = appLogger;
+  final AppLogger _logger = AppLogger();
   String? _apiKey;
 
   AuthInterceptor([String? apiKey]) : _apiKey = apiKey;

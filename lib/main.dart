@@ -3,16 +3,17 @@ import 'package:provider/provider.dart';
 import 'config/app_router.dart';
 import 'core/config/api_config.dart';
 import 'core/services/logger/logger_service.dart';
-import 'core/network/api_client.dart';
+import 'core/network/dio_client.dart';
+import 'api/v2/ai_v2.dart';
 import 'features/ai/ai_provider.dart';
 
 void main() {
   // 初始化日志服务
   appLogger.init();
-  
+
   // 记录应用启动日志
   appLogger.i('App 启动');
-  
+
   runApp(const MyApp());
 }
 
@@ -75,7 +76,7 @@ class MyApp extends StatelessWidget {
     try {
       // 获取当前配置
       final config = await ApiConfigManager.getCurrentConfig();
-      
+
       if (config == null) {
         // 如果没有配置，返回一个不包含AIProvider的应用
         return MaterialApp(
@@ -88,16 +89,16 @@ class MyApp extends StatelessWidget {
           onGenerateRoute: AppRouter.generateRoute,
         );
       }
-      
+
       // 创建API客户端
-      final apiClient = ApiClient(
+      final apiClient = DioClient(
         baseUrl: config.url,
         apiKey: config.apiKey,
       );
-      
+
       // 创建AIV2Api实例
       final aiV2Api = AIV2Api(apiClient);
-      
+
       // 创建包含Provider的应用
       return MultiProvider(
         providers: [

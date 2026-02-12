@@ -463,6 +463,8 @@ class ContainerSearch extends Equatable {
 
 /// Container Compose Log Search Model
 class ContainerComposeLogSearch extends Equatable {
+  final int? composeId;
+  final int? lines;
   final String? name;
   final String? since;
   final String? tail;
@@ -470,6 +472,8 @@ class ContainerComposeLogSearch extends Equatable {
   final String? container;
 
   const ContainerComposeLogSearch({
+    this.composeId,
+    this.lines,
     this.name,
     this.since,
     this.tail,
@@ -479,6 +483,8 @@ class ContainerComposeLogSearch extends Equatable {
 
   factory ContainerComposeLogSearch.fromJson(Map<String, dynamic> json) {
     return ContainerComposeLogSearch(
+      composeId: json['composeId'] as int?,
+      lines: json['lines'] as int?,
       name: json['name'] as String?,
       since: json['since'] as String?,
       tail: json['tail'] as String?,
@@ -489,6 +495,8 @@ class ContainerComposeLogSearch extends Equatable {
 
   Map<String, dynamic> toJson() {
     return {
+      'composeId': composeId,
+      'lines': lines,
       'name': name,
       'since': since,
       'tail': tail,
@@ -498,17 +506,19 @@ class ContainerComposeLogSearch extends Equatable {
   }
 
   @override
-  List<Object?> get props => [name, since, tail, follow, container];
+  List<Object?> get props => [composeId, lines, name, since, tail, follow, container];
 }
 
 /// Container Compose Config Update Model
 class ContainerComposeConfigUpdate extends Equatable {
+  final String? id;
   final String name;
   final String content;
   final String? path;
   final String? description;
 
   const ContainerComposeConfigUpdate({
+    this.id,
     required this.name,
     required this.content,
     this.path,
@@ -517,6 +527,7 @@ class ContainerComposeConfigUpdate extends Equatable {
 
   factory ContainerComposeConfigUpdate.fromJson(Map<String, dynamic> json) {
     return ContainerComposeConfigUpdate(
+      id: json['id'] as String?,
       name: json['name'] as String,
       content: json['content'] as String,
       path: json['path'] as String?,
@@ -526,6 +537,7 @@ class ContainerComposeConfigUpdate extends Equatable {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'content': content,
       'path': path,
@@ -534,7 +546,7 @@ class ContainerComposeConfigUpdate extends Equatable {
   }
 
   @override
-  List<Object?> get props => [name, content, path, description];
+  List<Object?> get props => [id, name, content, path, description];
 }
 
 /// Container Compose Status Model

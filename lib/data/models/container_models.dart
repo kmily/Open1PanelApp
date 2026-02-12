@@ -1133,7 +1133,7 @@ class ContainerComposeLog extends Equatable {
   final String id;
   final String composeName;
   final String? level;
-  final String message;
+  final String? message;
   final String? createTime;
   final String? containerName;
   final String? operation;

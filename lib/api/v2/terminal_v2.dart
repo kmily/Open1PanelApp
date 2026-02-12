@@ -18,13 +18,13 @@ class TerminalV2Api {
   /// 创建一个新的终端会话
   /// @param request 终端会话创建请求
   /// @return 会话信息
-  Future<Response<TerminalSession>> createTerminalSession(TerminalSessionCreate request) async {
+  Future<Response<TerminalSessionInfo>> createTerminalSession(TerminalSessionCreate request) async {
     final response = await _client.post(
       ApiConstants.buildApiPath('/terminal/sessions'),
       data: request.toJson(),
     );
     return Response(
-      data: TerminalSession.fromJson(response.data as Map<String, dynamic>),
+      data: TerminalSessionInfo.fromJson(response.data as Map<String, dynamic>),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -35,13 +35,13 @@ class TerminalV2Api {
   ///
   /// 获取所有终端会话列表
   /// @return 会话列表
-  Future<Response<List<TerminalSession>>> getTerminalSessions() async {
+  Future<Response<List<TerminalSessionInfo>>> getTerminalSessions() async {
     final response = await _client.get(
       ApiConstants.buildApiPath('/terminal/sessions'),
     );
     return Response(
       data: (response.data as List?)
-          ?.map((item) => TerminalSession.fromJson(item as Map<String, dynamic>))
+          ?.map((item) => TerminalSessionInfo.fromJson(item as Map<String, dynamic>))
           .toList() ?? [],
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
@@ -54,12 +54,12 @@ class TerminalV2Api {
   /// 获取指定终端会话的详细信息
   /// @param sessionId 会话ID
   /// @return 会话详情
-  Future<Response<TerminalSession>> getTerminalSessionDetail(String sessionId) async {
+  Future<Response<TerminalSessionInfo>> getTerminalSessionDetail(String sessionId) async {
     final response = await _client.get(
       ApiConstants.buildApiPath('/terminal/sessions/$sessionId'),
     );
     return Response(
-      data: TerminalSession.fromJson(response.data as Map<String, dynamic>),
+      data: TerminalSessionInfo.fromJson(response.data as Map<String, dynamic>),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -69,10 +69,13 @@ class TerminalV2Api {
   /// 删除终端会话
   ///
   /// 删除指定的终端会话
-  /// @param sessionIds 会话ID列表
+  /// @param sessionId 会话ID
   /// @return 删除结果
-  Future<Response> deleteTerminalSession(List<String> sessionIds) async {
-    final operation = TerminalSessionOperate(sessionIds: sessionIds, operation: 'delete');
+  Future<Response> deleteTerminalSession(String sessionId) async {
+    final operation = TerminalSessionOperate(
+      sessionId: sessionId,
+      operation: 'delete',
+    );
     return await _client.post(
       ApiConstants.buildApiPath('/terminal/sessions/delete'),
       data: operation.toJson(),
@@ -86,7 +89,7 @@ class TerminalV2Api {
   /// @return 执行结果
   Future<Response<TerminalCommandResult>> executeTerminalCommand(TerminalCommandExecute request) async {
     final response = await _client.post(
-      ApiConstants.buildApiPath('/terminal/sessions/${request.sessionId}/execute'),
+      ApiConstants.buildApiPath('/terminal/command'),
       data: request.toJson(),
     );
     return Response(
@@ -98,7 +101,7 @@ class TerminalV2Api {
   }
 
   /// 获取终端输出
-  /// 
+  ///
   /// 获取指定终端会话的输出
   /// @param sessionId 会话ID
   /// @param lines 输出行数（可选，默认为100）
@@ -111,7 +114,7 @@ class TerminalV2Api {
   }
 
   /// 发送输入到终端
-  /// 
+  ///
   /// 发送输入到指定的终端会话
   /// @param sessionId 会话ID
   /// @param input 输入内容
@@ -127,7 +130,7 @@ class TerminalV2Api {
   }
 
   /// 调整终端大小
-  /// 
+  ///
   /// 调整指定终端会话的大小
   /// @param sessionId 会话ID
   /// @param rows 行数
@@ -146,7 +149,7 @@ class TerminalV2Api {
   }
 
   /// 获取终端历史记录
-  /// 
+  ///
   /// 获取指定终端会话的历史记录
   /// @param sessionId 会话ID
   /// @param limit 记录数量限制（可选，默认为100）
@@ -159,7 +162,7 @@ class TerminalV2Api {
   }
 
   /// 清除终端历史记录
-  /// 
+  ///
   /// 清除指定终端会话的历史记录
   /// @param sessionId 会话ID
   /// @return 清除结果
@@ -168,7 +171,7 @@ class TerminalV2Api {
   }
 
   /// 获取终端状态
-  /// 
+  ///
   /// 获取指定终端会话的状态
   /// @param sessionId 会话ID
   /// @return 终端状态
@@ -177,7 +180,7 @@ class TerminalV2Api {
   }
 
   /// 重命名终端会话
-  /// 
+  ///
   /// 重命名指定的终端会话
   /// @param sessionId 会话ID
   /// @param name 新名称
@@ -193,7 +196,7 @@ class TerminalV2Api {
   }
 
   /// 获取终端文件列表
-  /// 
+  ///
   /// 获取指定终端会话的文件列表
   /// @param sessionId 会话ID
   /// @param path 路径（可选，默认为当前目录）
@@ -206,7 +209,7 @@ class TerminalV2Api {
   }
 
   /// 上传文件到终端
-  /// 
+  ///
   /// 上传文件到指定的终端会话
   /// @param sessionId 会话ID
   /// @param filePath 文件路径
@@ -225,7 +228,7 @@ class TerminalV2Api {
   }
 
   /// 从终端下载文件
-  /// 
+  ///
   /// 从指定的终端会话下载文件
   /// @param sessionId 会话ID
   /// @param filePath 文件路径
@@ -241,7 +244,7 @@ class TerminalV2Api {
   }
 
   /// 获取终端进程列表
-  /// 
+  ///
   /// 获取指定终端会话的进程列表
   /// @param sessionId 会话ID
   /// @return 进程列表
@@ -250,7 +253,7 @@ class TerminalV2Api {
   }
 
   /// 终止终端进程
-  /// 
+  ///
   /// 终止指定终端会话的进程
   /// @param sessionId 会话ID
   /// @param processId 进程ID
@@ -266,7 +269,7 @@ class TerminalV2Api {
   }
 
   /// 获取终端配置
-  /// 
+  ///
   /// 获取终端配置信息
   /// @return 终端配置
   Future<Response> getTerminalConfig() async {
@@ -274,7 +277,7 @@ class TerminalV2Api {
   }
 
   /// 更新终端配置
-  /// 
+  ///
   /// 更新终端配置
   /// @param config 终端配置
   /// @return 更新结果
@@ -283,7 +286,7 @@ class TerminalV2Api {
   }
 
   /// 获取终端主题
-  /// 
+  ///
   /// 获取可用的终端主题列表
   /// @return 主题列表
   Future<Response> getTerminalThemes() async {
@@ -291,7 +294,7 @@ class TerminalV2Api {
   }
 
   /// 设置终端主题
-  /// 
+  ///
   /// 设置终端主题
   /// @param theme 主题名称
   /// @return 设置结果
@@ -303,7 +306,7 @@ class TerminalV2Api {
   }
 
   /// 获取终端字体
-  /// 
+  ///
   /// 获取可用的终端字体列表
   /// @return 字体列表
   Future<Response> getTerminalFonts() async {
@@ -311,7 +314,7 @@ class TerminalV2Api {
   }
 
   /// 设置终端字体
-  /// 
+  ///
   /// 设置终端字体
   /// @param font 字体名称
   /// @param fontSize 字体大小（可选）

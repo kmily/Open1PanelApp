@@ -276,6 +276,36 @@ Map<String, dynamic> _$AppInstalledCheckResponseToJson(
       'message': instance.message,
     };
 
+AppInstalledCheckRequest _$AppInstalledCheckRequestFromJson(
+        Map<String, dynamic> json) =>
+    AppInstalledCheckRequest(
+      appId: json['appId'] as String,
+      version: json['version'] as String,
+      type: json['type'] as String,
+    );
+
+Map<String, dynamic> _$AppInstalledCheckRequestToJson(
+        AppInstalledCheckRequest instance) =>
+    <String, dynamic>{
+      'appId': instance.appId,
+      'version': instance.version,
+      'type': instance.type,
+    };
+
+AppInstalledIgnoreUpgradeRequest _$AppInstalledIgnoreUpgradeRequestFromJson(
+        Map<String, dynamic> json) =>
+    AppInstalledIgnoreUpgradeRequest(
+      appInstallId: (json['appInstallId'] as num).toInt(),
+      reason: json['reason'] as String,
+    );
+
+Map<String, dynamic> _$AppInstalledIgnoreUpgradeRequestToJson(
+        AppInstalledIgnoreUpgradeRequest instance) =>
+    <String, dynamic>{
+      'appInstallId': instance.appInstallId,
+      'reason': instance.reason,
+    };
+
 AppInstalledOperateRequest _$AppInstalledOperateRequestFromJson(
         Map<String, dynamic> json) =>
     AppInstalledOperateRequest(
@@ -430,72 +460,6 @@ Map<String, dynamic> _$AppUpdateResponseToJson(AppUpdateResponse instance) =>
     <String, dynamic>{
       'updates': instance.updates,
       'total': instance.total,
-    };
-
-AppInstallCreateRequest _$AppInstallCreateRequestFromJson(
-        Map<String, dynamic> json) =>
-    AppInstallCreateRequest(
-      appId: json['appId'] as String,
-      version: json['version'] as String,
-      type: json['type'] as String,
-      params: json['params'] as Map<String, dynamic>?,
-    );
-
-Map<String, dynamic> _$AppInstallCreateRequestToJson(
-        AppInstallCreateRequest instance) =>
-    <String, dynamic>{
-      'appId': instance.appId,
-      'version': instance.version,
-      'type': instance.type,
-      'params': instance.params,
-    };
-
-AppInstalledCheckRequest _$AppInstalledCheckRequestFromJson(
-        Map<String, dynamic> json) =>
-    AppInstalledCheckRequest(
-      appId: json['appId'] as String,
-      version: json['version'] as String,
-      type: json['type'] as String,
-    );
-
-Map<String, dynamic> _$AppInstalledCheckRequestToJson(
-        AppInstalledCheckRequest instance) =>
-    <String, dynamic>{
-      'appId': instance.appId,
-      'version': instance.version,
-      'type': instance.type,
-    };
-
-AppInstalledIgnoreUpgradeRequest _$AppInstalledIgnoreUpgradeRequestFromJson(
-        Map<String, dynamic> json) =>
-    AppInstalledIgnoreUpgradeRequest(
-      appInstallId: (json['appInstallId'] as num).toInt(),
-      reason: json['reason'] as String,
-    );
-
-Map<String, dynamic> _$AppInstalledIgnoreUpgradeRequestToJson(
-        AppInstalledIgnoreUpgradeRequest instance) =>
-    <String, dynamic>{
-      'appInstallId': instance.appInstallId,
-      'reason': instance.reason,
-    };
-
-AppInstalledOperateRequest _$AppInstalledOperateRequestFromJson(
-        Map<String, dynamic> json) =>
-    AppInstalledOperateRequest(
-      installId: (json['installId'] as num).toInt(),
-      operation: json['operation'] as String,
-      force: json['force'] as bool?,
-      params: json['params'] as Map<String, dynamic>?,
-    );
-
-Map<String, dynamic> _$AppInstalledOperateRequestToJson(
-        AppInstalledOperateRequest instance) =>
-    <String, dynamic>{
-      'installId': instance.installId,
-      'operation': instance.operation,
-      'force': instance.force,
-      'params': instance.params,
     };
 
 AppVersion _$AppVersionFromJson(Map<String, dynamic> json) => AppVersion(

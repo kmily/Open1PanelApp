@@ -510,7 +510,7 @@ class RuntimePackage extends Equatable {
   final int? id;
   final String? name;
   final String? version;
-  final String? runtimeType;
+  final String? type;
   final int? runtimeId;
   final String? description;
   final String? status;
@@ -519,7 +519,7 @@ class RuntimePackage extends Equatable {
     this.id,
     this.name,
     this.version,
-    this.runtimeType,
+    this.type,
     this.runtimeId,
     this.description,
     this.status,
@@ -530,7 +530,7 @@ class RuntimePackage extends Equatable {
       id: json['id'] as int?,
       name: json['name'] as String?,
       version: json['version'] as String?,
-      runtimeType: json['runtimeType'] as String?,
+      type: json['type'] as String? ?? json['runtimeType'] as String?,
       runtimeId: json['runtimeId'] as int?,
       description: json['description'] as String?,
       status: json['status'] as String?,
@@ -542,7 +542,7 @@ class RuntimePackage extends Equatable {
       'id': id,
       'name': name,
       'version': version,
-      'runtimeType': runtimeType,
+      'type': type,
       'runtimeId': runtimeId,
       'description': description,
       'status': status,
@@ -550,5 +550,5 @@ class RuntimePackage extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, version, runtimeType, runtimeId, description, status];
+  List<Object?> get props => [id, name, version, type, runtimeId, description, status];
 }

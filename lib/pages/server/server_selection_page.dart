@@ -121,12 +121,12 @@ class _ServerSelectionPageState extends State<ServerSelectionPage> {
     try {
       appLogger.iWithPackage('server.connection', '开始测试服务器连接: ${config.name}');
       
-      final apiClient = ApiClient(
+      final apiClient = DioClient(
         baseUrl: config.url,
         apiKey: config.apiKey,
       );
 
-      final response = await apiClient.dio.get('/api/v2/dashboard/base/os');
+      final response = await apiClient.get('/api/v2/dashboard/base/os');
       
       setState(() {
         _isLoading = false;

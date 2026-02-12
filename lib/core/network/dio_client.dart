@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import '../services/logger_service.dart';
+import '../services/logger/logger_service.dart';
 import '../config/api_constants.dart';
 import 'network_exceptions.dart';
 import 'interceptors/auth_interceptor.dart';
@@ -10,17 +10,17 @@ import 'interceptors/retry_interceptor.dart';
 /// 基于Dio的HTTP客户端 - 支持1Panel API认证
 class DioClient {
   final Dio _dio;
-  final Logger _logger = appLogger;
+  final AppLogger _logger = AppLogger();
   late AuthInterceptor _authInterceptor;
 
   DioClient({String? baseUrl, String? apiKey})
-      : _dio = Dio(_createBaseOptions(baseUrl)) {
+      : _dio = Dio(_createBaseOptionsStatic(baseUrl)) {
     _authInterceptor = AuthInterceptor(apiKey);
     _addInterceptors();
   }
 
-  /// 创建基础配置
-  BaseOptions _createBaseOptions(String? baseUrl) {
+  /// 创建基础配置（静态方法，用于构造函数）
+  static BaseOptions _createBaseOptionsStatic(String? baseUrl) {
     return BaseOptions(
       baseUrl: baseUrl ?? ApiConstants.defaultBaseUrl,
       connectTimeout: const Duration(seconds: ApiConstants.connectTimeout),
@@ -34,6 +34,11 @@ class DioClient {
       responseType: ResponseType.json,
       validateStatus: (status) => status != null && status >= 200 && status < 300,
     );
+  }
+
+  /// 创建基础配置
+  BaseOptions _createBaseOptions(String? baseUrl) {
+    return _createBaseOptionsStatic(baseUrl);
   }
 
   /// 添加拦截器
