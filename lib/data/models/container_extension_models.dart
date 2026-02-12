@@ -456,3 +456,199 @@ class ContainerSearch extends Equatable {
   @override
   List<Object?> get props => [page, pageSize, search, status, sortBy, sortOrder];
 }
+
+// ============================================
+// Container Compose Models
+// ============================================
+
+/// Container Compose Log Search Model
+class ContainerComposeLogSearch extends Equatable {
+  final String? name;
+  final String? since;
+  final String? tail;
+  final bool? follow;
+  final String? container;
+
+  const ContainerComposeLogSearch({
+    this.name,
+    this.since,
+    this.tail,
+    this.follow,
+    this.container,
+  });
+
+  factory ContainerComposeLogSearch.fromJson(Map<String, dynamic> json) {
+    return ContainerComposeLogSearch(
+      name: json['name'] as String?,
+      since: json['since'] as String?,
+      tail: json['tail'] as String?,
+      follow: json['follow'] as bool?,
+      container: json['container'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'since': since,
+      'tail': tail,
+      'follow': follow,
+      'container': container,
+    };
+  }
+
+  @override
+  List<Object?> get props => [name, since, tail, follow, container];
+}
+
+/// Container Compose Config Update Model
+class ContainerComposeConfigUpdate extends Equatable {
+  final String name;
+  final String content;
+  final String? path;
+  final String? description;
+
+  const ContainerComposeConfigUpdate({
+    required this.name,
+    required this.content,
+    this.path,
+    this.description,
+  });
+
+  factory ContainerComposeConfigUpdate.fromJson(Map<String, dynamic> json) {
+    return ContainerComposeConfigUpdate(
+      name: json['name'] as String,
+      content: json['content'] as String,
+      path: json['path'] as String?,
+      description: json['description'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'content': content,
+      'path': path,
+      'description': description,
+    };
+  }
+
+  @override
+  List<Object?> get props => [name, content, path, description];
+}
+
+/// Container Compose Status Model
+class ContainerComposeStatus extends Equatable {
+  final String name;
+  final String status;
+  final int? containerCount;
+  final int? runningCount;
+  final int? exitedCount;
+  final String? createdAt;
+  final String? updatedAt;
+
+  const ContainerComposeStatus({
+    required this.name,
+    required this.status,
+    this.containerCount,
+    this.runningCount,
+    this.exitedCount,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory ContainerComposeStatus.fromJson(Map<String, dynamic> json) {
+    return ContainerComposeStatus(
+      name: json['name'] as String,
+      status: json['status'] as String,
+      containerCount: json['containerCount'] as int?,
+      runningCount: json['runningCount'] as int?,
+      exitedCount: json['exitedCount'] as int?,
+      createdAt: json['createdAt'] as String?,
+      updatedAt: json['updatedAt'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'status': status,
+      'containerCount': containerCount,
+      'runningCount': runningCount,
+      'exitedCount': exitedCount,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+    };
+  }
+
+  @override
+  List<Object?> get props => [name, status, containerCount, runningCount, exitedCount, createdAt, updatedAt];
+}
+
+/// Container Compose Import Model
+class ContainerComposeImport extends Equatable {
+  final String name;
+  final String content;
+  final String? description;
+  final String? path;
+
+  const ContainerComposeImport({
+    required this.name,
+    required this.content,
+    this.description,
+    this.path,
+  });
+
+  factory ContainerComposeImport.fromJson(Map<String, dynamic> json) {
+    return ContainerComposeImport(
+      name: json['name'] as String,
+      content: json['content'] as String,
+      description: json['description'] as String?,
+      path: json['path'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'content': content,
+      'description': description,
+      'path': path,
+    };
+  }
+
+  @override
+  List<Object?> get props => [name, content, description, path];
+}
+
+/// Container Compose Export Model
+class ContainerComposeExport extends Equatable {
+  final String name;
+  final String? format;
+  final String? downloadPath;
+
+  const ContainerComposeExport({
+    required this.name,
+    this.format,
+    this.downloadPath,
+  });
+
+  factory ContainerComposeExport.fromJson(Map<String, dynamic> json) {
+    return ContainerComposeExport(
+      name: json['name'] as String,
+      format: json['format'] as String?,
+      downloadPath: json['downloadPath'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'format': format,
+      'downloadPath': downloadPath,
+    };
+  }
+
+  @override
+  List<Object?> get props => [name, format, downloadPath];
+}

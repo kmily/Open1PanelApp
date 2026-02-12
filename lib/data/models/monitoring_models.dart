@@ -470,3 +470,104 @@ class AlertNotification extends Equatable {
   @override
   List<Object?> get props => [id, ruleName, level, message, details, status, timestamp, acknowledged];
 }
+
+/// Security configuration model
+class SecurityConfig extends Equatable {
+  final bool? sslEnabled;
+  final String? sslCert;
+  final String? sslKey;
+  final bool? mfaEnabled;
+  final String? jwtSecret;
+  final int? jwtExpireHours;
+  final bool? ipWhitelistEnabled;
+  final List<String>? ipWhitelist;
+  final int? maxLoginAttempts;
+  final int? lockoutDuration;
+  final bool? passwordPolicyEnabled;
+  final int? minPasswordLength;
+  final bool? requireUppercase;
+  final bool? requireLowercase;
+  final bool? requireNumbers;
+  final bool? requireSpecialChars;
+
+  const SecurityConfig({
+    this.sslEnabled,
+    this.sslCert,
+    this.sslKey,
+    this.mfaEnabled,
+    this.jwtSecret,
+    this.jwtExpireHours,
+    this.ipWhitelistEnabled,
+    this.ipWhitelist,
+    this.maxLoginAttempts,
+    this.lockoutDuration,
+    this.passwordPolicyEnabled,
+    this.minPasswordLength,
+    this.requireUppercase,
+    this.requireLowercase,
+    this.requireNumbers,
+    this.requireSpecialChars,
+  });
+
+  factory SecurityConfig.fromJson(Map<String, dynamic> json) {
+    return SecurityConfig(
+      sslEnabled: json['sslEnabled'] as bool?,
+      sslCert: json['sslCert'] as String?,
+      sslKey: json['sslKey'] as String?,
+      mfaEnabled: json['mfaEnabled'] as bool?,
+      jwtSecret: json['jwtSecret'] as String?,
+      jwtExpireHours: json['jwtExpireHours'] as int?,
+      ipWhitelistEnabled: json['ipWhitelistEnabled'] as bool?,
+      ipWhitelist: (json['ipWhitelist'] as List?)?.map((e) => e as String).toList(),
+      maxLoginAttempts: json['maxLoginAttempts'] as int?,
+      lockoutDuration: json['lockoutDuration'] as int?,
+      passwordPolicyEnabled: json['passwordPolicyEnabled'] as bool?,
+      minPasswordLength: json['minPasswordLength'] as int?,
+      requireUppercase: json['requireUppercase'] as bool?,
+      requireLowercase: json['requireLowercase'] as bool?,
+      requireNumbers: json['requireNumbers'] as bool?,
+      requireSpecialChars: json['requireSpecialChars'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sslEnabled': sslEnabled,
+      'sslCert': sslCert,
+      'sslKey': sslKey,
+      'mfaEnabled': mfaEnabled,
+      'jwtSecret': jwtSecret,
+      'jwtExpireHours': jwtExpireHours,
+      'ipWhitelistEnabled': ipWhitelistEnabled,
+      'ipWhitelist': ipWhitelist,
+      'maxLoginAttempts': maxLoginAttempts,
+      'lockoutDuration': lockoutDuration,
+      'passwordPolicyEnabled': passwordPolicyEnabled,
+      'minPasswordLength': minPasswordLength,
+      'requireUppercase': requireUppercase,
+      'requireLowercase': requireLowercase,
+      'requireNumbers': requireNumbers,
+      'requireSpecialChars': requireSpecialChars,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        sslEnabled,
+        sslCert,
+        sslKey,
+        mfaEnabled,
+        jwtSecret,
+        jwtExpireHours,
+        ipWhitelistEnabled,
+        ipWhitelist,
+        maxLoginAttempts,
+        lockoutDuration,
+        passwordPolicyEnabled,
+        minPasswordLength,
+        requireUppercase,
+        requireLowercase,
+        requireNumbers,
+        requireSpecialChars,
+      ];
+}

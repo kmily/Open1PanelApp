@@ -150,6 +150,35 @@ class SearchRequest extends PageRequest {
   List<Object?> get props => [...super.props, info];
 }
 
+/// 带分页的搜索请求
+class SearchWithPage extends PageRequest {
+  final String? info;
+
+  const SearchWithPage({
+    this.info,
+    super.page,
+    super.pageSize,
+  });
+
+  factory SearchWithPage.fromJson(Map<String, dynamic> json) {
+    return SearchWithPage(
+      info: json['info'] as String?,
+      page: json['page'] as int? ?? 1,
+      pageSize: json['pageSize'] as int? ?? 20,
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    if (info != null) json['info'] = info;
+    return json;
+  }
+
+  @override
+  List<Object?> get props => [...super.props, info];
+}
+
 /// 通用响应模型
 class CommonResponse<T> extends Equatable {
   final bool success;
@@ -182,6 +211,287 @@ class CommonResponse<T> extends Equatable {
   List<Object?> get props => [success, message, data, code, timestamp];
 }
 
+/// 批量删除模型
+class BatchDelete extends Equatable {
+  final List<int> ids;
+
+  const BatchDelete({
+    required this.ids,
+  });
+
+  factory BatchDelete.fromJson(Map<String, dynamic> json) {
+    return BatchDelete(
+      ids: (json['ids'] as List<dynamic>?)?.map((e) => e as int).toList() ?? [],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ids': ids,
+    };
+  }
+
+  @override
+  List<Object?> get props => [ids];
+}
+
+/// 强制删除模型
+class ForceDelete extends Equatable {
+  final int id;
+  final bool force;
+
+  const ForceDelete({
+    required this.id,
+    this.force = false,
+  });
+
+  factory ForceDelete.fromJson(Map<String, dynamic> json) {
+    return ForceDelete(
+      id: json['id'] as int,
+      force: json['force'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'force': force,
+    };
+  }
+
+  @override
+  List<Object?> get props => [id, force];
+}
+
+/// 按名称操作模型
+class OperationWithName extends Equatable {
+  final String name;
+  final String? operation;
+
+  const OperationWithName({
+    required this.name,
+    this.operation,
+  });
+
+  factory OperationWithName.fromJson(Map<String, dynamic> json) {
+    return OperationWithName(
+      name: json['name'] as String,
+      operation: json['operation'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      if (operation != null) 'operation': operation,
+    };
+  }
+
+  @override
+  List<Object?> get props => [name, operation];
+}
+
+/// 记录搜索模型
+class RecordSearch extends PageRequest {
+  final String? info;
+  final String? startTime;
+  final String? endTime;
+
+  const RecordSearch({
+    this.info,
+    this.startTime,
+    this.endTime,
+    super.page,
+    super.pageSize,
+  });
+
+  factory RecordSearch.fromJson(Map<String, dynamic> json) {
+    return RecordSearch(
+      info: json['info'] as String?,
+      startTime: json['startTime'] as String?,
+      endTime: json['endTime'] as String?,
+      page: json['page'] as int? ?? 1,
+      pageSize: json['pageSize'] as int? ?? 20,
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    if (info != null) json['info'] = info;
+    if (startTime != null) json['startTime'] = startTime;
+    if (endTime != null) json['endTime'] = endTime;
+    return json;
+  }
+
+  @override
+  List<Object?> get props => [...super.props, info, startTime, endTime];
+}
+
+/// 分组创建模型
+class GroupCreate extends Equatable {
+  final int? id;
+  final String name;
+  final String type;
+
+  const GroupCreate({
+    this.id,
+    required this.name,
+    required this.type,
+  });
+
+  factory GroupCreate.fromJson(Map<String, dynamic> json) {
+    return GroupCreate(
+      id: json['id'] as int?,
+      name: json['name'] as String,
+      type: json['type'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (id != null) 'id': id,
+      'name': name,
+      'type': type,
+    };
+  }
+
+  @override
+  List<Object?> get props => [id, name, type];
+}
+
+/// 分组更新模型
+class GroupUpdate extends Equatable {
+  final int id;
+  final String name;
+  final String type;
+
+  const GroupUpdate({
+    required this.id,
+    required this.name,
+    required this.type,
+  });
+
+  factory GroupUpdate.fromJson(Map<String, dynamic> json) {
+    return GroupUpdate(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      type: json['type'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'type': type,
+    };
+  }
+
+  @override
+  List<Object?> get props => [id, name, type];
+}
+
+/// 分组搜索模型
+class GroupSearch extends Equatable {
+  final String? type;
+
+  const GroupSearch({
+    this.type,
+  });
+
+  factory GroupSearch.fromJson(Map<String, dynamic> json) {
+    return GroupSearch(
+      type: json['type'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (type != null) 'type': type,
+    };
+  }
+
+  @override
+  List<Object?> get props => [type];
+}
+
+/// 通用备份模型
+class CommonBackup extends Equatable {
+  final String type;
+  final String name;
+  final String? detailName;
+  final String? secret;
+
+  const CommonBackup({
+    required this.type,
+    required this.name,
+    this.detailName,
+    this.secret,
+  });
+
+  factory CommonBackup.fromJson(Map<String, dynamic> json) {
+    return CommonBackup(
+      type: json['type'] as String,
+      name: json['name'] as String,
+      detailName: json['detailName'] as String?,
+      secret: json['secret'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'name': name,
+      if (detailName != null) 'detailName': detailName,
+      if (secret != null) 'secret': secret,
+    };
+  }
+
+  @override
+  List<Object?> get props => [type, name, detailName, secret];
+}
+
+/// 通用恢复模型
+class CommonRecover extends Equatable {
+  final String type;
+  final String name;
+  final String? detailName;
+  final String? secret;
+  final String? file;
+
+  const CommonRecover({
+    required this.type,
+    required this.name,
+    this.detailName,
+    this.secret,
+    this.file,
+  });
+
+  factory CommonRecover.fromJson(Map<String, dynamic> json) {
+    return CommonRecover(
+      type: json['type'] as String,
+      name: json['name'] as String,
+      detailName: json['detailName'] as String?,
+      secret: json['secret'] as String?,
+      file: json['file'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'name': name,
+      if (detailName != null) 'detailName': detailName,
+      if (secret != null) 'secret': secret,
+      if (file != null) 'file': file,
+    };
+  }
+
+  @override
+  List<Object?> get props => [type, name, detailName, secret, file];
+}
+
 /// 状态枚举
 class Status {
   static const String enabled = 'Enabled';
@@ -211,4 +521,150 @@ enum SortDirection {
       orElse: () => SortDirection.desc,
     );
   }
+}
+
+/// 系统信息模型
+class SystemInfo extends Equatable {
+  final String? hostname;
+  final String? os;
+  final String? osVersion;
+  final String? platform;
+  final String? platformVersion;
+  final String? kernelVersion;
+  final String? architecture;
+  final int? cpuCores;
+  final double? cpuUsage;
+  final int? totalMemory;
+  final int? usedMemory;
+  final double? memoryUsage;
+  final int? totalDisk;
+  final int? usedDisk;
+  final double? diskUsage;
+  final String? uptime;
+  final int? loadAverage1m;
+  final int? loadAverage5m;
+  final int? loadAverage15m;
+  final String? panelVersion;
+  final String? panelStatus;
+  final int? appCount;
+  final int? containerCount;
+  final int? websiteCount;
+  final int? databaseCount;
+
+  const SystemInfo({
+    this.hostname,
+    this.os,
+    this.osVersion,
+    this.platform,
+    this.platformVersion,
+    this.kernelVersion,
+    this.architecture,
+    this.cpuCores,
+    this.cpuUsage,
+    this.totalMemory,
+    this.usedMemory,
+    this.memoryUsage,
+    this.totalDisk,
+    this.usedDisk,
+    this.diskUsage,
+    this.uptime,
+    this.loadAverage1m,
+    this.loadAverage5m,
+    this.loadAverage15m,
+    this.panelVersion,
+    this.panelStatus,
+    this.appCount,
+    this.containerCount,
+    this.websiteCount,
+    this.databaseCount,
+  });
+
+  factory SystemInfo.fromJson(Map<String, dynamic> json) {
+    return SystemInfo(
+      hostname: json['hostname'] as String?,
+      os: json['os'] as String?,
+      osVersion: json['osVersion'] as String?,
+      platform: json['platform'] as String?,
+      platformVersion: json['platformVersion'] as String?,
+      kernelVersion: json['kernelVersion'] as String?,
+      architecture: json['architecture'] as String?,
+      cpuCores: json['cpuCores'] as int?,
+      cpuUsage: (json['cpuUsage'] as num?)?.toDouble(),
+      totalMemory: json['totalMemory'] as int?,
+      usedMemory: json['usedMemory'] as int?,
+      memoryUsage: (json['memoryUsage'] as num?)?.toDouble(),
+      totalDisk: json['totalDisk'] as int?,
+      usedDisk: json['usedDisk'] as int?,
+      diskUsage: (json['diskUsage'] as num?)?.toDouble(),
+      uptime: json['uptime'] as String?,
+      loadAverage1m: json['loadAverage1m'] as int?,
+      loadAverage5m: json['loadAverage5m'] as int?,
+      loadAverage15m: json['loadAverage15m'] as int?,
+      panelVersion: json['panelVersion'] as String?,
+      panelStatus: json['panelStatus'] as String?,
+      appCount: json['appCount'] as int?,
+      containerCount: json['containerCount'] as int?,
+      websiteCount: json['websiteCount'] as int?,
+      databaseCount: json['databaseCount'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'hostname': hostname,
+      'os': os,
+      'osVersion': osVersion,
+      'platform': platform,
+      'platformVersion': platformVersion,
+      'kernelVersion': kernelVersion,
+      'architecture': architecture,
+      'cpuCores': cpuCores,
+      'cpuUsage': cpuUsage,
+      'totalMemory': totalMemory,
+      'usedMemory': usedMemory,
+      'memoryUsage': memoryUsage,
+      'totalDisk': totalDisk,
+      'usedDisk': usedDisk,
+      'diskUsage': diskUsage,
+      'uptime': uptime,
+      'loadAverage1m': loadAverage1m,
+      'loadAverage5m': loadAverage5m,
+      'loadAverage15m': loadAverage15m,
+      'panelVersion': panelVersion,
+      'panelStatus': panelStatus,
+      'appCount': appCount,
+      'containerCount': containerCount,
+      'websiteCount': websiteCount,
+      'databaseCount': databaseCount,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        hostname,
+        os,
+        osVersion,
+        platform,
+        platformVersion,
+        kernelVersion,
+        architecture,
+        cpuCores,
+        cpuUsage,
+        totalMemory,
+        usedMemory,
+        memoryUsage,
+        totalDisk,
+        usedDisk,
+        diskUsage,
+        uptime,
+        loadAverage1m,
+        loadAverage5m,
+        loadAverage15m,
+        panelVersion,
+        panelStatus,
+        appCount,
+        containerCount,
+        websiteCount,
+        databaseCount,
+      ];
 }

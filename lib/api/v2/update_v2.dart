@@ -5,7 +5,7 @@
 
 import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
-import '../models/update_models.dart';
+import '../../data/models/update_models.dart';
 
 class UpdateV2Api {
   final DioClient _client;

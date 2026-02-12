@@ -78,7 +78,7 @@ class FirewallV2Api {
   /// @param ids 规则ID列表
   /// @return 删除结果
   Future<Response> deleteFirewallRule(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/firewall/rules/del'),
       data: operation.toJson(),
@@ -158,7 +158,7 @@ class FirewallV2Api {
   /// @param ids 规则ID列表
   /// @return 启用结果
   Future<Response> enableFirewallRule(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/firewall/rules/enable'),
       data: operation.toJson(),
@@ -171,7 +171,7 @@ class FirewallV2Api {
   /// @param ids 规则ID列表
   /// @return 禁用结果
   Future<Response> disableFirewallRule(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/firewall/rules/disable'),
       data: operation.toJson(),

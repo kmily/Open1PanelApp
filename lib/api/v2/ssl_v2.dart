@@ -32,7 +32,7 @@ class SSLV2Api {
   /// @param ids 证书ID列表
   /// @return 删除结果
   Future<Response> deleteSSL(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/ssl/del'),
       data: operation.toJson(),
@@ -155,7 +155,7 @@ class SSLV2Api {
   /// @param ids 证书ID列表
   /// @return 续期结果
   Future<Response> renewSSLCertificates(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/ssl/batch/renew'),
       data: operation.toJson(),
@@ -391,7 +391,7 @@ class SSLV2Api {
   /// @param ids SSL证书ID列表
   /// @return 删除结果
   Future<Response> deleteWebsiteSSL(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/websites/ssl/del'),
       data: operation.toJson(),
@@ -550,7 +550,7 @@ class SSLV2Api {
   /// @param ids SSL证书ID列表
   /// @return 续期结果
   Future<Response> autoRenewSSL(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/websites/ssl/auto-renew'),
       data: operation.toJson(),

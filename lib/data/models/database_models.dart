@@ -139,12 +139,14 @@ class DatabaseUpdate extends DatabaseCreate {
 class DatabaseSearch extends Equatable {
   final String? info;
   final String? name;
+  final String? type;
   final int page;
   final int pageSize;
 
   const DatabaseSearch({
     this.info,
     this.name,
+    this.type,
     this.page = 1,
     this.pageSize = 20,
   });
@@ -153,6 +155,7 @@ class DatabaseSearch extends Equatable {
     return DatabaseSearch(
       info: json['info'] as String?,
       name: json['name'] as String?,
+      type: json['type'] as String?,
       page: json['page'] as int? ?? 1,
       pageSize: json['pageSize'] as int? ?? 20,
     );
@@ -162,13 +165,14 @@ class DatabaseSearch extends Equatable {
     return {
       'info': info,
       'name': name,
+      'type': type,
       'page': page,
       'pageSize': pageSize,
     };
   }
 
   @override
-  List<Object?> get props => [info, name, page, pageSize];
+  List<Object?> get props => [info, name, type, page, pageSize];
 }
 
 /// 数据库信息模型

@@ -213,10 +213,10 @@ class _QuickActionItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: colorScheme.outline.withOpacity(0.1),
+            color: colorScheme.outline.withValues(alpha: 0.1),
           ),
         ),
         child: Column(
@@ -287,7 +287,7 @@ class _ActivityItem extends StatelessWidget {
         Text(
           time,
           style: TextStyle(
-            color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
             fontSize: 12,
           ),
         ),

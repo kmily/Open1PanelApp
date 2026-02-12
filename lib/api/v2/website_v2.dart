@@ -32,7 +32,7 @@ class WebsiteV2Api {
   /// @param ids 网站ID列表
   /// @return 删除结果
   Future<Response> deleteWebsite(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/websites/del'),
       data: operation.toJson(),
@@ -113,7 +113,7 @@ class WebsiteV2Api {
   /// @param ids 网站ID列表
   /// @return 启动结果
   Future<Response> startWebsite(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/websites/start'),
       data: operation.toJson(),
@@ -126,7 +126,7 @@ class WebsiteV2Api {
   /// @param ids 网站ID列表
   /// @return 停止结果
   Future<Response> stopWebsite(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/websites/stop'),
       data: operation.toJson(),
@@ -139,7 +139,7 @@ class WebsiteV2Api {
   /// @param ids 网站ID列表
   /// @return 重启结果
   Future<Response> restartWebsite(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/websites/restart'),
       data: operation.toJson(),

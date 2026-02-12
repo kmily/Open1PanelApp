@@ -5,7 +5,7 @@
 
 import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
-import '../models/website_group_models.dart';
+import '../../data/models/website_group_models.dart';
 
 class WebsiteGroupV2Api {
   final DioClient _client;

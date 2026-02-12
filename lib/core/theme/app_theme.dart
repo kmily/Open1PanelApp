@@ -61,18 +61,18 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey.withOpacity(0.1),
+        fillColor: Colors.grey.withValues(alpha: 0.1),
       ),
       navigationBarTheme: NavigationBarThemeData(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        indicatorColor: primaryBrandColor.withOpacity(0.1),
+        indicatorColor: primaryBrandColor.withValues(alpha: 0.1),
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
       ),
       navigationRailTheme: NavigationRailThemeData(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        indicatorColor: primaryBrandColor.withOpacity(0.1),
+        indicatorColor: primaryBrandColor.withValues(alpha: 0.1),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         shape: RoundedRectangleBorder(
@@ -139,18 +139,18 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey.withOpacity(0.1),
+        fillColor: Colors.grey.withValues(alpha: 0.1),
       ),
       navigationBarTheme: NavigationBarThemeData(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        indicatorColor: primaryBrandColor.withOpacity(0.1),
+        indicatorColor: primaryBrandColor.withValues(alpha: 0.1),
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
       ),
       navigationRailTheme: NavigationRailThemeData(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        indicatorColor: primaryBrandColor.withOpacity(0.1),
+        indicatorColor: primaryBrandColor.withValues(alpha: 0.1),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         shape: RoundedRectangleBorder(

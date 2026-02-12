@@ -32,7 +32,7 @@ class CronjobV2Api {
   /// @param ids 定时任务ID列表
   /// @return 删除结果
   Future<Response> deleteCronjob(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/cronjobs/del'),
       data: operation.toJson(),

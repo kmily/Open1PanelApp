@@ -206,7 +206,7 @@ class MonitorV2Api {
   /// @param ids 规则ID列表
   /// @return 删除结果
   Future<Response> deleteAlertRules(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/monitoring/alerts/rules/del'),
       data: operation.toJson(),
@@ -219,7 +219,7 @@ class MonitorV2Api {
   /// @param ids 规则ID列表
   /// @return 启用结果
   Future<Response> enableAlertRules(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/monitoring/alerts/rules/enable'),
       data: operation.toJson(),
@@ -232,7 +232,7 @@ class MonitorV2Api {
   /// @param ids 规则ID列表
   /// @return 禁用结果
   Future<Response> disableAlertRules(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/monitoring/alerts/rules/disable'),
       data: operation.toJson(),
@@ -283,7 +283,7 @@ class MonitorV2Api {
   /// @param ids 通知ID列表
   /// @return 确认结果
   Future<Response> acknowledgeAlertNotifications(List<int> ids) async {
-    final operation = OperateByID(ids: ids);
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
       ApiConstants.buildApiPath('/monitoring/alerts/notifications/acknowledge'),
       data: operation.toJson(),

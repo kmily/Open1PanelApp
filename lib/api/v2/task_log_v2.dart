@@ -5,7 +5,7 @@
 
 import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
-import '../models/task_log_models.dart';
+import '../../data/models/task_log_models.dart';
 
 class TaskLogV2Api {
   final DioClient _client;

@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/backup_account_models.dart';
+import '../../data/models/common_models.dart' hide CommonBackup, CommonRecover, RecordSearch;
 
 class BackupAccountV2Api {
   final DioClient _client;
@@ -204,25 +205,16 @@ class BackupAccountV2Api {
   /// @param request 备份账户配置
   /// @return 测试结果
   Future<Response<bool>> testBackupAccount(BackupOperate request) async {
-    try {
-      final response = await _client.post(
-        '${ApiConstants.buildApiPath('/backups')}/test',
-        data: request.toJson(),
-      );
-      return Response(
-        data: true, // 如果没有异常，则连接测试成功
-        statusCode: response.statusCode,
-        statusMessage: response.statusMessage,
-        requestOptions: response.requestOptions,
-      );
-    } catch (e) {
-      return Response(
-        data: false, // 连接测试失败
-        statusCode: 500,
-        statusMessage: 'Connection test failed',
-        requestOptions: _client.dio.options,
-      );
-    }
+    final response = await _client.post(
+      '${ApiConstants.buildApiPath('/backups')}/test',
+      data: request.toJson(),
+    );
+    return Response(
+      data: response.statusCode == 200,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
   }
 
   /// 刷新备份令牌
@@ -420,25 +412,4 @@ class BackupAccountV2Api {
       requestOptions: response.requestOptions,
     );
   }
-}
-
-/// 分页结果基类
-class PageResult extends Equatable {
-  final List<dynamic> items;
-  final int total;
-
-  const PageResult({
-    required this.items,
-    required this.total,
-  });
-
-  factory PageResult.fromJson(Map<String, dynamic> json, Function(dynamic)? fromJsonT) {
-    return PageResult(
-      items: (json['items'] as List?) ?? [],
-      total: json['total'] as int? ?? 0,
-    );
-  }
-
-  @override
-  List<Object?> get props => [items, total];
 }

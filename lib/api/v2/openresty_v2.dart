@@ -5,7 +5,7 @@
 
 import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
-import '../models/openresty_models.dart';
+import '../../data/models/openresty_models.dart';
 
 class OpenRestyV2Api {
   final DioClient _client;

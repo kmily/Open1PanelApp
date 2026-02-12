@@ -3,10 +3,11 @@
 /// 此文件包含与数据库管理相关的所有API接口，
 /// 包括数据库的创建、删除、备份、恢复、查询等操作。
 
-import 'package:dio/dio/dio.dart';
+import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/database_models.dart';
+import '../../data/models/common_models.dart';
 
 class DatabaseV2Api {
   final DioClient _client;
@@ -219,24 +220,15 @@ class DatabaseV2Api {
   /// @param id 数据库ID
   /// @return 测试结果
   Future<Response<bool>> testDatabaseConnection(int id) async {
-    try {
-      final response = await _client.get(
-        '${ApiConstants.buildApiPath('/databases')}/$id/connection/test',
-      );
-      return Response(
-        data: true, // 如果没有异常，则连接测试成功
-        statusCode: response.statusCode,
-        statusMessage: response.statusMessage,
-        requestOptions: response.requestOptions,
-      );
-    } catch (e) {
-      return Response(
-        data: false, // 连接测试失败
-        statusCode: 500,
-        statusMessage: 'Connection test failed',
-        requestOptions: _client.dio.options,
-      );
-    }
+    final response = await _client.get(
+      '${ApiConstants.buildApiPath('/databases')}/$id/connection/test',
+    );
+    return Response(
+      data: response.statusCode == 200,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
   }
 
   /// 检查数据库是否存在
@@ -269,62 +261,15 @@ class DatabaseV2Api {
   ///
   /// 获取所有支持的数据库类型选项
   /// @return 数据库类型列表
-  Future<Response<List<DatabaseType>>> getDatabaseTypes() async {
-    // 返回支持的数据库类型列表
-    final types = DatabaseType.values;
-    return Response(
-      data: types,
-      statusCode: 200,
-      statusMessage: 'Success',
-      requestOptions: _client.dio.options,
-    );
+  Future<List<DatabaseType>> getDatabaseTypes() async {
+    return DatabaseType.values;
   }
 
   /// 获取数据库状态选项
   ///
   /// 获取所有数据库状态选项
   /// @return 数据库状态列表
-  Future<Response<List<DatabaseStatus>>> getDatabaseStatuses() async {
-    // 返回支持的数据库状态列表
-    final statuses = DatabaseStatus.values;
-    return Response(
-      data: statuses,
-      statusCode: 200,
-      statusMessage: 'Success',
-      requestOptions: _client.dio.options,
-    );
+  Future<List<DatabaseStatus>> getDatabaseStatuses() async {
+    return DatabaseStatus.values;
   }
-}
-
-/// 分页结果模型
-class PageResult<T> extends Equatable {
-  final List<T> items;
-  final int total;
-  final int page;
-  final int pageSize;
-  final int totalPages;
-
-  const PageResult({
-    required this.items,
-    required this.total,
-    this.page = 1,
-    this.pageSize = 20,
-    this.totalPages = 1,
-  });
-
-  factory PageResult.fromJson(Map<String, dynamic> json, T Function(dynamic) fromJsonT) {
-    return PageResult(
-      items: (json['items'] as List?)
-          ?.map((item) => fromJsonT(item))
-          .toList() ??
-          [],
-      total: json['total'] as int? ?? 0,
-      page: json['page'] as int? ?? 1,
-      pageSize: json['pageSize'] as int? ?? 20,
-      totalPages: json['totalPages'] as int? ?? 0,
-    );
-  }
-
-  @override
-  List<Object?> get props => [items, total, page, pageSize, totalPages];
 }
