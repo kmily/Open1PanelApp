@@ -501,3 +501,40 @@ Map<String, dynamic> _$MfaStatusToJson(MfaStatus instance) => <String, dynamic>{
       'enabled': instance.enabled,
       'secret': instance.secret,
     };
+
+TerminalInfo _$TerminalInfoFromJson(Map<String, dynamic> json) => TerminalInfo(
+      cursorBlink: json['cursorBlink'] as String?,
+      cursorStyle: json['cursorStyle'] as String?,
+      fontSize: json['fontSize'] as String?,
+      letterSpacing: json['letterSpacing'] as String?,
+      lineHeight: json['lineHeight'] as String?,
+      scrollSensitivity: json['scrollSensitivity'] as String?,
+      scrollback: json['scrollback'] as String?,
+    );
+
+Map<String, dynamic> _$TerminalInfoToJson(TerminalInfo instance) =>
+    <String, dynamic>{
+      'cursorBlink': instance.cursorBlink,
+      'cursorStyle': instance.cursorStyle,
+      'fontSize': instance.fontSize,
+      'letterSpacing': instance.letterSpacing,
+      'lineHeight': instance.lineHeight,
+      'scrollSensitivity': instance.scrollSensitivity,
+      'scrollback': instance.scrollback,
+    };
+
+InterfaceInfo _$InterfaceInfoFromJson(Map<String, dynamic> json) =>
+    InterfaceInfo(
+      theme: json['theme'] as String?,
+      language: json['language'] as String?,
+      menuCollapse: json['menuCollapse'] as String?,
+      entry: json['entry'] as String?,
+    );
+
+Map<String, dynamic> _$InterfaceInfoToJson(InterfaceInfo instance) =>
+    <String, dynamic>{
+      'theme': instance.theme,
+      'language': instance.language,
+      'menuCollapse': instance.menuCollapse,
+      'entry': instance.entry,
+    };

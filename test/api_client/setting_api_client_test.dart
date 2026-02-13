@@ -52,7 +52,7 @@ void main() {
 
         expect(response.statusCode, equals(200));
         expect(response.data, isNotNull);
-        expect(response.data, isA<SystemSettings>());
+        expect(response.data, isA<SettingInfo>());
 
         final settings = response.data!;
         print('\n========================================');
@@ -63,66 +63,43 @@ void main() {
       });
     });
 
-    group('getPanelSettings - 获取面板设置', () {
-      test('应该成功获取面板设置', () async {
+    group('getTerminalSettings - 获取终端设置', () {
+      test('应该成功获取终端设置', () async {
         if (!hasApiKey) {
           print('⚠️  跳过测试: API密钥未配置');
           return;
         }
 
-        final response = await api.getPanelSettings();
+        final response = await api.getTerminalSettings();
 
         expect(response.statusCode, equals(200));
         expect(response.data, isNotNull);
-        expect(response.data, isA<PanelSettings>());
+        expect(response.data, isA<TerminalInfo>());
 
         final settings = response.data!;
         print('\n========================================');
-        print('✅ 面板设置测试成功');
+        print('✅ 终端设置测试成功');
         print('========================================');
-        print('面板设置已获取');
+        print('终端设置已获取');
         print('========================================\n');
       });
     });
 
-    group('getSystemTime - 获取系统时间', () {
-      test('应该成功获取系统时间', () async {
+    group('getInterfaceSettings - 获取界面设置', () {
+      test('应该成功获取界面设置', () async {
         if (!hasApiKey) {
           print('⚠️  跳过测试: API密钥未配置');
           return;
         }
 
-        final response = await api.getSystemTime();
+        final response = await api.getInterfaceSettings();
 
         expect(response.statusCode, equals(200));
         expect(response.data, isNotNull);
-        expect(response.data, isA<SystemTime>());
-
-        final time = response.data!;
-        print('\n========================================');
-        print('✅ 系统时间测试成功');
-        print('========================================');
-        print('系统时间: ${time.time}');
-        print('时区: ${time.timeZone}');
-        print('========================================\n');
-      });
-    });
-
-    group('getSecuritySettings - 获取安全设置', () {
-      test('应该成功获取安全设置', () async {
-        if (!hasApiKey) {
-          print('⚠️  跳过测试: API密钥未配置');
-          return;
-        }
-
-        final response = await api.getSecuritySettings();
-
-        expect(response.statusCode, equals(200));
-        expect(response.data, isNotNull);
-        expect(response.data, isA<SecuritySettings>());
+        expect(response.data, isA<InterfaceInfo>());
 
         print('\n========================================');
-        print('✅ 安全设置测试成功');
+        print('✅ 界面设置测试成功');
         print('========================================\n');
       });
     });
@@ -190,15 +167,15 @@ void main() {
       expect(timer.duration.inMilliseconds, lessThan(3000));
     });
 
-    test('getPanelSettings响应时间应该小于3秒', () async {
+    test('getTerminalSettings响应时间应该小于3秒', () async {
       if (!hasApiKey) {
         print('⚠️  跳过测试: API密钥未配置');
         return;
       }
 
-      final timer = TestPerformanceTimer('getPanelSettings');
+      final timer = TestPerformanceTimer('getTerminalSettings');
       timer.start();
-      await api.getPanelSettings();
+      await api.getTerminalSettings();
       timer.stop();
       timer.logResult();
       expect(timer.duration.inMilliseconds, lessThan(3000));

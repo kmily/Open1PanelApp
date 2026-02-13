@@ -19,7 +19,7 @@ class AuthV2Api {
   /// @return 验证码数据
   Future<Response<String>> getCaptcha() async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/auth/captcha'),
+      ApiConstants.buildApiPath('/core/auth/captcha'),
     );
     return Response(
       data: response.data.toString(),
@@ -34,7 +34,7 @@ class AuthV2Api {
   /// @return 演示模式状态
   Future<Response<Map<String, dynamic>>> checkDemoMode() async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/auth/demo'),
+      ApiConstants.buildApiPath('/core/auth/demo'),
     );
     return Response(
       data: response.data as Map<String, dynamic>,
@@ -49,7 +49,7 @@ class AuthV2Api {
   /// @return 安全状态信息
   Future<Response<Map<String, dynamic>>> getSafetyStatus() async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/auth/issafety'),
+      ApiConstants.buildApiPath('/core/auth/issafety'),
     );
     return Response(
       data: response.data as Map<String, dynamic>,
@@ -64,7 +64,7 @@ class AuthV2Api {
   /// @return 系统语言设置
   Future<Response<String>> getSystemLanguage() async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/auth/language'),
+      ApiConstants.buildApiPath('/core/auth/language'),
     );
     return Response(
       data: response.data.toString(),
@@ -81,7 +81,7 @@ class AuthV2Api {
   /// @return 登录结果
   Future<Response<Map<String, dynamic>>> login(Map<String, dynamic> request) async {
     final response = await _client.post(
-      ApiConstants.buildApiPath('/auth/login'),
+      ApiConstants.buildApiPath('/core/auth/login'),
       data: request,
     );
     return Response(
@@ -98,7 +98,7 @@ class AuthV2Api {
   /// @return 登出结果
   Future<Response<Map<String, dynamic>>> logout() async {
     final response = await _client.post(
-      ApiConstants.buildApiPath('/auth/logout'),
+      ApiConstants.buildApiPath('/core/auth/logout'),
     );
     return Response(
       data: response.data as Map<String, dynamic>,
@@ -115,7 +115,7 @@ class AuthV2Api {
   /// @return 登录结果
   Future<Response<Map<String, dynamic>>> mfaLogin(Map<String, dynamic> request) async {
     final response = await _client.post(
-      ApiConstants.buildApiPath('/auth/mfalogin'),
+      ApiConstants.buildApiPath('/core/auth/mfalogin'),
       data: request,
     );
     return Response(
@@ -132,7 +132,7 @@ class AuthV2Api {
   /// @return 登录设置
   Future<Response<Map<String, dynamic>>> getLoginSettings() async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/auth/setting'),
+      ApiConstants.buildApiPath('/core/auth/setting'),
     );
     return Response(
       data: response.data as Map<String, dynamic>,

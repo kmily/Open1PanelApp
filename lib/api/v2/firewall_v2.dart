@@ -20,7 +20,7 @@ class FirewallV2Api {
   /// @return 防火墙状态
   Future<Response<FirewallStatus>> getFirewallStatus() async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/firewall/status'),
+      ApiConstants.buildApiPath('/hosts/firewall/status'),
     );
     return Response(
       data: FirewallStatus.fromJson(response.data as Map<String, dynamic>),
@@ -36,7 +36,7 @@ class FirewallV2Api {
   /// @return 启动结果
   Future<Response> startFirewall() async {
     return await _client.post(
-      ApiConstants.buildApiPath('/firewall/start'),
+      ApiConstants.buildApiPath('/hosts/firewall/start'),
     );
   }
 
@@ -46,7 +46,7 @@ class FirewallV2Api {
   /// @return 停止结果
   Future<Response> stopFirewall() async {
     return await _client.post(
-      ApiConstants.buildApiPath('/firewall/stop'),
+      ApiConstants.buildApiPath('/hosts/firewall/stop'),
     );
   }
 
@@ -56,7 +56,7 @@ class FirewallV2Api {
   /// @return 重启结果
   Future<Response> restartFirewall() async {
     return await _client.post(
-      ApiConstants.buildApiPath('/firewall/restart'),
+      ApiConstants.buildApiPath('/hosts/firewall/restart'),
     );
   }
 
@@ -67,7 +67,7 @@ class FirewallV2Api {
   /// @return 创建结果
   Future<Response> createFirewallRule(FirewallRuleCreate rule) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/firewall/rules'),
+      ApiConstants.buildApiPath('/hosts/firewall/rules'),
       data: rule.toJson(),
     );
   }
@@ -80,7 +80,7 @@ class FirewallV2Api {
   Future<Response> deleteFirewallRule(List<int> ids) async {
     final operation = BatchDelete(ids: ids);
     return await _client.post(
-      ApiConstants.buildApiPath('/firewall/rules/del'),
+      ApiConstants.buildApiPath('/hosts/firewall/rules/del'),
       data: operation.toJson(),
     );
   }
@@ -92,7 +92,7 @@ class FirewallV2Api {
   /// @return 更新结果
   Future<Response> updateFirewallRule(FirewallRuleUpdate rule) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/firewall/rules/${rule.id}/update'),
+      ApiConstants.buildApiPath('/hosts/firewall/rules/${rule.id}/update'),
       data: rule.toJson(),
     );
   }
@@ -121,7 +121,7 @@ class FirewallV2Api {
       enabled: enabled,
     );
     final response = await _client.post(
-      ApiConstants.buildApiPath('/firewall/rules/search'),
+      ApiConstants.buildApiPath('/hosts/firewall/rules/search'),
       data: request.toJson(),
     );
     return Response(
@@ -142,7 +142,7 @@ class FirewallV2Api {
   /// @return 规则详情
   Future<Response<FirewallRule>> getFirewallRuleDetail(int id) async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/firewall/rules/$id'),
+      ApiConstants.buildApiPath('/hosts/firewall/rules/$id'),
     );
     return Response(
       data: FirewallRule.fromJson(response.data as Map<String, dynamic>),
@@ -160,7 +160,7 @@ class FirewallV2Api {
   Future<Response> enableFirewallRule(List<int> ids) async {
     final operation = BatchDelete(ids: ids);
     return await _client.post(
-      ApiConstants.buildApiPath('/firewall/rules/enable'),
+      ApiConstants.buildApiPath('/hosts/firewall/rules/enable'),
       data: operation.toJson(),
     );
   }
@@ -173,7 +173,7 @@ class FirewallV2Api {
   Future<Response> disableFirewallRule(List<int> ids) async {
     final operation = BatchDelete(ids: ids);
     return await _client.post(
-      ApiConstants.buildApiPath('/firewall/rules/disable'),
+      ApiConstants.buildApiPath('/hosts/firewall/rules/disable'),
       data: operation.toJson(),
     );
   }
@@ -205,7 +205,7 @@ class FirewallV2Api {
       enabled: enabled,
     );
     final response = await _client.post(
-      ApiConstants.buildApiPath('/firewall/ports/search'),
+      ApiConstants.buildApiPath('/hosts/firewall/ports/search'),
       data: request.toJson(),
     );
     return Response(
@@ -226,7 +226,7 @@ class FirewallV2Api {
   /// @return 开放结果
   Future<Response> openFirewallPort(FirewallPortCreate portCreate) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/firewall/ports/open'),
+      ApiConstants.buildApiPath('/hosts/firewall/ports/open'),
       data: portCreate.toJson(),
     );
   }
@@ -243,7 +243,7 @@ class FirewallV2Api {
       'protocol': protocol,
     };
     return await _client.post(
-      ApiConstants.buildApiPath('/firewall/ports/close'),
+      ApiConstants.buildApiPath('/hosts/firewall/ports/close'),
       data: data,
     );
   }
@@ -281,7 +281,7 @@ class FirewallV2Api {
       endTime: endTime,
     );
     final response = await _client.post(
-      ApiConstants.buildApiPath('/firewall/logs/search'),
+      ApiConstants.buildApiPath('/hosts/firewall/logs/search'),
       data: request.toJson(),
     );
     return Response(

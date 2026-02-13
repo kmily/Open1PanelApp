@@ -14,6 +14,54 @@ class ProcessV2Api {
 
   ProcessV2Api(this._client);
 
+  /// 停止进程
+  ///
+  /// 停止指定的进程
+  /// @param request 进程操作请求
+  /// @return 停止结果
+  Future<Response> stopProcess(ProcessRequest request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/process/stop'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 启动进程
+  ///
+  /// 启动指定的进程
+  /// @param request 进程操作请求
+  /// @return 启动结果
+  Future<Response> startProcess(ProcessRequest request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/process/start'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 重启进程
+  ///
+  /// 重启指定的进程
+  /// @param request 进程操作请求
+  /// @return 重启结果
+  Future<Response> restartProcess(ProcessRequest request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/process/restart'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 杀死进程
+  ///
+  /// 强制终止指定的进程
+  /// @param request 进程操作请求
+  /// @return 终止结果
+  Future<Response> killProcess(ProcessRequest request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/process/kill'),
+      data: request.toJson(),
+    );
+  }
+
   /// 获取进程列表
   ///
   /// 获取所有进程列表
@@ -44,7 +92,7 @@ class ProcessV2Api {
       sortOrder: sortOrder,
     );
     final response = await _client.post(
-      ApiConstants.buildApiPath('/processes/search'),
+      ApiConstants.buildApiPath('/process/search'),
       data: request.toJson(),
     );
     return Response(
@@ -65,124 +113,10 @@ class ProcessV2Api {
   /// @return 进程详情
   Future<Response<ProcessInfo>> getProcessDetail(int pid) async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/processes/$pid'),
+      ApiConstants.buildApiPath('/process/$pid'),
     );
     return Response(
       data: ProcessInfo.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 停止进程
-  ///
-  /// 停止指定的进程
-  /// @param operation 进程操作
-  /// @return 停止结果
-  Future<Response> operateProcess(ProcessOperation operation) async {
-    return await _client.post(
-      ApiConstants.buildApiPath('/processes/operate'),
-      data: operation.toJson(),
-    );
-  }
-
-  /// 停止进程
-  ///
-  /// 停止指定的进程
-  /// @param pids 进程ID列表
-  /// @param force 是否强制停止
-  /// @return 停止结果
-  Future<Response> stopProcess(List<int> pids, {bool force = false}) async {
-    final operation = ProcessOperation(
-      pids: pids,
-      operation: force ? 'kill' : 'stop',
-    );
-    return await operateProcess(operation);
-  }
-
-  /// 启动进程
-  ///
-  /// 启动指定的进程
-  /// @param pids 进程ID列表
-  /// @return 启动结果
-  Future<Response> startProcess(List<int> pids) async {
-    final operation = ProcessOperation(
-      pids: pids,
-      operation: 'start',
-    );
-    return await operateProcess(operation);
-  }
-
-  /// 重启进程
-  ///
-  /// 重启指定的进程
-  /// @param pids 进程ID列表
-  /// @return 重启结果
-  Future<Response> restartProcess(List<int> pids) async {
-    final operation = ProcessOperation(
-      pids: pids,
-      operation: 'restart',
-    );
-    return await operateProcess(operation);
-  }
-
-  /// 暂停进程
-  ///
-  /// 暂停指定的进程
-  /// @param pids 进程ID列表
-  /// @return 暂停结果
-  Future<Response> pauseProcess(List<int> pids) async {
-    final operation = ProcessOperation(
-      pids: pids,
-      operation: 'pause',
-    );
-    return await operateProcess(operation);
-  }
-
-  /// 恢复进程
-  ///
-  /// 恢复指定的进程
-  /// @param pids 进程ID列表
-  /// @return 恢复结果
-  Future<Response> resumeProcess(List<int> pids) async {
-    final operation = ProcessOperation(
-      pids: pids,
-      operation: 'resume',
-    );
-    return await operateProcess(operation);
-  }
-
-  /// 杀死进程
-  ///
-  /// 强制终止指定的进程
-  /// @param pids 进程ID列表
-  /// @return 终止结果
-  Future<Response> killProcess(List<int> pids) async {
-    final operation = ProcessOperation(
-      pids: pids,
-      operation: 'kill',
-    );
-    return await operateProcess(operation);
-  }
-
-  /// 获取进程树
-  ///
-  /// 获取进程树结构
-  /// @param pid 根进程ID（可选）
-  /// @return 进程树
-  Future<Response<List<ProcessTreeNode>>> getProcessTree({int? pid}) async {
-    final data = {
-      if (pid != null) 'pid': pid,
-    };
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/processes/tree'),
-      data: data,
-    );
-    return Response(
-      data: (response.data as List?)
-          ?.map((item) => ProcessTreeNode.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -195,7 +129,7 @@ class ProcessV2Api {
   /// @return 统计信息
   Future<Response<ProcessStats>> getProcessStats() async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/processes/stats'),
+      ApiConstants.buildApiPath('/process/stats'),
     );
     return Response(
       data: ProcessStats.fromJson(response.data as Map<String, dynamic>),
@@ -204,72 +138,23 @@ class ProcessV2Api {
       requestOptions: response.requestOptions,
     );
   }
+}
 
-  /// 获取进程资源使用情况
-  ///
-  /// 获取指定进程的资源使用情况
-  /// @param pid 进程ID
-  /// @return 资源使用情况
-  Future<Response<Map<String, dynamic>>> getProcessResources(int pid) async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/processes/$pid/resources'),
-    );
-    return Response(
-      data: response.data as Map<String, dynamic>,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
+/// 进程操作请求
+class ProcessRequest {
+  final String? name;
+  final int? pid;
+  final List<int>? pids;
 
-  /// 获取进程环境变量
-  ///
-  /// 获取指定进程的环境变量
-  /// @param pid 进程ID
-  /// @return 环境变量
-  Future<Response<Map<String, String>>> getProcessEnvironment(int pid) async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/processes/$pid/environment'),
-    );
-    return Response(
-      data: response.data as Map<String, String>,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
+  const ProcessRequest({
+    this.name,
+    this.pid,
+    this.pids,
+  });
 
-  /// 获取进程网络连接
-  ///
-  /// 获取指定进程的网络连接
-  /// @param pid 进程ID
-  /// @return 网络连接
-  Future<Response<List<Map<String, dynamic>>>> getProcessConnections(int pid) async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/processes/$pid/connections'),
-    );
-    return Response(
-      data: (response.data as List?)?.cast<Map<String, dynamic>>() ?? [],
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取进程打开的文件
-  ///
-  /// 获取指定进程打开的文件列表
-  /// @param pid 进程ID
-  /// @return 打开的文件列表
-  Future<Response<List<String>>> getProcessOpenFiles(int pid) async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/processes/$pid/open-files'),
-    );
-    return Response(
-      data: (response.data as List?)?.cast<String>() ?? [],
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
+  Map<String, dynamic> toJson() => {
+        if (name != null) 'name': name,
+        if (pid != null) 'pid': pid,
+        if (pids != null) 'pids': pids,
+      };
 }

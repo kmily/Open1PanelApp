@@ -14,6 +14,82 @@ class MonitorV2Api {
 
   MonitorV2Api(this._client);
 
+  /// 获取监控数据
+  ///
+  /// 获取系统监控指标数据
+  /// @param request 监控搜索请求
+  /// @return 监控数据列表
+  Future<Response<List<MonitorData>>> getMonitorData(MonitorSearch request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/hosts/monitor/search'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: (response.data as List?)
+          ?.map((item) => MonitorData.fromJson(item as Map<String, dynamic>))
+          .toList() ?? [],
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 获取GPU监控数据
+  ///
+  /// 获取GPU监控指标数据
+  /// @param request GPU监控搜索请求
+  /// @return GPU监控数据
+  Future<Response<MonitorGPUData>> getGPUMonitorData(MonitorGPUSearch request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/hosts/monitor/gpu/search'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: MonitorGPUData.fromJson(response.data as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 清理监控数据
+  ///
+  /// 清理历史监控数据
+  /// @return 清理结果
+  Future<Response> cleanMonitorData() async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/hosts/monitor/clean'),
+    );
+  }
+
+  /// 获取监控设置
+  ///
+  /// 获取系统监控设置
+  /// @return 监控设置
+  Future<Response<MonitorSetting>> getMonitorSetting() async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/hosts/monitor/setting'),
+    );
+    return Response(
+      data: MonitorSetting.fromJson(response.data as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 更新监控设置
+  ///
+  /// 更新系统监控设置
+  /// @param request 监控设置更新请求
+  /// @return 更新结果
+  Future<Response> updateMonitorSetting(MonitorSettingUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/hosts/monitor/setting/update'),
+      data: request.toJson(),
+    );
+  }
+
   /// 获取系统指标
   ///
   /// 获取系统监控指标数据
@@ -24,13 +100,13 @@ class MonitorV2Api {
     MetricType? metricType,
     String timeRange = '1h',
   }) async {
-    final data = {
-      'metricType': metricType?.value,
-      'timeRange': timeRange,
-    };
+    final request = MonitorSearch(
+      timeRange: timeRange,
+      metricType: metricType?.value,
+    );
     final response = await _client.post(
-      ApiConstants.buildApiPath('/monitoring/system'),
-      data: data,
+      ApiConstants.buildApiPath('/hosts/monitor/search'),
+      data: request.toJson(),
     );
     return Response(
       data: SystemMetrics.fromJson(response.data as Map<String, dynamic>),
@@ -46,12 +122,10 @@ class MonitorV2Api {
   /// @param timeRange 时间范围（可选，默认为1h）
   /// @return CPU指标数据
   Future<Response<CPUMetrics>> getCPUMetrics({String timeRange = '1h'}) async {
-    final data = {
-      'timeRange': timeRange,
-    };
+    final request = MonitorSearch(timeRange: timeRange);
     final response = await _client.post(
-      ApiConstants.buildApiPath('/monitoring/cpu'),
-      data: data,
+      ApiConstants.buildApiPath('/hosts/monitor/search'),
+      data: request.toJson(),
     );
     return Response(
       data: CPUMetrics.fromJson(response.data as Map<String, dynamic>),
@@ -67,12 +141,10 @@ class MonitorV2Api {
   /// @param timeRange 时间范围（可选，默认为1h）
   /// @return 内存指标数据
   Future<Response<MemoryMetrics>> getMemoryMetrics({String timeRange = '1h'}) async {
-    final data = {
-      'timeRange': timeRange,
-    };
+    final request = MonitorSearch(timeRange: timeRange);
     final response = await _client.post(
-      ApiConstants.buildApiPath('/monitoring/memory'),
-      data: data,
+      ApiConstants.buildApiPath('/hosts/monitor/search'),
+      data: request.toJson(),
     );
     return Response(
       data: MemoryMetrics.fromJson(response.data as Map<String, dynamic>),
@@ -92,13 +164,13 @@ class MonitorV2Api {
     String? device,
     String timeRange = '1h',
   }) async {
-    final data = {
-      if (device != null) 'device': device,
-      'timeRange': timeRange,
-    };
+    final request = MonitorSearch(
+      timeRange: timeRange,
+      device: device,
+    );
     final response = await _client.post(
-      ApiConstants.buildApiPath('/monitoring/disk'),
-      data: data,
+      ApiConstants.buildApiPath('/hosts/monitor/search'),
+      data: request.toJson(),
     );
     return Response(
       data: (response.data as List?)
@@ -120,13 +192,13 @@ class MonitorV2Api {
     String? interface,
     String timeRange = '1h',
   }) async {
-    final data = {
-      if (interface != null) 'interface': interface,
-      'timeRange': timeRange,
-    };
+    final request = MonitorSearch(
+      timeRange: timeRange,
+      networkInterface: interface,
+    );
     final response = await _client.post(
-      ApiConstants.buildApiPath('/monitoring/network'),
-      data: data,
+      ApiConstants.buildApiPath('/hosts/monitor/search'),
+      data: request.toJson(),
     );
     return Response(
       data: (response.data as List?)
@@ -137,236 +209,169 @@ class MonitorV2Api {
       requestOptions: response.requestOptions,
     );
   }
+}
 
-  /// 获取告警规则列表
-  ///
-  /// 获取所有告警规则
-  /// @param search 搜索关键词（可选）
-  /// @param metricType 指标类型（可选）
-  /// @param level 告警级别（可选）
-  /// @param page 页码（可选，默认为1）
-  /// @param pageSize 每页数量（可选，默认为10）
-  /// @return 告警规则列表
-  Future<Response<PageResult<AlertRule>>> getAlertRules({
-    String? search,
-    MetricType? metricType,
-    AlertLevel? level,
-    int page = 1,
-    int pageSize = 10,
-  }) async {
-    final data = {
-      'page': page,
-      'pageSize': pageSize,
-      if (search != null) 'search': search,
-      'metricType': metricType?.value,
-      'level': level?.value,
-    };
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/monitoring/alerts/rules/search'),
-      data: data,
-    );
-    return Response(
-      data: PageResult.fromJson(
-        response.data as Map<String, dynamic>,
-        (json) => AlertRule.fromJson(json as Map<String, dynamic>),
-      ),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
+/// 监控搜索请求
+class MonitorSearch {
+  final String? timeRange;
+  final String? metricType;
+  final String? device;
+  final String? networkInterface;
+
+  const MonitorSearch({
+    this.timeRange,
+    this.metricType,
+    this.device,
+    this.networkInterface,
+  });
+
+  Map<String, dynamic> toJson() => {
+        if (timeRange != null) 'timeRange': timeRange,
+        if (metricType != null) 'metricType': metricType,
+        if (device != null) 'device': device,
+        if (networkInterface != null) 'networkInterface': networkInterface,
+      };
+}
+
+/// GPU监控搜索请求
+class MonitorGPUSearch {
+  final String? timeRange;
+
+  const MonitorGPUSearch({this.timeRange});
+
+  Map<String, dynamic> toJson() => {
+        if (timeRange != null) 'timeRange': timeRange,
+      };
+}
+
+/// 监控数据
+class MonitorData {
+  final String? time;
+  final double? cpu;
+  final double? memory;
+  final double? disk;
+  final double? network;
+
+  const MonitorData({
+    this.time,
+    this.cpu,
+    this.memory,
+    this.disk,
+    this.network,
+  });
+
+  factory MonitorData.fromJson(Map<String, dynamic> json) {
+    return MonitorData(
+      time: json['time'] as String?,
+      cpu: (json['cpu'] as num?)?.toDouble(),
+      memory: (json['memory'] as num?)?.toDouble(),
+      disk: (json['disk'] as num?)?.toDouble(),
+      network: (json['network'] as num?)?.toDouble(),
     );
   }
 
-  /// 创建告警规则
-  ///
-  /// 创建新的告警规则
-  /// @param rule 告警规则信息
-  /// @return 创建结果
-  Future<Response> createAlertRule(AlertRule rule) async {
-    return await _client.post(
-      ApiConstants.buildApiPath('/monitoring/alerts/rules'),
-      data: rule.toJson(),
+  Map<String, dynamic> toJson() => {
+        if (time != null) 'time': time,
+        if (cpu != null) 'cpu': cpu,
+        if (memory != null) 'memory': memory,
+        if (disk != null) 'disk': disk,
+        if (network != null) 'network': network,
+      };
+}
+
+/// GPU监控数据
+class MonitorGPUData {
+  final List<GPUInfo>? data;
+
+  const MonitorGPUData({this.data});
+
+  factory MonitorGPUData.fromJson(Map<String, dynamic> json) {
+    return MonitorGPUData(
+      data: (json['data'] as List?)
+          ?.map((item) => GPUInfo.fromJson(item as Map<String, dynamic>))
+          .toList(),
     );
   }
 
-  /// 更新告警规则
-  ///
-  /// 更新指定的告警规则
-  /// @param rule 告警规则更新信息
-  /// @return 更新结果
-  Future<Response> updateAlertRule(AlertRule rule) async {
-    return await _client.post(
-      ApiConstants.buildApiPath('/monitoring/alerts/rules/${rule.id}'),
-      data: rule.toJson(),
+  Map<String, dynamic> toJson() => {
+        if (data != null)
+          'data': data!.map((item) => item.toJson()).toList(),
+      };
+}
+
+/// GPU信息
+class GPUInfo {
+  final String? name;
+  final double? utilization;
+  final double? memory;
+  final double? temperature;
+
+  const GPUInfo({
+    this.name,
+    this.utilization,
+    this.memory,
+    this.temperature,
+  });
+
+  factory GPUInfo.fromJson(Map<String, dynamic> json) {
+    return GPUInfo(
+      name: json['name'] as String?,
+      utilization: (json['utilization'] as num?)?.toDouble(),
+      memory: (json['memory'] as num?)?.toDouble(),
+      temperature: (json['temperature'] as num?)?.toDouble(),
     );
   }
 
-  /// 删除告警规则
-  ///
-  /// 删除指定的告警规则
-  /// @param ids 规则ID列表
-  /// @return 删除结果
-  Future<Response> deleteAlertRules(List<int> ids) async {
-    final operation = BatchDelete(ids: ids);
-    return await _client.post(
-      ApiConstants.buildApiPath('/monitoring/alerts/rules/del'),
-      data: operation.toJson(),
+  Map<String, dynamic> toJson() => {
+        if (name != null) 'name': name,
+        if (utilization != null) 'utilization': utilization,
+        if (memory != null) 'memory': memory,
+        if (temperature != null) 'temperature': temperature,
+      };
+}
+
+/// 监控设置
+class MonitorSetting {
+  final int? interval;
+  final int? retention;
+  final bool? enabled;
+
+  const MonitorSetting({
+    this.interval,
+    this.retention,
+    this.enabled,
+  });
+
+  factory MonitorSetting.fromJson(Map<String, dynamic> json) {
+    return MonitorSetting(
+      interval: json['interval'] as int?,
+      retention: json['retention'] as int?,
+      enabled: json['enabled'] as bool?,
     );
   }
 
-  /// 启用告警规则
-  ///
-  /// 启用指定的告警规则
-  /// @param ids 规则ID列表
-  /// @return 启用结果
-  Future<Response> enableAlertRules(List<int> ids) async {
-    final operation = BatchDelete(ids: ids);
-    return await _client.post(
-      ApiConstants.buildApiPath('/monitoring/alerts/rules/enable'),
-      data: operation.toJson(),
-    );
-  }
+  Map<String, dynamic> toJson() => {
+        if (interval != null) 'interval': interval,
+        if (retention != null) 'retention': retention,
+        if (enabled != null) 'enabled': enabled,
+      };
+}
 
-  /// 禁用告警规则
-  ///
-  /// 禁用指定的告警规则
-  /// @param ids 规则ID列表
-  /// @return 禁用结果
-  Future<Response> disableAlertRules(List<int> ids) async {
-    final operation = BatchDelete(ids: ids);
-    return await _client.post(
-      ApiConstants.buildApiPath('/monitoring/alerts/rules/disable'),
-      data: operation.toJson(),
-    );
-  }
+/// 监控设置更新请求
+class MonitorSettingUpdate {
+  final int? interval;
+  final int? retention;
+  final bool? enabled;
 
-  /// 获取告警通知列表
-  ///
-  /// 获取告警通知列表
-  /// @param search 搜索关键词（可选）
-  /// @param level 告警级别（可选）
-  /// @param acknowledged 是否已确认（可选）
-  /// @param page 页码（可选，默认为1）
-  /// @param pageSize 每页数量（可选，默认为10）
-  /// @return 告警通知列表
-  Future<Response<PageResult<AlertNotification>>> getAlertNotifications({
-    String? search,
-    AlertLevel? level,
-    bool? acknowledged,
-    int page = 1,
-    int pageSize = 10,
-  }) async {
-    final data = {
-      'page': page,
-      'pageSize': pageSize,
-      if (search != null) 'search': search,
-      'level': level?.value,
-      'acknowledged': acknowledged,
-    };
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/monitoring/alerts/notifications/search'),
-      data: data,
-    );
-    return Response(
-      data: PageResult.fromJson(
-        response.data as Map<String, dynamic>,
-        (json) => AlertNotification.fromJson(json as Map<String, dynamic>),
-      ),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
+  const MonitorSettingUpdate({
+    this.interval,
+    this.retention,
+    this.enabled,
+  });
 
-  /// 确认告警通知
-  ///
-  /// 确认指定的告警通知
-  /// @param ids 通知ID列表
-  /// @return 确认结果
-  Future<Response> acknowledgeAlertNotifications(List<int> ids) async {
-    final operation = BatchDelete(ids: ids);
-    return await _client.post(
-      ApiConstants.buildApiPath('/monitoring/alerts/notifications/acknowledge'),
-      data: operation.toJson(),
-    );
-  }
-
-  /// 获取监控配置
-  ///
-  /// 获取系统监控配置
-  /// @return 监控配置
-  Future<Response> getMonitoringConfig() async {
-    return await _client.get(
-      ApiConstants.buildApiPath('/monitoring/config'),
-    );
-  }
-
-  /// 更新监控配置
-  ///
-  /// 更新系统监控配置
-  /// @param config 监控配置
-  /// @return 更新结果
-  Future<Response> updateMonitoringConfig(SecurityConfig config) async {
-    return await _client.post(
-      ApiConstants.buildApiPath('/monitoring/config'),
-      data: config.toJson(),
-    );
-  }
-
-  /// 获取监控统计信息
-  ///
-  /// 获取监控统计信息
-  /// @return 统计信息
-  Future<Response> getMonitoringStats() async {
-    return await _client.get(
-      ApiConstants.buildApiPath('/monitoring/stats'),
-    );
-  }
-
-  /// 测试告警规则
-  ///
-  /// 测试告警规则的有效性
-  /// @param rule 告警规则
-  /// @return 测试结果
-  Future<Response<Map<String, dynamic>>> testAlertRule(AlertRule rule) async {
-    return await _client.post(
-      ApiConstants.buildApiPath('/monitoring/alerts/rules/test'),
-      data: rule.toJson(),
-    );
-  }
-
-  /// 获取监控仪表板数据
-  ///
-  /// 获取监控仪表板数据
-  /// @return 仪表板数据
-  Future<Response<Map<String, dynamic>>> getMonitoringDashboard() async {
-    return await _client.get(
-      ApiConstants.buildApiPath('/monitoring/dashboard'),
-    );
-  }
-
-  /// 导出监控数据
-  ///
-  /// 导出监控数据
-  /// @param metricType 指标类型
-  /// @param startTime 开始时间
-  /// @param endTime 结束时间
-  /// @param format 导出格式（可选，默认为json）
-  /// @return 导出结果
-  Future<Response> exportMonitoringData({
-    required MetricType metricType,
-    required String startTime,
-    required String endTime,
-    String format = 'json',
-  }) async {
-    final data = {
-      'metricType': metricType.value,
-      'startTime': startTime,
-      'endTime': endTime,
-      'format': format,
-    };
-    return await _client.post(
-      ApiConstants.buildApiPath('/monitoring/export'),
-      data: data,
-    );
-  }
+  Map<String, dynamic> toJson() => {
+        if (interval != null) 'interval': interval,
+        if (retention != null) 'retention': retention,
+        if (enabled != null) 'enabled': enabled,
+      };
 }

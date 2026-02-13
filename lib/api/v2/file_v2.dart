@@ -13,6 +13,24 @@ class FileV2Api {
 
   FileV2Api(this._client);
 
+  /// 搜索文件
+  ///
+  /// 在指定目录下搜索文件
+  /// @param request 文件搜索请求
+  /// @return 文件信息响应（包含items数组）
+  Future<Response<FileSearchResponse>> searchFiles(FileSearch request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/files/search'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: FileSearchResponse.fromJson(response.data as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
   /// 获取文件列表
   ///
   /// 获取指定目录下的文件列表
@@ -20,13 +38,12 @@ class FileV2Api {
   /// @return 文件列表
   Future<Response<List<FileInfo>>> getFiles(FileSearch request) async {
     final response = await _client.post(
-      ApiConstants.buildApiPath('/files'),
+      ApiConstants.buildApiPath('/files/search'),
       data: request.toJson(),
     );
+    final fileResponse = FileSearchResponse.fromJson(response.data as Map<String, dynamic>);
     return Response(
-      data: (response.data as List?)
-          ?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
+      data: fileResponse.items,
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -324,10 +341,17 @@ class FileV2Api {
       ApiConstants.buildApiPath('/files/favorite/search'),
       data: request.toJson(),
     );
+    // 处理API返回可能是Map或List的情况
+    final data = response.data;
+    List<FileInfo> files = [];
+    if (data is List) {
+      files = data.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList();
+    } else if (data is Map<String, dynamic>) {
+      final items = data['items'] as List? ?? data['data'] as List?;
+      files = items?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList() ?? [];
+    }
     return Response(
-      data: (response.data as List?)
-          ?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
+      data: files,
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -414,10 +438,17 @@ class FileV2Api {
       ApiConstants.buildApiPath('/files/recycle/search'),
       data: request.toJson(),
     );
+    // 处理API返回可能是Map或List的情况
+    final data = response.data;
+    List<FileInfo> files = [];
+    if (data is List) {
+      files = data.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList();
+    } else if (data is Map<String, dynamic>) {
+      final items = data['items'] as List? ?? data['data'] as List?;
+      files = items?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList() ?? [];
+    }
     return Response(
-      data: (response.data as List?)
-          ?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
+      data: files,
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -498,10 +529,17 @@ class FileV2Api {
       ApiConstants.buildApiPath('/files/upload/search'),
       data: request.toJson(),
     );
+    // 处理API返回可能是Map或List的情况
+    final data = response.data;
+    List<FileInfo> files = [];
+    if (data is List) {
+      files = data.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList();
+    } else if (data is Map<String, dynamic>) {
+      final items = data['items'] as List? ?? data['data'] as List?;
+      files = items?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList() ?? [];
+    }
     return Response(
-      data: (response.data as List?)
-          ?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
+      data: files,
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,

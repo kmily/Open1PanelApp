@@ -809,3 +809,53 @@ class MfaStatus extends Equatable {
   @override
   List<Object?> get props => [enabled, secret];
 }
+
+/// 终端设置信息
+@JsonSerializable()
+class TerminalInfo extends Equatable {
+  final String? cursorBlink;
+  final String? cursorStyle;
+  final String? fontSize;
+  final String? letterSpacing;
+  final String? lineHeight;
+  final String? scrollSensitivity;
+  final String? scrollback;
+
+  const TerminalInfo({
+    this.cursorBlink,
+    this.cursorStyle,
+    this.fontSize,
+    this.letterSpacing,
+    this.lineHeight,
+    this.scrollSensitivity,
+    this.scrollback,
+  });
+
+  factory TerminalInfo.fromJson(Map<String, dynamic> json) => _$TerminalInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$TerminalInfoToJson(this);
+
+  @override
+  List<Object?> get props => [cursorBlink, cursorStyle, fontSize, letterSpacing, lineHeight, scrollSensitivity, scrollback];
+}
+
+/// 界面设置信息
+@JsonSerializable()
+class InterfaceInfo extends Equatable {
+  final String? theme;
+  final String? language;
+  final String? menuCollapse;
+  final String? entry;
+
+  const InterfaceInfo({
+    this.theme,
+    this.language,
+    this.menuCollapse,
+    this.entry,
+  });
+
+  factory InterfaceInfo.fromJson(Map<String, dynamic> json) => _$InterfaceInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$InterfaceInfoToJson(this);
+
+  @override
+  List<Object?> get props => [theme, language, menuCollapse, entry];
+}

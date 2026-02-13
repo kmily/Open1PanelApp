@@ -1,269 +1,87 @@
-/// 1Panel V2 API - Process 相关接口
+/// 1Panel V2 API - Runtime 相关接口
 ///
-/// 此文件包含与进程管理相关的所有API接口，
-/// 包括进程的查询、启动、停止、重启等操作。
+/// 此文件包含与运行时环境管理相关的所有API接口，
+/// 包括PHP运行时、Node.js运行时等的创建、删除、更新、查询等操作。
 
 import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
-import '../../data/models/process_models.dart';
+import '../../data/models/runtime_models.dart';
 import '../../data/models/common_models.dart';
 
-class ProcessV2Api {
+class RuntimeV2Api {
   final DioClient _client;
 
-  ProcessV2Api(this._client);
+  RuntimeV2Api(this._client);
 
-  /// 获取进程列表
+  /// 创建运行时
   ///
-  /// 获取所有进程列表
-  /// @param search 搜索关键词（可选）
-  /// @param user 用户名（可选）
-  /// @param status 进程状态（可选）
-  /// @param sortBy 排序字段（可选）
-  /// @param sortOrder 排序顺序（可选）
-  /// @param page 页码（可选，默认为1）
-  /// @param pageSize 每页数量（可选，默认为10）
-  /// @return 进程列表
-  Future<Response<PageResult<ProcessInfo>>> getProcesses({
-    String? search,
-    String? user,
-    ProcessStatus? status,
-    String? sortBy,
-    String? sortOrder,
-    int page = 1,
-    int pageSize = 10,
-  }) async {
-    final request = ProcessSearch(
-      page: page,
-      pageSize: pageSize,
-      search: search,
-      user: user,
-      status: status,
-      sortBy: sortBy,
-      sortOrder: sortOrder,
-    );
+  /// 创建一个新的运行时环境
+  /// @param request 运行时创建请求
+  /// @return 创建结果
+  Future<Response<RuntimeInfo>> createRuntime(RuntimeCreate request) async {
     final response = await _client.post(
-      ApiConstants.buildApiPath('/processes/search'),
+      ApiConstants.buildApiPath('/runtimes'),
       data: request.toJson(),
     );
     return Response(
-      data: PageResult.fromJson(
-        response.data as Map<String, dynamic>,
-        (json) => ProcessInfo.fromJson(json as Map<String, dynamic>),
-      ),
+      data: RuntimeInfo.fromJson(response.data as Map<String, dynamic>),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
     );
   }
 
-  /// 获取进程详情
+  /// 获取运行时详情
   ///
-  /// 获取指定进程的详细信息
-  /// @param pid 进程ID
-  /// @return 进程详情
-  Future<Response<ProcessInfo>> getProcessDetail(int pid) async {
+  /// 获取指定运行时的详细信息
+  /// @param id 运行时ID
+  /// @return 运行时详情
+  Future<Response<RuntimeInfo>> getRuntime(int id) async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/processes/$pid'),
+      ApiConstants.buildApiPath('/runtimes/$id'),
     );
     return Response(
-      data: ProcessInfo.fromJson(response.data as Map<String, dynamic>),
+      data: RuntimeInfo.fromJson(response.data as Map<String, dynamic>),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
     );
   }
 
-  /// 停止进程
+  /// 删除运行时
   ///
-  /// 停止指定的进程
-  /// @param operation 进程操作
-  /// @return 停止结果
-  Future<Response> operateProcess(ProcessOperation operation) async {
+  /// 删除指定的运行时
+  /// @param ids 运行时ID列表
+  /// @return 删除结果
+  Future<Response> deleteRuntime(List<int> ids) async {
+    final operation = BatchDelete(ids: ids);
     return await _client.post(
-      ApiConstants.buildApiPath('/processes/operate'),
+      ApiConstants.buildApiPath('/runtimes/del'),
       data: operation.toJson(),
     );
   }
 
-  /// 停止进程
+  /// 操作运行时
   ///
-  /// 停止指定的进程
-  /// @param pids 进程ID列表
-  /// @param force 是否强制停止
-  /// @return 停止结果
-  Future<Response> stopProcess(List<int> pids, {bool force = false}) async {
-    final operation = ProcessOperation(
-      pids: pids,
-      operation: force ? 'kill' : 'stop',
-    );
-    return await operateProcess(operation);
-  }
-
-  /// 启动进程
-  ///
-  /// 启动指定的进程
-  /// @param pids 进程ID列表
-  /// @return 启动结果
-  Future<Response> startProcess(List<int> pids) async {
-    final operation = ProcessOperation(
-      pids: pids,
-      operation: 'start',
-    );
-    return await operateProcess(operation);
-  }
-
-  /// 重启进程
-  ///
-  /// 重启指定的进程
-  /// @param pids 进程ID列表
-  /// @return 重启结果
-  Future<Response> restartProcess(List<int> pids) async {
-    final operation = ProcessOperation(
-      pids: pids,
-      operation: 'restart',
-    );
-    return await operateProcess(operation);
-  }
-
-  /// 暂停进程
-  ///
-  /// 暂停指定的进程
-  /// @param pids 进程ID列表
-  /// @return 暂停结果
-  Future<Response> pauseProcess(List<int> pids) async {
-    final operation = ProcessOperation(
-      pids: pids,
-      operation: 'pause',
-    );
-    return await operateProcess(operation);
-  }
-
-  /// 恢复进程
-  ///
-  /// 恢复指定的进程
-  /// @param pids 进程ID列表
-  /// @return 恢复结果
-  Future<Response> resumeProcess(List<int> pids) async {
-    final operation = ProcessOperation(
-      pids: pids,
-      operation: 'resume',
-    );
-    return await operateProcess(operation);
-  }
-
-  /// 杀死进程
-  ///
-  /// 强制终止指定的进程
-  /// @param pids 进程ID列表
-  /// @return 终止结果
-  Future<Response> killProcess(List<int> pids) async {
-    final operation = ProcessOperation(
-      pids: pids,
-      operation: 'kill',
-    );
-    return await operateProcess(operation);
-  }
-
-  /// 获取进程树
-  ///
-  /// 获取进程树结构
-  /// @param pid 根进程ID（可选）
-  /// @return 进程树
-  Future<Response<List<ProcessTreeNode>>> getProcessTree({int? pid}) async {
-    final data = {
-      if (pid != null) 'pid': pid,
-    };
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/processes/tree'),
-      data: data,
-    );
-    return Response(
-      data: (response.data as List?)
-          ?.map((item) => ProcessTreeNode.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
+  /// 对运行时执行操作（启动、停止、重启等）
+  /// @param request 运行时操作请求
+  /// @return 操作结果
+  Future<Response> operateRuntime(RuntimeOperate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/runtimes/operate'),
+      data: request.toJson(),
     );
   }
 
-  /// 获取进程统计信息
+  /// 获取PHP运行时扩展列表
   ///
-  /// 获取进程统计信息
-  /// @return 统计信息
-  Future<Response<ProcessStats>> getProcessStats() async {
+  /// 获取PHP运行时的可用扩展列表
+  /// @param id 运行时ID
+  /// @return 扩展列表
+  Future<Response<List<String>>> getPhpExtensions(int id) async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/processes/stats'),
-    );
-    return Response(
-      data: ProcessStats.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取进程资源使用情况
-  ///
-  /// 获取指定进程的资源使用情况
-  /// @param pid 进程ID
-  /// @return 资源使用情况
-  Future<Response<Map<String, dynamic>>> getProcessResources(int pid) async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/processes/$pid/resources'),
-    );
-    return Response(
-      data: response.data as Map<String, dynamic>,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取进程环境变量
-  ///
-  /// 获取指定进程的环境变量
-  /// @param pid 进程ID
-  /// @return 环境变量
-  Future<Response<Map<String, String>>> getProcessEnvironment(int pid) async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/processes/$pid/environment'),
-    );
-    return Response(
-      data: response.data as Map<String, String>,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取进程网络连接
-  ///
-  /// 获取指定进程的网络连接
-  /// @param pid 进程ID
-  /// @return 网络连接
-  Future<Response<List<Map<String, dynamic>>>> getProcessConnections(int pid) async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/processes/$pid/connections'),
-    );
-    return Response(
-      data: (response.data as List?)?.cast<Map<String, dynamic>>() ?? [],
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取进程打开的文件
-  ///
-  /// 获取指定进程打开的文件列表
-  /// @param pid 进程ID
-  /// @return 打开的文件列表
-  Future<Response<List<String>>> getProcessOpenFiles(int pid) async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/processes/$pid/open-files'),
+      ApiConstants.buildApiPath('/runtimes/$id/extensions'),
     );
     return Response(
       data: (response.data as List?)?.cast<String>() ?? [],
@@ -272,4 +90,289 @@ class ProcessV2Api {
       requestOptions: response.requestOptions,
     );
   }
+
+  /// 更新PHP运行时配置
+  ///
+  /// 更新PHP运行时的配置文件
+  /// @param request 配置更新请求
+  /// @return 更新结果
+  Future<Response> updatePhpConfig(RuntimeConfigUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/runtimes/php/config/update'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 加载PHP运行时配置
+  ///
+  /// 加载PHP运行时的配置文件内容
+  /// @param id 运行时ID
+  /// @return 配置内容
+  Future<Response<String>> loadPhpConfig(int id) async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/runtimes/$id/php/config'),
+    );
+    return Response(
+      data: response.data.toString(),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 获取PHP运行时状态
+  ///
+  /// 获取PHP运行时的当前状态
+  /// @param id 运行时ID
+  /// @return 运行时状态
+  Future<Response<RuntimeStatus>> getPhpStatus(int id) async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/runtimes/$id/php/status'),
+    );
+    return Response(
+      data: RuntimeStatus.fromJson(response.data as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 更新运行时备注
+  ///
+  /// 更新运行时的备注信息
+  /// @param request 备注更新请求
+  /// @return 更新结果
+  Future<Response> updateRuntimeRemark(RuntimeRemarkUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/runtimes/remark/update'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 获取运行时列表
+  ///
+  /// 获取所有运行时列表
+  /// @param request 搜索请求
+  /// @return 运行时列表
+  Future<Response<PageResult<RuntimeInfo>>> getRuntimes(RuntimeSearch request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/runtimes/search'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: PageResult.fromJson(
+        response.data as Map<String, dynamic>,
+        (json) => RuntimeInfo.fromJson(json as Map<String, dynamic>),
+      ),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 同步运行时状态
+  ///
+  /// 同步所有运行时的状态
+  /// @return 同步结果
+  Future<Response> syncRuntimeStatus() async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/runtimes/status/sync'),
+    );
+  }
+
+  /// 更新运行时
+  ///
+  /// 更新指定的运行时配置
+  /// @param request 运行时更新请求
+  /// @return 更新结果
+  Future<Response> updateRuntime(RuntimeUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/runtimes/update'),
+      data: request.toJson(),
+    );
+  }
+}
+
+/// 运行时创建请求
+class RuntimeCreate {
+  final String? name;
+  final String? type;
+  final String? version;
+  final String? remark;
+
+  const RuntimeCreate({
+    this.name,
+    this.type,
+    this.version,
+    this.remark,
+  });
+
+  Map<String, dynamic> toJson() => {
+        if (name != null) 'name': name,
+        if (type != null) 'type': type,
+        if (version != null) 'version': version,
+        if (remark != null) 'remark': remark,
+      };
+}
+
+/// 运行时操作请求
+class RuntimeOperate {
+  final int? id;
+  final String? operate;
+
+  const RuntimeOperate({
+    this.id,
+    this.operate,
+  });
+
+  Map<String, dynamic> toJson() => {
+        if (id != null) 'id': id,
+        if (operate != null) 'operate': operate,
+      };
+}
+
+/// 运行时配置更新请求
+class RuntimeConfigUpdate {
+  final int? id;
+  final String? content;
+
+  const RuntimeConfigUpdate({
+    this.id,
+    this.content,
+  });
+
+  Map<String, dynamic> toJson() => {
+        if (id != null) 'id': id,
+        if (content != null) 'content': content,
+      };
+}
+
+/// 运行时备注更新请求
+class RuntimeRemarkUpdate {
+  final int? id;
+  final String? remark;
+
+  const RuntimeRemarkUpdate({
+    this.id,
+    this.remark,
+  });
+
+  Map<String, dynamic> toJson() => {
+        if (id != null) 'id': id,
+        if (remark != null) 'remark': remark,
+      };
+}
+
+/// 运行时搜索请求
+class RuntimeSearch {
+  final String? name;
+  final String? type;
+  final String? status;
+  final int? page;
+  final int? pageSize;
+
+  const RuntimeSearch({
+    this.name,
+    this.type,
+    this.status,
+    this.page,
+    this.pageSize,
+  });
+
+  Map<String, dynamic> toJson() => {
+        if (name != null) 'name': name,
+        if (type != null) 'type': type,
+        if (status != null) 'status': status,
+        if (page != null) 'page': page,
+        if (pageSize != null) 'pageSize': pageSize,
+      };
+}
+
+/// 运行时更新请求
+class RuntimeUpdate {
+  final int? id;
+  final String? name;
+  final String? remark;
+
+  const RuntimeUpdate({
+    this.id,
+    this.name,
+    this.remark,
+  });
+
+  Map<String, dynamic> toJson() => {
+        if (id != null) 'id': id,
+        if (name != null) 'name': name,
+        if (remark != null) 'remark': remark,
+      };
+}
+
+/// 运行时信息
+class RuntimeInfo {
+  final int? id;
+  final String? name;
+  final String? type;
+  final String? version;
+  final String? status;
+  final String? remark;
+  final String? createdAt;
+
+  const RuntimeInfo({
+    this.id,
+    this.name,
+    this.type,
+    this.version,
+    this.status,
+    this.remark,
+    this.createdAt,
+  });
+
+  factory RuntimeInfo.fromJson(Map<String, dynamic> json) {
+    return RuntimeInfo(
+      id: json['id'] as int?,
+      name: json['name'] as String?,
+      type: json['type'] as String?,
+      version: json['version'] as String?,
+      status: json['status'] as String?,
+      remark: json['remark'] as String?,
+      createdAt: json['createdAt'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        if (id != null) 'id': id,
+        if (name != null) 'name': name,
+        if (type != null) 'type': type,
+        if (version != null) 'version': version,
+        if (status != null) 'status': status,
+        if (remark != null) 'remark': remark,
+        if (createdAt != null) 'createdAt': createdAt,
+      };
+}
+
+/// 运行时状态
+class RuntimeStatus {
+  final String? status;
+  final String? message;
+  final int? uptime;
+
+  const RuntimeStatus({
+    this.status,
+    this.message,
+    this.uptime,
+  });
+
+  factory RuntimeStatus.fromJson(Map<String, dynamic> json) {
+    return RuntimeStatus(
+      status: json['status'] as String?,
+      message: json['message'] as String?,
+      uptime: json['uptime'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        if (status != null) 'status': status,
+        if (message != null) 'message': message,
+        if (uptime != null) 'uptime': uptime,
+      };
 }

@@ -45,24 +45,23 @@ Map<String, dynamic> _$AppSearchResponseToJson(AppSearchResponse instance) =>
     };
 
 AppItem _$AppItemFromJson(Map<String, dynamic> json) => AppItem(
-      description: json['description'] as String,
+      description: json['description'] as String?,
       github: json['github'] as String?,
-      gpuSupport: json['gpuSupport'] as bool,
-      icon: json['icon'] as String,
-      id: (json['id'] as num).toInt(),
-      installed: json['installed'] as bool,
-      key: json['key'] as String,
-      limit: (json['limit'] as num).toInt(),
-      name: json['name'] as String,
-      recommend: (json['recommend'] as num).toInt(),
-      resource: json['resource'] as String,
-      status: json['status'] as String,
-      tags: (json['tags'] as List<dynamic>)
-          .map((e) => TagDTO.fromJson(e as Map<String, dynamic>))
+      gpuSupport: json['gpuSupport'] as bool?,
+      icon: json['icon'] as String?,
+      id: (json['id'] as num?)?.toInt(),
+      installed: json['installed'] as bool?,
+      key: json['key'] as String?,
+      limit: (json['limit'] as num?)?.toInt(),
+      name: json['name'] as String?,
+      recommend: (json['recommend'] as num?)?.toInt(),
+      resource: json['resource'] as String?,
+      status: json['status'] as String?,
+      tags: json['tags'] as List<dynamic>?,
+      type: json['type'] as String?,
+      versions: (json['versions'] as List<dynamic>?)
+          ?.map((e) => e as String)
           .toList(),
-      type: json['type'] as String,
-      versions:
-          (json['versions'] as List<dynamic>).map((e) => e as String).toList(),
       website: json['website'] as String?,
     );
 

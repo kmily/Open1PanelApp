@@ -17,12 +17,30 @@ class SettingV2Api {
   ///
   /// 获取系统设置信息
   /// @return 系统设置
-  Future<Response<SystemSettings>> getSystemSettings() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/settings'),
+  Future<Response<SettingInfo>> getSystemSettings() async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/core/settings/search'),
     );
     return Response(
-      data: SystemSettings.fromJson(response.data as Map<String, dynamic>),
+      data: SettingInfo.fromJson(response.data as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 通过key获取系统设置
+  ///
+  /// 通过key获取系统设置
+  /// @param key 设置key
+  /// @return 系统设置
+  Future<Response<SettingInfo>> getSystemSettingByKey(String key) async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/core/settings/by'),
+      queryParameters: {'key': key},
+    );
+    return Response(
+      data: SettingInfo.fromJson(response.data as Map<String, dynamic>),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -32,18 +50,12 @@ class SettingV2Api {
   /// 更新系统设置
   ///
   /// 更新系统设置
-  /// @param settings 设置信息
+  /// @param request 设置更新请求
   /// @return 更新结果
-  Future<Response<SystemSettings>> updateSystemSettings(SystemSettings settings) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings'),
-      data: settings.toJson(),
-    );
-    return Response(
-      data: SystemSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
+  Future<Response<void>> updateSystemSetting(SettingUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/settings/update'),
+      data: request.toJson(),
     );
   }
 
@@ -63,385 +75,135 @@ class SettingV2Api {
     );
   }
 
-  /// 获取系统时间
+  /// 获取终端设置
   ///
-  /// 获取系统时间
-  /// @return 系统时间
-  Future<Response<SystemTime>> getSystemTime() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/time'),
-    );
-    return Response(
-      data: SystemTime.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新系统时间
-  ///
-  /// 更新系统时间
-  /// @param timeSet 时间设置
-  /// @return 更新结果
-  Future<Response<SystemTime>> updateSystemTime(SystemTimeSet timeSet) async {
+  /// 获取终端设置信息
+  /// @return 终端设置
+  Future<Response<TerminalInfo>> getTerminalSettings() async {
     final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/time'),
-      data: timeSet.toJson(),
+      ApiConstants.buildApiPath('/core/settings/terminal/search'),
     );
     return Response(
-      data: SystemTime.fromJson(response.data as Map<String, dynamic>),
+      data: TerminalInfo.fromJson(response.data as Map<String, dynamic>),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
     );
   }
 
-  /// 同步系统时间
+  /// 更新终端设置
   ///
-  /// 同步系统时间
-  /// @param ntpSync NTP同步设置
-  /// @return 同步结果
-  Future<Response> syncSystemTime(NTPSync ntpSync) async {
+  /// 更新终端设置
+  /// @param request 终端设置更新请求
+  /// @return 更新结果
+  Future<Response<void>> updateTerminalSettings(TerminalUpdate request) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/settings/time/sync'),
-      data: ntpSync.toJson(),
+      ApiConstants.buildApiPath('/core/settings/terminal/update'),
+      data: request.toJson(),
     );
   }
 
-  /// 获取安全设置
+  /// 获取界面设置
   ///
-  /// 获取安全设置信息
-  /// @return 安全设置
-  Future<Response<SecuritySettings>> getSecuritySettings() async {
+  /// 获取界面设置信息
+  /// @return 界面设置
+  Future<Response<InterfaceInfo>> getInterfaceSettings() async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/security'),
+      ApiConstants.buildApiPath('/core/settings/interface'),
     );
     return Response(
-      data: SecuritySettings.fromJson(response.data as Map<String, dynamic>),
+      data: InterfaceInfo.fromJson(response.data as Map<String, dynamic>),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
     );
   }
 
-  /// 更新安全设置
+  /// 更新密码设置
   ///
-  /// 更新安全设置
-  /// @param settings 安全设置
+  /// 更新系统密码设置
+  /// @param request 密码更新请求
   /// @return 更新结果
-  Future<Response<SecuritySettings>> updateSecuritySettings(SecuritySettings settings) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/security'),
-      data: settings.toJson(),
-    );
-    return Response(
-      data: SecuritySettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取面板设置
-  ///
-  /// 获取面板设置信息
-  /// @return 面板设置
-  Future<Response<PanelSettings>> getPanelSettings() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/panel'),
-    );
-    return Response(
-      data: PanelSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新面板设置
-  ///
-  /// 更新面板设置
-  /// @param settings 面板设置
-  /// @return 更新结果
-  Future<Response<PanelSettings>> updatePanelSettings(PanelSettings settings) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/panel'),
-      data: settings.toJson(),
-    );
-    return Response(
-      data: PanelSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取用户设置
-  ///
-  /// 获取用户设置信息
-  /// @return 用户设置
-  Future<Response<UserSettings>> getUserSettings() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/user'),
-    );
-    return Response(
-      data: UserSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新用户设置
-  ///
-  /// 更新用户设置
-  /// @param settings 用户设置
-  /// @return 更新结果
-  Future<Response<UserSettings>> updateUserSettings(UserSettings settings) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/user'),
-      data: settings.toJson(),
-    );
-    return Response(
-      data: UserSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取通知设置
-  ///
-  /// 获取通知设置信息
-  /// @return 通知设置
-  Future<Response<NotificationSettings>> getNotificationSettings() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/notification'),
-    );
-    return Response(
-      data: NotificationSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新通知设置
-  ///
-  /// 更新通知设置
-  /// @param settings 通知设置
-  /// @return 更新结果
-  Future<Response<NotificationSettings>> updateNotificationSettings(NotificationSettings settings) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/notification'),
-      data: settings.toJson(),
-    );
-    return Response(
-      data: NotificationSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取备份设置
-  ///
-  /// 获取备份设置信息
-  /// @return 备份设置
-  Future<Response<BackupSettings>> getBackupSettings() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/backup'),
-    );
-    return Response(
-      data: BackupSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新备份设置
-  ///
-  /// 更新备份设置
-  /// @param settings 备份设置
-  /// @return 更新结果
-  Future<Response<BackupSettings>> updateBackupSettings(BackupSettings settings) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/backup'),
-      data: settings.toJson(),
-    );
-    return Response(
-      data: BackupSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取主题设置
-  ///
-  /// 获取主题设置信息
-  /// @return 主题设置
-  Future<Response<ThemeSettings>> getThemeSettings() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/theme'),
-    );
-    return Response(
-      data: ThemeSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新主题设置
-  ///
-  /// 更新主题设置
-  /// @param settings 主题设置
-  /// @return 更新结果
-  Future<Response<ThemeSettings>> updateThemeSettings(ThemeSettings settings) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/theme'),
-      data: settings.toJson(),
-    );
-    return Response(
-      data: ThemeSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取语言设置
-  ///
-  /// 获取语言设置信息
-  /// @return 语言设置
-  Future<Response<LanguageSettings>> getLanguageSettings() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/language'),
-    );
-    return Response(
-      data: LanguageSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新语言设置
-  ///
-  /// 更新语言设置
-  /// @param languageSet 语言设置
-  /// @return 更新结果
-  Future<Response<LanguageSettings>> updateLanguageSettings(LanguageSet languageSet) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/language'),
-      data: languageSet.toJson(),
-    );
-    return Response(
-      data: LanguageSettings.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取时区列表
-  ///
-  /// 获取可用的时区列表
-  /// @return 时区列表
-  Future<Response<List<TimezoneInfo>>> getTimezones() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/timezones'),
-    );
-    return Response(
-      data: (response.data as List?)
-          ?.map((item) => TimezoneInfo.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取语言列表
-  ///
-  /// 获取可用的语言列表
-  /// @return 语言列表
-  Future<Response<List<LanguageInfo>>> getLanguages() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/languages'),
-    );
-    return Response(
-      data: (response.data as List?)
-          ?.map((item) => LanguageInfo.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取主题列表
-  ///
-  /// 获取可用的主题列表
-  /// @return 主题列表
-  Future<Response<List<ThemeInfo>>> getThemes() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/themes'),
-    );
-    return Response(
-      data: (response.data as List?)
-          ?.map((item) => ThemeInfo.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 重置系统设置
-  ///
-  /// 重置系统设置为默认值
-  /// @return 重置结果
-  Future<Response> resetSystemSettings() async {
+  Future<Response<void>> updatePasswordSettings(PasswordUpdate request) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/settings/reset'),
+      ApiConstants.buildApiPath('/core/settings/password/update'),
+      data: request.toJson(),
     );
   }
 
-  /// 导出系统设置
+  /// 更新端口设置
   ///
-  /// 导出系统设置
-  /// @return 导出结果
-  Future<Response<SettingsExport>> exportSystemSettings() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/export'),
-    );
-    return Response(
-      data: SettingsExport.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
+  /// 更新系统端口设置
+  /// @param request 端口更新请求
+  /// @return 更新结果
+  Future<Response<void>> updatePortSettings(PortUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/settings/port/update'),
+      data: request.toJson(),
     );
   }
 
-  /// 导入系统设置
+  /// 更新代理设置
   ///
-  /// 导入系统设置
-  /// @param settingsImport 设置导入内容
-  /// @return 导入结果
-  Future<Response<SystemSettings>> importSystemSettings(SettingsImport settingsImport) async {
+  /// 更新系统代理设置
+  /// @param request 代理更新请求
+  /// @return 更新结果
+  Future<Response<void>> updateProxySettings(ProxyUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/settings/proxy/update'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 更新绑定设置
+  ///
+  /// 更新绑定相关设置
+  /// @param request 绑定更新请求
+  /// @return 更新结果
+  Future<Response<void>> updateBindSettings(BindUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/settings/bind/update'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 更新菜单设置
+  ///
+  /// 更新系统菜单设置
+  /// @param request 菜单更新请求
+  /// @return 更新结果
+  Future<Response<void>> updateMenuSettings(MenuUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/settings/menu/update'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 获取默认菜单
+  ///
+  /// 获取默认菜单配置
+  /// @return 默认菜单
+  Future<Response<Map<String, dynamic>>> getDefaultMenu() async {
     final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/import'),
-      data: settingsImport.toJson(),
+      ApiConstants.buildApiPath('/core/settings/menu/default'),
     );
     return Response(
-      data: SystemSettings.fromJson(response.data as Map<String, dynamic>),
+      data: response.data as Map<String, dynamic>,
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 处理过期
+  ///
+  /// 处理系统过期
+  /// @param request 过期处理请求
+  /// @return 处理结果
+  Future<Response<void>> handleExpired(ExpiredHandle request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/settings/expired/handle'),
+      data: request.toJson(),
     );
   }
 
@@ -451,7 +213,7 @@ class SettingV2Api {
   /// @return API密钥生成结果
   Future<Response<Map<String, dynamic>>> generateApiKey() async {
     final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/api/config/generate/key'),
+      ApiConstants.buildApiPath('/core/settings/api/config/generate/key'),
     );
     return Response(
       data: response.data as Map<String, dynamic>,
@@ -460,6 +222,48 @@ class SettingV2Api {
       requestOptions: response.requestOptions,
     );
   }
+
+  /// 更新API配置
+  ///
+  /// 更新API配置
+  /// @param request API配置更新请求
+  /// @return 更新结果
+  Future<Response<void>> updateApiConfig(ApiConfigUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/settings/api/config/update'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 获取应用商店配置
+  ///
+  /// 获取应用商店配置信息
+  /// @return 应用商店配置
+  Future<Response<Map<String, dynamic>>> getAppStoreConfig() async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/core/settings/apps/store/config'),
+    );
+    return Response(
+      data: response.data as Map<String, dynamic>,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 更新应用商店配置
+  ///
+  /// 更新应用商店配置
+  /// @param request 应用商店配置更新请求
+  /// @return 更新结果
+  Future<Response<void>> updateAppStoreConfig(AppStoreConfigUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/settings/apps/store/update'),
+      data: request.toJson(),
+    );
+  }
+
+  // ==================== 快照相关API ====================
 
   /// 获取基础目录设置
   ///
@@ -477,211 +281,14 @@ class SettingV2Api {
     );
   }
 
-  /// 更新基础目录设置
+  /// 通过key获取设置（settings路径）
   ///
-  /// 更新基础目录配置
-  /// @param dirPath 基础目录路径
-  /// @return 更新结果
-  Future<Response<void>> updateBaseDir(Map<String, dynamic> request) async {
-    final response = await _client.put(
-      ApiConstants.buildApiPath('/settings/basedir'),
-      data: request,
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 绑定更新设置
-  ///
-  /// 更新绑定相关设置
-  /// @param request 绑定更新请求
-  /// @return 更新结果
-  Future<Response<void>> updateBindSettings( Map<String, dynamic> request) async {
-    final response = await _client.put(
-      ApiConstants.buildApiPath('/settings/bind/update'),
-      data: request,
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新密码设置
-  ///
-  /// 更新系统密码设置
-  /// @param request 密码更新请求
-  /// @return 更新结果
-  Future<Response<void>> updatePasswordSettings( Map<String, dynamic> request) async {
-    final response = await _client.put(
-      ApiConstants.buildApiPath('/settings/password/update'),
-      data: request,
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新端口设置
-  ///
-  /// 更新系统端口设置
-  /// @param request 端口更新请求
-  /// @return 更新结果
-  Future<Response<void>> updatePortSettings( Map<String, dynamic> request) async {
-    final response = await _client.put(
-      ApiConstants.buildApiPath('/settings/port/update'),
-      data: request,
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新代理设置
-  ///
-  /// 更新系统代理设置
-  /// @param request 代理更新请求
-  /// @return 更新结果
-  Future<Response<void>> updateProxySettings( Map<String, dynamic> request) async {
-    final response = await _client.put(
-      ApiConstants.buildApiPath('/settings/proxy/update'),
-      data: request,
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 系统回滚
-  ///
-  /// 执行系统回滚操作
-  /// @return 回滚结果
-  Future<Response<void>> systemRollback() async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/rollback'),
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新界面设置
-  ///
-  /// 更新用户界面设置
-  /// @param request 界面更新请求
-  /// @return 更新结果
-  Future<Response<void>> updateInterfaceSettings( Map<String, dynamic> request) async {
-    final response = await _client.put(
-      ApiConstants.buildApiPath('/settings/interface'),
-      data: request,
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新菜单设置
-  ///
-  /// 更新系统菜单设置
-  /// @param request 菜单更新请求
-  /// @return 更新结果
-  Future<Response<void>> updateMenuSettings( Map<String, dynamic> request) async {
-    final response = await _client.put(
-      ApiConstants.buildApiPath('/settings/menu/update'),
-      data: request,
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 终端设置搜索
-  ///
-  /// 搜索终端设置
-  /// @param request 搜索请求
-  /// @return 搜索结果
-  Future<Response<List<SettingInfo>>> searchTerminalSettings( Map<String, dynamic> request) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/terminal/search'),
-      data: request,
-    );
-    return Response(
-      data: (response.data as List?)
-          ?.map((item) => SettingInfo.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新终端设置
-  ///
-  /// 更新终端设置
-  /// @param request 终端更新请求
-  /// @return 更新结果
-  Future<Response<void>> updateTerminalSettings( Map<String, dynamic> request) async {
-    final response = await _client.put(
-      ApiConstants.buildApiPath('/settings/terminal/update'),
-      data: request,
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新SSL设置
-  ///
-  /// 更新SSL证书设置
-  /// @param request SSL更新请求
-  /// @return 更新结果
-  Future<Response<void>> updateSSLSettings( Map<String, dynamic> request) async {
-    final response = await _client.put(
-      ApiConstants.buildApiPath('/settings/ssl/update'),
-      data: request,
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取SSL证书信息
-  ///
-  /// 获取SSL证书信息
-  /// @return SSL证书信息
-  Future<Response<Map<String, dynamic>>> getSSLInfo() async {
+  /// 通过key获取设置
+  /// @param key 设置key
+  /// @return 设置值
+  Future<Response<Map<String, dynamic>>> getSettingByKey(String key) async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/settings/ssl/info'),
+      ApiConstants.buildApiPath('/settings/get/$key'),
     );
     return Response(
       data: response.data as Map<String, dynamic>,
@@ -691,67 +298,13 @@ class SettingV2Api {
     );
   }
 
-  /// 下载SSL证书
+  /// 搜索设置
   ///
-  /// 下载SSL证书文件
-  /// @param request SSL下载请求
-  /// @return 下载结果
-  Future<Response<String>> downloadSSLCertificate( Map<String, dynamic> request) async {
+  /// 搜索系统设置
+  /// @return 设置信息
+  Future<Response<Map<String, dynamic>>> searchSettings() async {
     final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/ssl/download'),
-      data: request,
-    );
-    return Response(
-      data: response.data?.toString() ?? '',
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 处理许可证过期
-  ///
-  /// 处理许可证过期
-  /// @param request 过期处理请求
-  /// @return 处理结果
-  Future<Response<void>> handleLicenseExpire( Map<String, dynamic> request) async {
-    final response = await _client.put(
-      ApiConstants.buildApiPath('/settings/expire/handle'),
-      data: request,
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 系统升级
-  ///
-  /// 执行系统升级操作
-  /// @return 升级结果
-  Future<Response<void>> systemUpgrade() async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/upgrade'),
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 系统验证
-  ///
-  /// 执行系统验证操作
-  /// @param request 验证请求
-  /// @return 验证结果
-  Future<Response<Map<String, dynamic>>> systemVerify( Map<String, dynamic> request) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/verify'),
-      data: request,
+      ApiConstants.buildApiPath('/settings/search'),
     );
     return Response(
       data: response.data as Map<String, dynamic>,
@@ -761,15 +314,13 @@ class SettingV2Api {
     );
   }
 
-  /// 验证过期码
+  /// 检查设置可用性
   ///
-  /// 验证许可证过期码
-  /// @param request 过期码验证请求
-  /// @return 验证结果
-  Future<Response<Map<String, dynamic>>> verifyExpireCode( Map<String, dynamic> request) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/expire/code'),
-      data: request,
+  /// 检查设置是否可用
+  /// @return 可用性结果
+  Future<Response<Map<String, dynamic>>> checkSettingsAvailable() async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/settings/search/available'),
     );
     return Response(
       data: response.data as Map<String, dynamic>,
@@ -779,39 +330,15 @@ class SettingV2Api {
     );
   }
 
-  /// 升级过期版本
+  /// 保存描述
   ///
-  /// 升级过期版本
-  /// @param request 过期升级请求
-  /// @return 升级结果
-  Future<Response<void>> upgradeExpireVersion( Map<String, dynamic> request) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/expire/upgrade'),
-      data: request,
-    );
-    return Response(
-      data: null,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 设置向导
-  ///
-  /// 执行设置向导操作
-  /// @param request 向导请求
-  /// @return 向导结果
-  Future<Response<Map<String, dynamic>>> wizardSettings( Map<String, dynamic> request) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/settings/wizard'),
-      data: request,
-    );
-    return Response(
-      data: response.data as Map<String, dynamic>,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
+  /// 保存系统描述
+  /// @param request 描述保存请求
+  /// @return 保存结果
+  Future<Response<void>> saveDescription(DescriptionSave request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/description/save'),
+      data: request.toJson(),
     );
   }
 
@@ -888,4 +415,108 @@ class SettingV2Api {
       requestOptions: response.requestOptions,
     );
   }
+}
+
+// ==================== 请求模型 ====================
+
+class SettingUpdate {
+  final String key;
+  final String value;
+
+  const SettingUpdate({required this.key, required this.value});
+
+  Map<String, dynamic> toJson() => {'key': key, 'value': value};
+}
+
+class TerminalUpdate {
+  final String? lineTheme;
+  final int? fontSize;
+  final String? fontFamily;
+
+  const TerminalUpdate({this.lineTheme, this.fontSize, this.fontFamily});
+
+  Map<String, dynamic> toJson() => {
+        if (lineTheme != null) 'lineTheme': lineTheme,
+        if (fontSize != null) 'fontSize': fontSize,
+        if (fontFamily != null) 'fontFamily': fontFamily,
+      };
+}
+
+class PasswordUpdate {
+  final String oldPassword;
+  final String newPassword;
+
+  const PasswordUpdate({required this.oldPassword, required this.newPassword});
+
+  Map<String, dynamic> toJson() => {'oldPassword': oldPassword, 'newPassword': newPassword};
+}
+
+class PortUpdate {
+  final int port;
+
+  const PortUpdate({required this.port});
+
+  Map<String, dynamic> toJson() => {'port': port};
+}
+
+class ProxyUpdate {
+  final String? proxyUrl;
+  final int? proxyPort;
+
+  const ProxyUpdate({this.proxyUrl, this.proxyPort});
+
+  Map<String, dynamic> toJson() => {
+        if (proxyUrl != null) 'proxyUrl': proxyUrl,
+        if (proxyPort != null) 'proxyPort': proxyPort,
+      };
+}
+
+class BindUpdate {
+  final String? bindAddress;
+
+  const BindUpdate({this.bindAddress});
+
+  Map<String, dynamic> toJson() => {
+        if (bindAddress != null) 'bindAddress': bindAddress,
+      };
+}
+
+class MenuUpdate {
+  final List<String> menus;
+
+  const MenuUpdate({required this.menus});
+
+  Map<String, dynamic> toJson() => {'menus': menus};
+}
+
+class ExpiredHandle {
+  final String? method;
+
+  const ExpiredHandle({this.method});
+
+  Map<String, dynamic> toJson() => {if (method != null) 'method': method};
+}
+
+class ApiConfigUpdate {
+  final String? apiKey;
+
+  const ApiConfigUpdate({this.apiKey});
+
+  Map<String, dynamic> toJson() => {if (apiKey != null) 'apiKey': apiKey};
+}
+
+class AppStoreConfigUpdate {
+  final String? storeUrl;
+
+  const AppStoreConfigUpdate({this.storeUrl});
+
+  Map<String, dynamic> toJson() => {if (storeUrl != null) 'storeUrl': storeUrl};
+}
+
+class DescriptionSave {
+  final String description;
+
+  const DescriptionSave({required this.description});
+
+  Map<String, dynamic> toJson() => {'description': description};
 }

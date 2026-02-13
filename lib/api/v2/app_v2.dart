@@ -85,8 +85,16 @@ class AppV2Api {
       ApiConstants.buildApiPath('/apps/ignored'),
     );
     final data = response.data as Map<String, dynamic>;
-    final list = data['data'] as List;
-    return list.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList();
+    // 处理API返回的data字段可能是Map或List的情况
+    final dataField = data['data'];
+    if (dataField is List) {
+      return dataField.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList();
+    } else if (dataField is Map<String, dynamic>) {
+      // 如果data是Map，尝试从items字段获取列表
+      final items = dataField['items'] as List?;
+      return items?.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    }
+    return [];
   }
 
   /// 检查应用安装
@@ -148,8 +156,16 @@ class AppV2Api {
       ApiConstants.buildApiPath('/apps/installed/list'),
     );
     final data = response.data as Map<String, dynamic>;
-    final list = data['data'] as List;
-    return list.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList();
+    // 处理API返回的data字段可能是Map或List的情况
+    final dataField = data['data'];
+    if (dataField is List) {
+      return dataField.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList();
+    } else if (dataField is Map<String, dynamic>) {
+      // 如果data是Map，尝试从items字段获取列表
+      final items = dataField['items'] as List?;
+      return items?.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    }
+    return [];
   }
 
   /// 加载应用端口
@@ -205,8 +221,15 @@ class AppV2Api {
       ApiConstants.buildApiPath('/apps/installed/update/versions/$appInstallId'),
     );
     final data = response.data as Map<String, dynamic>;
-    final list = data['data'] as List;
-    return list.map((e) => AppVersion.fromJson(e as Map<String, dynamic>)).toList();
+    // 处理API返回的data字段可能是Map或List的情况
+    final dataField = data['data'];
+    if (dataField is List) {
+      return dataField.map((e) => AppVersion.fromJson(e as Map<String, dynamic>)).toList();
+    } else if (dataField is Map<String, dynamic>) {
+      final items = dataField['items'] as List?;
+      return items?.map((e) => AppVersion.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    }
+    return [];
   }
 
   /// 获取应用服务列表
@@ -215,14 +238,21 @@ class AppV2Api {
       ApiConstants.buildApiPath('/apps/services/$key'),
     );
     final data = response.data as Map<String, dynamic>;
-    final list = data['data'] as List;
-    return list.map((e) => AppServiceResponse.fromJson(e as Map<String, dynamic>)).toList();
+    // 处理API返回的data字段可能是Map或List的情况
+    final dataField = data['data'];
+    if (dataField is List) {
+      return dataField.map((e) => AppServiceResponse.fromJson(e as Map<String, dynamic>)).toList();
+    } else if (dataField is Map<String, dynamic>) {
+      final items = dataField['items'] as List?;
+      return items?.map((e) => AppServiceResponse.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    }
+    return [];
   }
 
   /// 获取应用商店配置
   Future<AppstoreConfigResponse> getAppstoreConfig() async {
     final response = await _dio.get<dynamic>(
-      ApiConstants.buildApiPath('/apps/store/config'),
+      ApiConstants.buildApiPath('/core/settings/apps/store/config'),
     );
     final data = response.data as Map<String, dynamic>;
     return AppstoreConfigResponse.fromJson(data['data'] as Map<String, dynamic>);

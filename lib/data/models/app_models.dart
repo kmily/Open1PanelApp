@@ -49,44 +49,54 @@ class AppSearchResponse {
 /// 应用项模型
 @JsonSerializable()
 class AppItem {
-  final String description;
+  final String? description;
   final String? github;
-  final bool gpuSupport;
-  final String icon;
-  final int id;
-  final bool installed;
-  final String key;
-  final int limit;
-  final String name;
-  final int recommend;
-  final String resource;
-  final String status;
-  final List<TagDTO> tags;
-  final String type;
-  final List<String> versions;
+  final bool? gpuSupport;
+  final String? icon;
+  final int? id;
+  final bool? installed;
+  final String? key;
+  final int? limit;
+  final String? name;
+  final int? recommend;
+  final String? resource;
+  final String? status;
+  final List<dynamic>? tags; // 支持字符串或对象
+  final String? type;
+  final List<String>? versions;
   final String? website;
 
   AppItem({
-    required this.description,
+    this.description,
     this.github,
-    required this.gpuSupport,
-    required this.icon,
-    required this.id,
-    required this.installed,
-    required this.key,
-    required this.limit,
-    required this.name,
-    required this.recommend,
-    required this.resource,
-    required this.status,
-    required this.tags,
-    required this.type,
-    required this.versions,
+    this.gpuSupport,
+    this.icon,
+    this.id,
+    this.installed,
+    this.key,
+    this.limit,
+    this.name,
+    this.recommend,
+    this.resource,
+    this.status,
+    this.tags,
+    this.type,
+    this.versions,
     this.website,
   });
 
   factory AppItem.fromJson(Map<String, dynamic> json) => _$AppItemFromJson(json);
   Map<String, dynamic> toJson() => _$AppItemToJson(this);
+  
+  /// 获取标签名称列表
+  List<String> get tagNames {
+    if (tags == null) return [];
+    return tags!.map((t) {
+      if (t is String) return t;
+      if (t is Map<String, dynamic>) return t['name'] as String? ?? t['key'] as String? ?? '';
+      return t.toString();
+    }).toList();
+  }
 }
 
 /// 标签DTO模型

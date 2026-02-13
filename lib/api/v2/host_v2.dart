@@ -21,7 +21,7 @@ class HostV2Api {
   /// @return 创建结果
   Future<Response> createHost(HostCreate request) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/hosts'),
+      ApiConstants.buildApiPath('/core/hosts'),
       data: request.toJson(),
     );
   }
@@ -33,7 +33,7 @@ class HostV2Api {
   /// @return 删除结果
   Future<Response> deleteHost(OperateByID request) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/hosts/del'),
+      ApiConstants.buildApiPath('/core/hosts/del'),
       data: request.toJson(),
     );
   }
@@ -45,7 +45,7 @@ class HostV2Api {
   /// @return 更新结果
   Future<Response> updateHost(HostUpdate request) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/hosts/${request.id}/update'),
+      ApiConstants.buildApiPath('/core/hosts/${request.id}/update'),
       data: request.toJson(),
     );
   }
@@ -57,7 +57,7 @@ class HostV2Api {
   /// @return 主机列表
   Future<Response<PageResult<HostInfo>>> getHosts(HostSearch request) async {
     final response = await _client.post(
-      ApiConstants.buildApiPath('/hosts/search'),
+      ApiConstants.buildApiPath('/core/hosts/search'),
       data: request.toJson(),
     );
     return Response(
@@ -78,7 +78,7 @@ class HostV2Api {
   /// @return 主机详情
   Future<Response<HostInfo>> getHostDetail(int id) async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/hosts/$id'),
+      ApiConstants.buildApiPath('/core/hosts/$id'),
     );
     return Response(
       data: HostInfo.fromJson(response.data as Map<String, dynamic>),
@@ -99,7 +99,7 @@ class HostV2Api {
       'timeRange': timeRange,
     };
     final response = await _client.post(
-      ApiConstants.buildApiPath('/hosts/$id/monitor'),
+      ApiConstants.buildApiPath('/core/hosts/$id/monitor'),
       data: data,
     );
     return Response(
@@ -117,7 +117,7 @@ class HostV2Api {
   /// @return 监控设置
   Future<Response<HostMonitorSetting>> getHostMonitorSetting(int id) async {
     final response = await _client.get(
-      ApiConstants.buildApiPath('/hosts/$id/monitor/setting'),
+      ApiConstants.buildApiPath('/core/hosts/$id/monitor/setting'),
     );
     return Response(
       data: HostMonitorSetting.fromJson(response.data as Map<String, dynamic>),
@@ -134,7 +134,7 @@ class HostV2Api {
   /// @return 更新结果
   Future<Response> updateHostMonitorSetting(HostMonitorSetting request) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/hosts/${request.hostId}/monitor/setting'),
+      ApiConstants.buildApiPath('/core/hosts/${request.hostId}/monitor/setting'),
       data: request.toJson(),
     );
   }
@@ -147,7 +147,7 @@ class HostV2Api {
   /// @return 监控搜索结果
   Future<Response<PageResult<HostMonitor>>> searchHostMonitor(int id, HostSearch request) async {
     final response = await _client.post(
-      ApiConstants.buildApiPath('/hosts/$id/monitor/search'),
+      ApiConstants.buildApiPath('/core/hosts/$id/monitor/search'),
       data: request.toJson(),
     );
     return Response(
