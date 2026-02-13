@@ -1,16 +1,35 @@
 /// 应用管理页面
 /// 
 /// 此文件定义应用管理页面，管理已安装的应用和应用市场。
+/// 遵循Material You Design 3设计规范
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../shared/widgets/app_card.dart';
 import '../../widgets/main_layout.dart';
+import 'apps_provider.dart';
 
-class AppsPage extends StatelessWidget {
+class AppsPage extends StatefulWidget {
   const AppsPage({super.key});
 
   @override
+  State<AppsPage> createState() => _AppsPageState();
+}
+
+class _AppsPageState extends State<AppsPage> {
+  @override
+  void initState() {
+    super.initState();
+    // 页面加载时获取数据
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AppsProvider>().loadAll();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return MainLayout(
       currentIndex: 1,
       child: Scaffold(
@@ -20,166 +39,286 @@ class AppsPage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.search),
               onPressed: () {
-                // 搜索应用
+                // TODO: 搜索应用
               },
             ),
             IconButton(
               icon: const Icon(Icons.filter_list),
               onPressed: () {
-                // 筛选应用
+                // TODO: 筛选应用
               },
             ),
             IconButton(
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.refresh),
               onPressed: () {
-                Navigator.pushNamed(context, '/app-store');
+                context.read<AppsProvider>().refresh();
               },
             ),
           ],
         ),
-        body: const SingleChildScrollView(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 应用统计卡片
-              AppCard(
-                title: '应用统计',
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+        body: Consumer<AppsProvider>(
+          builder: (context, provider, child) {
+            final data = provider.data;
+
+            // 显示错误
+            if (data.error != null) {
+              return _ErrorView(
+                error: data.error!,
+                onRetry: () => provider.loadAll(),
+              );
+            }
+
+            // 显示加载状态
+            if (data.isLoading && data.installedApps.isEmpty) {
+              return const _LoadingView();
+            }
+
+            return RefreshIndicator(
+              onRefresh: () => provider.refresh(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _AppStatItem(
-                      title: '已安装',
-                      value: '12',
-                      color: Colors.green,
+                    // 应用统计卡片
+                    _StatsCard(stats: data.stats),
+                    const SizedBox(height: 16),
+                    
+                    // 应用分类
+                    Text(
+                      '应用分类',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    _AppStatItem(
-                      title: '运行中',
-                      value: '8',
-                      color: Colors.blue,
+                    const SizedBox(height: 12),
+                    _AppCategoriesGrid(),
+                    const SizedBox(height: 16),
+                    
+                    // 已安装应用
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '已安装应用',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/app-store');
+                          },
+                          child: const Text('应用商店'),
+                        ),
+                      ],
                     ),
-                    _AppStatItem(
-                      title: '已停止',
-                      value: '4',
-                      color: Colors.orange,
-                    ),
+                    const SizedBox(height: 12),
+                    
+                    // 应用列表
+                    if (data.installedApps.isEmpty && !data.isLoading)
+                      const _EmptyView(
+                        icon: Icons.apps_outlined,
+                        title: '暂无已安装应用',
+                        subtitle: '前往应用商店安装应用',
+                      )
+                    else
+                      ...data.installedApps.map((app) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _InstalledAppCard(
+                            app: app,
+                            onStart: () => provider.startApp(app.id ?? ''),
+                            onStop: () => provider.stopApp(app.id ?? ''),
+                            onRestart: () => provider.restartApp(app.id ?? ''),
+                            onUninstall: () => _showUninstallDialog(context, app, provider),
+                          ),
+                        );
+                      }).toList(),
                   ],
                 ),
               ),
-              SizedBox(height: 16),
-              
-              // 应用分类
-              Text(
-                '应用分类',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 12),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  _AppCategoryItem(
-                    icon: Icons.web,
-                    label: 'Web服务',
-                    count: 5,
-                  ),
-                  _AppCategoryItem(
-                    icon: Icons.storage,
-                    label: '数据库',
-                    count: 3,
-                  ),
-                  _AppCategoryItem(
-                    icon: Icons.code,
-                    label: '开发工具',
-                    count: 2,
-                  ),
-                  _AppCategoryItem(
-                    icon: Icons.security,
-                    label: '安全工具',
-                    count: 2,
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              
-              // 已安装应用
-              Text(
-                '已安装应用',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 12),
-              
-              // 应用列表
-              _AppItem(
-                name: 'Nginx',
-                description: '高性能的HTTP和反向代理web服务器',
-                status: '运行中',
-                statusColor: Colors.green,
-                icon: Icons.web,
-              ),
-              SizedBox(height: 12),
-              
-              _AppItem(
-                name: 'MySQL',
-                description: '流行的关系型数据库管理系统',
-                status: '运行中',
-                statusColor: Colors.green,
-                icon: Icons.storage,
-              ),
-              SizedBox(height: 12),
-              
-              _AppItem(
-                name: 'Redis',
-                description: '内存数据结构存储，用作数据库、缓存和消息代理',
-                status: '已停止',
-                statusColor: Colors.orange,
-                icon: Icons.memory,
-              ),
-              SizedBox(height: 12),
-              
-              _AppItem(
-                name: 'Docker',
-                description: '开源的容器化平台',
-                status: '运行中',
-                statusColor: Colors.green,
-                icon: Icons.inventory_2,
-              ),
-            ],
-          ),
+            );
+          },
         ),
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             Navigator.pushNamed(context, '/app-store');
           },
-          child: const Icon(Icons.add),
+          icon: const Icon(Icons.add),
+          label: const Text('安装应用'),
+        ),
+      ),
+    );
+  }
+
+  void _showUninstallDialog(
+    BuildContext context,
+    dynamic app,
+    AppsProvider provider,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.delete_outline, color: Colors.red),
+        title: const Text('卸载应用'),
+        content: Text('确定要卸载 ${app.name ?? '此应用'} 吗？此操作不可撤销。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final success = await provider.uninstallApp(app.id ?? '');
+              if (success && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('应用已卸载')),
+                );
+              }
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text('卸载'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 加载中视图
+class _LoadingView extends StatelessWidget {
+  const _LoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 16),
+          Text('加载中...'),
+        ],
+      ),
+    );
+  }
+}
+
+/// 错误视图
+class _ErrorView extends StatelessWidget {
+  final String error;
+  final VoidCallback onRetry;
+
+  const _ErrorView({
+    required this.error,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: colorScheme.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              '加载失败',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('重试'),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-/// 应用统计项组件
-class _AppStatItem extends StatelessWidget {
+/// 统计卡片
+class _StatsCard extends StatelessWidget {
+  final AppStats stats;
+
+  const _StatsCard({required this.stats});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return AppCard(
+      title: '应用统计',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _StatItem(
+            title: '已安装',
+            value: stats.installed.toString(),
+            color: colorScheme.primary,
+            icon: Icons.download_done,
+          ),
+          _StatItem(
+            title: '运行中',
+            value: stats.running.toString(),
+            color: Colors.green,
+            icon: Icons.play_circle,
+          ),
+          _StatItem(
+            title: '已停止',
+            value: stats.stopped.toString(),
+            color: Colors.orange,
+            icon: Icons.stop_circle,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 统计项
+class _StatItem extends StatelessWidget {
   final String title;
   final String value;
   final Color color;
+  final IconData icon;
 
-  const _AppStatItem({
+  const _StatItem({
     required this.title,
     required this.value,
     required this.color,
+    required this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Icon(icon, color: color, size: 28),
+        const SizedBox(height: 8),
         Text(
           value,
           style: TextStyle(
@@ -189,49 +328,113 @@ class _AppStatItem extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(title),
+        Text(
+          title,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
       ],
     );
   }
+}
+
+/// 应用分类网格
+class _AppCategoriesGrid extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final categories = [
+      _CategoryData(
+        icon: Icons.web,
+        label: 'Web服务',
+        color: Colors.blue,
+      ),
+      _CategoryData(
+        icon: Icons.storage,
+        label: '数据库',
+        color: Colors.green,
+      ),
+      _CategoryData(
+        icon: Icons.code,
+        label: '开发工具',
+        color: Colors.purple,
+      ),
+      _CategoryData(
+        icon: Icons.security,
+        label: '安全工具',
+        color: Colors.orange,
+      ),
+    ];
+
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: categories.map((category) {
+        return _AppCategoryItem(
+          icon: category.icon,
+          label: category.label,
+          color: category.color,
+          onTap: () {
+            // TODO: 筛选该分类的应用
+          },
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _CategoryData {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _CategoryData({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
 }
 
 /// 应用分类项组件
 class _AppCategoryItem extends StatelessWidget {
   final IconData icon;
   final String label;
-  final int count;
+  final Color color;
+  final VoidCallback onTap;
 
   const _AppCategoryItem({
     required this.icon,
     required this.label,
-    required this.count,
+    required this.color,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return InkWell(
       borderRadius: BorderRadius.circular(12),
-      onTap: () {
-        // 筛选该分类的应用
-      },
+      onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.grey.withValues(alpha: 0.1),
+          color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: colorScheme.outline.withOpacity(0.1),
+          ),
         ),
-        child: Column(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon),
-            const SizedBox(height: 8),
-            Text(label),
-            const SizedBox(height: 4),
+            Icon(icon, color: color, size: 20),
+            const SizedBox(width: 8),
             Text(
-              '$count个',
+              label,
               style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 12,
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -241,44 +444,222 @@ class _AppCategoryItem extends StatelessWidget {
   }
 }
 
-/// 应用项组件
-class _AppItem extends StatelessWidget {
-  final String name;
-  final String description;
-  final String status;
-  final Color statusColor;
+/// 空状态视图
+class _EmptyView extends StatelessWidget {
   final IconData icon;
+  final String title;
+  final String subtitle;
 
-  const _AppItem({
-    required this.name,
-    required this.description,
-    required this.status,
-    required this.statusColor,
+  const _EmptyView({
     required this.icon,
+    required this.title,
+    required this.subtitle,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AppCard(
-      title: name,
-      subtitle: Text(description),
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: statusColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          status,
-          style: TextStyle(
-            color: statusColor,
-            fontSize: 12,
-          ),
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(48),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 64,
+              color: colorScheme.outline,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, '/app-store');
+              },
+              icon: const Icon(Icons.store),
+              label: const Text('前往应用商店'),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+/// 已安装应用卡片
+class _InstalledAppCard extends StatelessWidget {
+  final dynamic app;
+  final VoidCallback onStart;
+  final VoidCallback onStop;
+  final VoidCallback onRestart;
+  final VoidCallback onUninstall;
+
+  const _InstalledAppCard({
+    required this.app,
+    required this.onStart,
+    required this.onStop,
+    required this.onRestart,
+    required this.onUninstall,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isRunning = app.status?.toLowerCase() == 'running';
+    final statusColor = isRunning ? Colors.green : Colors.orange;
+    
+    return AppCard(
+      title: app.name ?? '未命名应用',
+      subtitle: Text(app.appName ?? '未知应用'),
+      trailing: _StatusChip(
+        status: isRunning ? '运行中' : '已停止',
+        color: statusColor,
+      ),
       onTap: () {
-        Navigator.pushNamed(context, '/app-detail');
+        Navigator.pushNamed(
+          context,
+          '/app-detail',
+          arguments: {'appId': app.id},
+        );
       },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (app.version != null)
+            Text(
+              '版本: ${app.version}',
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 14,
+              ),
+            ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (isRunning) ...[
+                _ActionButton(
+                  icon: Icons.stop,
+                  label: '停止',
+                  color: Colors.orange,
+                  onTap: onStop,
+                ),
+                const SizedBox(width: 8),
+                _ActionButton(
+                  icon: Icons.restart_alt,
+                  label: '重启',
+                  color: colorScheme.primary,
+                  onTap: onRestart,
+                ),
+              ] else ...[
+                _ActionButton(
+                  icon: Icons.play_arrow,
+                  label: '启动',
+                  color: Colors.green,
+                  onTap: onStart,
+                ),
+              ],
+              const SizedBox(width: 8),
+              _ActionButton(
+                icon: Icons.delete_outline,
+                label: '卸载',
+                color: Colors.red,
+                onTap: onUninstall,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 状态标签
+class _StatusChip extends StatelessWidget {
+  final String status;
+  final Color color;
+
+  const _StatusChip({
+    required this.status,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text(
+        status,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+}
+
+/// 操作按钮
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 18),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

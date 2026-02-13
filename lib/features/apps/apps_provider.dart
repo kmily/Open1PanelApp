@@ -1,0 +1,258 @@
+/// 应用管理状态管理
+///
+/// 管理应用商店和已安装应用数据
+
+import 'package:flutter/foundation.dart';
+import '../../api/v2/app_v2.dart';
+import '../../core/network/api_client_manager.dart';
+import '../../data/models/app_models.dart';
+
+/// 应用统计数据
+class AppStats {
+  final int total;
+  final int installed;
+  final int running;
+  final int stopped;
+
+  const AppStats({
+    this.total = 0,
+    this.installed = 0,
+    this.running = 0,
+    this.stopped = 0,
+  });
+}
+
+/// 应用数据状态
+class AppsData {
+  final List<AppItem> availableApps;
+  final List<InstalledApp> installedApps;
+  final AppStats stats;
+  final bool isLoading;
+  final String? error;
+  final DateTime? lastUpdated;
+
+  const AppsData({
+    this.availableApps = const [],
+    this.installedApps = const [],
+    this.stats = const AppStats(),
+    this.isLoading = false,
+    this.error,
+    this.lastUpdated,
+  });
+
+  AppsData copyWith({
+    List<AppItem>? availableApps,
+    List<InstalledApp>? installedApps,
+    AppStats? stats,
+    bool? isLoading,
+    String? error,
+    DateTime? lastUpdated,
+  }) {
+    return AppsData(
+      availableApps: availableApps ?? this.availableApps,
+      installedApps: installedApps ?? this.installedApps,
+      stats: stats ?? this.stats,
+      isLoading: isLoading ?? this.isLoading,
+      error: error ?? this.error,
+      lastUpdated: lastUpdated ?? this.lastUpdated,
+    );
+  }
+}
+
+/// 应用管理状态管理器
+class AppsProvider extends ChangeNotifier {
+  AppsProvider({AppV2Api? appApi}) : _appApi = appApi;
+
+  AppV2Api? _appApi;
+
+  AppsData _data = const AppsData();
+
+  AppsData get data => _data;
+
+  /// 获取API客户端
+  Future<void> _ensureApiClient() async {
+    if (_appApi == null) {
+      final manager = ApiClientManager.instance;
+      _appApi = await manager.getAppApi();
+    }
+  }
+
+  /// 加载应用商店数据
+  Future<void> loadAvailableApps() async {
+    _data = _data.copyWith(isLoading: true, error: null);
+    notifyListeners();
+
+    try {
+      await _ensureApiClient();
+
+      // 获取应用列表
+      final response = await _appApi!.listApps(
+        page: 1,
+        pageSize: 100,
+      );
+
+      final apps = response.data?.items ?? [];
+
+      _data = _data.copyWith(
+        availableApps: apps,
+        isLoading: false,
+        lastUpdated: DateTime.now(),
+      );
+    } catch (e) {
+      _data = _data.copyWith(
+        isLoading: false,
+        error: '加载应用列表失败: $e',
+      );
+    }
+    notifyListeners();
+  }
+
+  /// 加载已安装应用
+  Future<void> loadInstalledApps() async {
+    _data = _data.copyWith(isLoading: true, error: null);
+    notifyListeners();
+
+    try {
+      await _ensureApiClient();
+
+      // 获取已安装应用列表
+      final response = await _appApi!.listInstalledApps(
+        page: 1,
+        pageSize: 100,
+      );
+
+      final apps = response.data?.items ?? [];
+
+      // 计算统计
+      int running = 0, stopped = 0;
+      for (final app in apps) {
+        if (app.status?.toLowerCase() == 'running') {
+          running++;
+        } else {
+          stopped++;
+        }
+      }
+
+      _data = _data.copyWith(
+        installedApps: apps,
+        stats: AppStats(
+          total: apps.length,
+          installed: apps.length,
+          running: running,
+          stopped: stopped,
+        ),
+        isLoading: false,
+        lastUpdated: DateTime.now(),
+      );
+    } catch (e) {
+      _data = _data.copyWith(
+        isLoading: false,
+        error: '加载已安装应用失败: $e',
+      );
+    }
+    notifyListeners();
+  }
+
+  /// 加载所有数据
+  Future<void> loadAll() async {
+    _data = _data.copyWith(isLoading: true, error: null);
+    notifyListeners();
+
+    try {
+      await _ensureApiClient();
+
+      // 并行加载应用商店和已安装应用
+      await Future.wait([
+        loadAvailableApps(),
+        loadInstalledApps(),
+      ]);
+    } catch (e) {
+      _data = _data.copyWith(
+        isLoading: false,
+        error: '加载数据失败: $e',
+      );
+      notifyListeners();
+    }
+  }
+
+  /// 安装应用
+  Future<bool> installApp(String appKey) async {
+    try {
+      await _ensureApiClient();
+      await _appApi!.installApp(appKey);
+      await loadInstalledApps(); // 刷新已安装列表
+      return true;
+    } catch (e) {
+      _data = _data.copyWith(error: '安装应用失败: $e');
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// 卸载应用
+  Future<bool> uninstallApp(String installId) async {
+    try {
+      await _ensureApiClient();
+      await _appApi!.uninstallApp(installId);
+      await loadInstalledApps(); // 刷新已安装列表
+      return true;
+    } catch (e) {
+      _data = _data.copyWith(error: '卸载应用失败: $e');
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// 启动应用
+  Future<bool> startApp(String installId) async {
+    try {
+      await _ensureApiClient();
+      await _appApi!.startApp(installId);
+      await loadInstalledApps(); // 刷新列表
+      return true;
+    } catch (e) {
+      _data = _data.copyWith(error: '启动应用失败: $e');
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// 停止应用
+  Future<bool> stopApp(String installId) async {
+    try {
+      await _ensureApiClient();
+      await _appApi!.stopApp(installId);
+      await loadInstalledApps(); // 刷新列表
+      return true;
+    } catch (e) {
+      _data = _data.copyWith(error: '停止应用失败: $e');
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// 重启应用
+  Future<bool> restartApp(String installId) async {
+    try {
+      await _ensureApiClient();
+      await _appApi!.restartApp(installId);
+      await loadInstalledApps(); // 刷新列表
+      return true;
+    } catch (e) {
+      _data = _data.copyWith(error: '重启应用失败: $e');
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// 刷新数据
+  Future<void> refresh() async {
+    await loadAll();
+  }
+
+  /// 清除错误
+  void clearError() {
+    _data = _data.copyWith(error: null);
+    notifyListeners();
+  }
+}

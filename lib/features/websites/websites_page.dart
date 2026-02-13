@@ -1,16 +1,35 @@
 /// 网站管理页面
 /// 
 /// 此文件定义网站管理页面，管理网站和域名。
+/// 遵循Material You Design 3设计规范
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../shared/widgets/app_card.dart';
 import '../../widgets/main_layout.dart';
+import 'websites_provider.dart';
 
-class WebsitesPage extends StatelessWidget {
+class WebsitesPage extends StatefulWidget {
   const WebsitesPage({super.key});
 
   @override
+  State<WebsitesPage> createState() => _WebsitesPageState();
+}
+
+class _WebsitesPageState extends State<WebsitesPage> {
+  @override
+  void initState() {
+    super.initState();
+    // 页面加载时获取数据
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<WebsitesProvider>().loadWebsites();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return MainLayout(
       currentIndex: 3,
       child: Scaffold(
@@ -20,127 +39,228 @@ class WebsitesPage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.search),
               onPressed: () {
-                // 搜索网站
+                // TODO: 搜索网站
               },
             ),
             IconButton(
               icon: const Icon(Icons.filter_list),
               onPressed: () {
-                // 筛选网站
+                // TODO: 筛选网站
               },
             ),
             IconButton(
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.refresh),
               onPressed: () {
-                Navigator.pushNamed(context, '/website-create');
+                context.read<WebsitesProvider>().refresh();
               },
             ),
           ],
         ),
-        body: DefaultTabController(
-          length: 2,
-          child: Column(
-            children: [
-              const TabBar(
-                tabs: [
-                  Tab(text: '网站'),
-                  Tab(text: '域名'),
-                ],
-              ),
-              Expanded(
-                child: TabBarView(
+        body: Consumer<WebsitesProvider>(
+          builder: (context, provider, child) {
+            final data = provider.data;
+
+            // 显示错误
+            if (data.error != null) {
+              return _ErrorView(
+                error: data.error!,
+                onRetry: () => provider.loadWebsites(),
+              );
+            }
+
+            // 显示加载状态
+            if (data.isLoading && data.websites.isEmpty) {
+              return const _LoadingView();
+            }
+
+            return RefreshIndicator(
+              onRefresh: () => provider.refresh(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 网站标签页
-                    _WebsitesTab(),
-                    // 域名标签页
-                    _DomainsTab(),
+                    // 网站统计卡片
+                    _StatsCard(stats: data.stats),
+                    const SizedBox(height: 16),
+                    
+                    // 网站列表
+                    if (data.websites.isEmpty && !data.isLoading)
+                      const _EmptyView(
+                        icon: Icons.language_outlined,
+                        title: '暂无网站',
+                        subtitle: '点击右下角按钮创建网站',
+                      )
+                    else
+                      ...data.websites.map((website) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _WebsiteCard(
+                            website: website,
+                            onStart: () => provider.startWebsite(website.id ?? 0),
+                            onStop: () => provider.stopWebsite(website.id ?? 0),
+                            onRestart: () => provider.restartWebsite(website.id ?? 0),
+                            onDelete: () => _showDeleteDialog(context, website, provider),
+                          ),
+                        );
+                      }).toList(),
                   ],
                 ),
               ),
-            ],
-          ),
+            );
+          },
         ),
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             Navigator.pushNamed(context, '/website-create');
           },
-          child: const Icon(Icons.add),
+          icon: const Icon(Icons.add),
+          label: const Text('创建网站'),
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteDialog(
+    BuildContext context,
+    dynamic website,
+    WebsitesProvider provider,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.delete_outline, color: Colors.red),
+        title: const Text('删除网站'),
+        content: Text('确定要删除 ${website.primaryDomain ?? '此网站'} 吗？此操作不可撤销。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final success = await provider.deleteWebsite(website.id ?? 0);
+              if (success && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('网站已删除')),
+                );
+              }
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 加载中视图
+class _LoadingView extends StatelessWidget {
+  const _LoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 16),
+          Text('加载中...'),
+        ],
+      ),
+    );
+  }
+}
+
+/// 错误视图
+class _ErrorView extends StatelessWidget {
+  final String error;
+  final VoidCallback onRetry;
+
+  const _ErrorView({
+    required this.error,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: colorScheme.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              '加载失败',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('重试'),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-/// 网站标签页
-class _WebsitesTab extends StatelessWidget {
+/// 统计卡片
+class _StatsCard extends StatelessWidget {
+  final WebsiteStats stats;
+
+  const _StatsCard({required this.stats});
+
   @override
   Widget build(BuildContext context) {
-    return const SingleChildScrollView(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return AppCard(
+      title: '网站统计',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // 网站统计卡片
-          AppCard(
-            title: '网站统计',
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _WebsiteStatItem(
-                  title: '总数',
-                  value: '5',
-                  color: Colors.blue,
-                ),
-                _WebsiteStatItem(
-                  title: '运行中',
-                  value: '4',
-                  color: Colors.green,
-                ),
-                _WebsiteStatItem(
-                  title: '已停止',
-                  value: '1',
-                  color: Colors.orange,
-                ),
-              ],
-            ),
+          _StatItem(
+            title: '总数',
+            value: stats.total.toString(),
+            color: colorScheme.primary,
+            icon: Icons.language,
           ),
-          SizedBox(height: 16),
-          
-          // 网站列表标题
-          Text(
-            '网站列表',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+          _StatItem(
+            title: '运行中',
+            value: stats.running.toString(),
+            color: Colors.green,
+            icon: Icons.play_circle,
           ),
-          SizedBox(height: 12),
-          
-          // 网站列表
-          _WebsiteItem(
-            name: '我的博客',
-            domain: 'blog.example.com',
-            status: '运行中',
-            statusColor: Colors.green,
-            type: 'WordPress',
-          ),
-          SizedBox(height: 12),
-          
-          _WebsiteItem(
-            name: '公司官网',
-            domain: 'www.example.com',
-            status: '运行中',
-            statusColor: Colors.green,
-            type: '静态网站',
-          ),
-          SizedBox(height: 12),
-          
-          _WebsiteItem(
-            name: 'API服务',
-            domain: 'api.example.com',
-            status: '已停止',
-            statusColor: Colors.orange,
-            type: 'Node.js',
+          _StatItem(
+            title: '已停止',
+            value: stats.stopped.toString(),
+            color: Colors.orange,
+            icon: Icons.stop_circle,
           ),
         ],
       ),
@@ -148,99 +268,26 @@ class _WebsitesTab extends StatelessWidget {
   }
 }
 
-/// 域名标签页
-class _DomainsTab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const SingleChildScrollView(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 域名统计卡片
-          AppCard(
-            title: '域名统计',
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _WebsiteStatItem(
-                  title: '总数',
-                  value: '8',
-                  color: Colors.blue,
-                ),
-                _WebsiteStatItem(
-                  title: '已绑定',
-                  value: '5',
-                  color: Colors.green,
-                ),
-                _WebsiteStatItem(
-                  title: '未绑定',
-                  value: '3',
-                  color: Colors.grey,
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 16),
-          
-          // 域名列表标题
-          Text(
-            '域名列表',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 12),
-          
-          // 域名列表
-          _DomainItem(
-            domain: 'example.com',
-            status: '已绑定',
-            statusColor: Colors.green,
-            registrar: 'GoDaddy',
-            expiry: '2024-12-31',
-          ),
-          SizedBox(height: 12),
-          
-          _DomainItem(
-            domain: 'blog.example.com',
-            status: '已绑定',
-            statusColor: Colors.green,
-            registrar: 'Namecheap',
-            expiry: '2025-03-15',
-          ),
-          SizedBox(height: 12),
-          
-          _DomainItem(
-            domain: 'api.example.com',
-            status: '已绑定',
-            statusColor: Colors.green,
-            registrar: 'Cloudflare',
-            expiry: '2024-11-20',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// 网站统计项组件
-class _WebsiteStatItem extends StatelessWidget {
+/// 统计项
+class _StatItem extends StatelessWidget {
   final String title;
   final String value;
   final Color color;
+  final IconData icon;
 
-  const _WebsiteStatItem({
+  const _StatItem({
     required this.title,
     required this.value,
     required this.color,
+    required this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Icon(icon, color: color, size: 28),
+        const SizedBox(height: 8),
         Text(
           value,
           style: TextStyle(
@@ -250,78 +297,145 @@ class _WebsiteStatItem extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(title),
+        Text(
+          title,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
       ],
     );
   }
 }
 
-/// 网站项组件
-class _WebsiteItem extends StatelessWidget {
-  final String name;
-  final String domain;
-  final String status;
-  final Color statusColor;
-  final String type;
+/// 空状态视图
+class _EmptyView extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
 
-  const _WebsiteItem({
-    required this.name,
-    required this.domain,
-    required this.status,
-    required this.statusColor,
-    required this.type,
+  const _EmptyView({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AppCard(
-      title: name,
-      subtitle: Text(domain),
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: statusColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          status,
-          style: TextStyle(
-            color: statusColor,
-            fontSize: 12,
-          ),
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(48),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 64,
+              color: colorScheme.outline,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+/// 网站卡片
+class _WebsiteCard extends StatelessWidget {
+  final dynamic website;
+  final VoidCallback onStart;
+  final VoidCallback onStop;
+  final VoidCallback onRestart;
+  final VoidCallback onDelete;
+
+  const _WebsiteCard({
+    required this.website,
+    required this.onStart,
+    required this.onStop,
+    required this.onRestart,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isRunning = website.status?.toLowerCase() == 'running';
+    final statusColor = isRunning ? Colors.green : Colors.orange;
+    
+    return AppCard(
+      title: website.primaryDomain ?? '未命名网站',
+      subtitle: Text(_getWebsiteType(website.type)),
+      trailing: _StatusChip(
+        status: isRunning ? '运行中' : '已停止',
+        color: statusColor,
+      ),
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          '/website-detail',
+          arguments: {'websiteId': website.id},
+        );
+      },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '类型: $type',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 14,
+          if (website.alias != null && website.alias.isNotEmpty)
+            Text(
+              '别名: ${website.alias}',
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 14,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              TextButton(
-                onPressed: () {
-                  // 访问网站
-                },
-                child: const Text('访问'),
-              ),
-              TextButton(
-                onPressed: () {
-                  // 管理网站
-                },
-                child: const Text('管理'),
-              ),
-              TextButton(
-                onPressed: () {
-                  // 删除网站
-                },
-                child: const Text('删除'),
+              if (isRunning) ...[
+                _ActionButton(
+                  icon: Icons.stop,
+                  label: '停止',
+                  color: Colors.orange,
+                  onTap: onStop,
+                ),
+                const SizedBox(width: 8),
+                _ActionButton(
+                  icon: Icons.restart_alt,
+                  label: '重启',
+                  color: colorScheme.primary,
+                  onTap: onRestart,
+                ),
+              ] else ...[
+                _ActionButton(
+                  icon: Icons.play_arrow,
+                  label: '启动',
+                  color: Colors.green,
+                  onTap: onStart,
+                ),
+              ],
+              const SizedBox(width: 8),
+              _ActionButton(
+                icon: Icons.delete_outline,
+                label: '删除',
+                color: Colors.red,
+                onTap: onDelete,
               ),
             ],
           ),
@@ -329,85 +443,101 @@ class _WebsiteItem extends StatelessWidget {
       ),
     );
   }
+
+  String _getWebsiteType(String? type) {
+    switch (type?.toLowerCase()) {
+      case 'static':
+        return '静态网站';
+      case 'php':
+        return 'PHP网站';
+      case 'reverse_proxy':
+        return '反向代理';
+      case 'java':
+        return 'Java网站';
+      case 'nodejs':
+        return 'Node.js网站';
+      case 'python':
+        return 'Python网站';
+      case 'go':
+        return 'Go网站';
+      case 'dotnet':
+        return '.NET网站';
+      default:
+        return '未知类型';
+    }
+  }
 }
 
-/// 域名项组件
-class _DomainItem extends StatelessWidget {
-  final String domain;
+/// 状态标签
+class _StatusChip extends StatelessWidget {
   final String status;
-  final Color statusColor;
-  final String registrar;
-  final String expiry;
+  final Color color;
 
-  const _DomainItem({
-    required this.domain,
+  const _StatusChip({
     required this.status,
-    required this.statusColor,
-    required this.registrar,
-    required this.expiry,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AppCard(
-      title: domain,
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: statusColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          status,
-          style: TextStyle(
-            color: statusColor,
-            fontSize: 12,
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text(
+        status,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '注册商: $registrar',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 14,
+    );
+  }
+}
+
+/// 操作按钮
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 18),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '到期时间: $expiry',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () {
-                  // 解析设置
-                },
-                child: const Text('解析设置'),
-              ),
-              TextButton(
-                onPressed: () {
-                  // SSL证书
-                },
-                child: const Text('SSL证书'),
-              ),
-              TextButton(
-                onPressed: () {
-                  // 绑定网站
-                },
-                child: const Text('绑定网站'),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

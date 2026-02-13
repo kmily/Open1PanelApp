@@ -6,10 +6,42 @@ import 'package:onepanelapp_app/core/services/app_settings_controller.dart';
 import 'package:onepanelapp_app/core/theme/app_theme.dart';
 import 'package:onepanelapp_app/l10n/generated/app_localizations.dart';
 
+// Feature Providers
+import 'features/dashboard/dashboard_provider.dart';
+import 'features/containers/containers_provider.dart';
+import 'features/apps/apps_provider.dart';
+import 'features/websites/websites_provider.dart';
+import 'features/server/server_provider.dart';
+
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AppSettingsController()..load(),
+    MultiProvider(
+      providers: [
+        // App Settings
+        ChangeNotifierProvider(
+          create: (_) => AppSettingsController()..load(),
+        ),
+        // Server Management
+        ChangeNotifierProvider(
+          create: (_) => ServerProvider(),
+        ),
+        // Dashboard
+        ChangeNotifierProvider(
+          create: (_) => DashboardProvider(),
+        ),
+        // Containers
+        ChangeNotifierProvider(
+          create: (_) => ContainersProvider(),
+        ),
+        // Apps
+        ChangeNotifierProvider(
+          create: (_) => AppsProvider(),
+        ),
+        // Websites
+        ChangeNotifierProvider(
+          create: (_) => WebsitesProvider(),
+        ),
+      ],
       child: const MyApp(),
     ),
   );

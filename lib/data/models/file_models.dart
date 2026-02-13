@@ -61,136 +61,6 @@ class FileSearch extends Equatable {
       ];
 }
 
-/// 文件搜索响应模型
-/// 对应1Panel API的 response.FileInfo 结构
-class FileSearchResponse extends Equatable {
-  final List<FileInfo> items;
-  final int? itemTotal;
-  final String? content;
-  final String? extension;
-  final int? favoriteID;
-  final String? gid;
-  final String? group;
-  final bool? isDetail;
-  final bool? isDir;
-  final bool? isHidden;
-  final bool? isSymlink;
-  final String? linkPath;
-  final String? mimeType;
-  final String? modTime;
-  final String? mode;
-  final String? name;
-  final String? path;
-  final int? size;
-  final String? type;
-  final String? uid;
-  final String? user;
-
-  const FileSearchResponse({
-    this.items = const [],
-    this.itemTotal,
-    this.content,
-    this.extension,
-    this.favoriteID,
-    this.gid,
-    this.group,
-    this.isDetail,
-    this.isDir,
-    this.isHidden,
-    this.isSymlink,
-    this.linkPath,
-    this.mimeType,
-    this.modTime,
-    this.mode,
-    this.name,
-    this.path,
-    this.size,
-    this.type,
-    this.uid,
-    this.user,
-  });
-
-  factory FileSearchResponse.fromJson(Map<String, dynamic> json) {
-    return FileSearchResponse(
-      items: (json['items'] as List?)
-              ?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>))
-              .toList() ??
-          [],
-      itemTotal: json['itemTotal'] as int?,
-      content: json['content'] as String?,
-      extension: json['extension'] as String?,
-      favoriteID: json['favoriteID'] as int?,
-      gid: json['gid'] as String?,
-      group: json['group'] as String?,
-      isDetail: json['isDetail'] as bool?,
-      isDir: json['isDir'] as bool?,
-      isHidden: json['isHidden'] as bool?,
-      isSymlink: json['isSymlink'] as bool?,
-      linkPath: json['linkPath'] as String?,
-      mimeType: json['mimeType'] as String?,
-      modTime: json['modTime'] as String?,
-      mode: json['mode'] as String?,
-      name: json['name'] as String?,
-      path: json['path'] as String?,
-      size: json['size'] as int?,
-      type: json['type'] as String?,
-      uid: json['uid'] as String?,
-      user: json['user'] as String?,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'items': items.map((item) => item.toJson()).toList(),
-      if (itemTotal != null) 'itemTotal': itemTotal,
-      if (content != null) 'content': content,
-      if (extension != null) 'extension': extension,
-      if (favoriteID != null) 'favoriteID': favoriteID,
-      if (gid != null) 'gid': gid,
-      if (group != null) 'group': group,
-      if (isDetail != null) 'isDetail': isDetail,
-      if (isDir != null) 'isDir': isDir,
-      if (isHidden != null) 'isHidden': isHidden,
-      if (isSymlink != null) 'isSymlink': isSymlink,
-      if (linkPath != null) 'linkPath': linkPath,
-      if (mimeType != null) 'mimeType': mimeType,
-      if (modTime != null) 'modTime': modTime,
-      if (mode != null) 'mode': mode,
-      if (name != null) 'name': name,
-      if (path != null) 'path': path,
-      if (size != null) 'size': size,
-      if (type != null) 'type': type,
-      if (uid != null) 'uid': uid,
-      if (user != null) 'user': user,
-    };
-  }
-
-  @override
-  List<Object?> get props => [
-        items,
-        itemTotal,
-        content,
-        extension,
-        favoriteID,
-        gid,
-        group,
-        isDetail,
-        isDir,
-        isHidden,
-        isSymlink,
-        linkPath,
-        mimeType,
-        modTime,
-        mode,
-        name,
-        path,
-        size,
-        type,
-        uid,
-        user,
-      ];
-}
-
 /// 文件信息模型
 class FileInfo extends Equatable {
   final String name;
@@ -404,19 +274,19 @@ class FileCopy extends Equatable {
 class FileUpload extends Equatable {
   final String path;
   final String? fileName;
-  final bool? shouldOverride;
+  final bool? override;
 
   const FileUpload({
     required this.path,
     this.fileName,
-    this.shouldOverride,
+    this.override,
   });
 
   factory FileUpload.fromJson(Map<String, dynamic> json) {
     return FileUpload(
       path: json['path'] as String,
       fileName: json['fileName'] as String?,
-      shouldOverride: json['override'] as bool?,
+      override: json['override'] as bool?,
     );
   }
 
@@ -424,12 +294,12 @@ class FileUpload extends Equatable {
     return {
       'path': path,
       'fileName': fileName,
-      'override': shouldOverride,
+      'override': override,
     };
   }
 
   @override
-  List<Object?> get props => [path, fileName, shouldOverride];
+  List<Object?> get props => [path, fileName, override];
 }
 
 /// 文件下载模型

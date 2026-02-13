@@ -15,14 +15,46 @@ class ServerDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final moduleItems = [
-      (l10n.serverModuleApps, Icons.apps_outlined),
-      (l10n.serverModuleContainers, Icons.inventory_2_outlined),
-      (l10n.serverModuleWebsites, Icons.language_outlined),
-      (l10n.serverModuleDatabases, Icons.storage_outlined),
-      (l10n.serverModuleFirewall, Icons.shield_outlined),
-      (l10n.serverModuleTerminal, Icons.terminal_outlined),
-      (l10n.serverModuleMonitoring, Icons.monitor_heart_outlined),
-      (l10n.serverModuleFiles, Icons.folder_outlined),
+      _ModuleItem(
+        title: l10n.serverModuleApps,
+        icon: Icons.apps_outlined,
+        route: '/apps',
+      ),
+      _ModuleItem(
+        title: l10n.serverModuleContainers,
+        icon: Icons.inventory_2_outlined,
+        route: '/containers',
+      ),
+      _ModuleItem(
+        title: l10n.serverModuleWebsites,
+        icon: Icons.language_outlined,
+        route: '/websites',
+      ),
+      _ModuleItem(
+        title: l10n.serverModuleDatabases,
+        icon: Icons.storage_outlined,
+        route: '/databases',
+      ),
+      _ModuleItem(
+        title: l10n.serverModuleFirewall,
+        icon: Icons.shield_outlined,
+        route: '/firewall',
+      ),
+      _ModuleItem(
+        title: l10n.serverModuleTerminal,
+        icon: Icons.terminal_outlined,
+        route: '/terminal',
+      ),
+      _ModuleItem(
+        title: l10n.serverModuleMonitoring,
+        icon: Icons.monitor_heart_outlined,
+        route: '/monitoring',
+      ),
+      _ModuleItem(
+        title: l10n.serverModuleFiles,
+        icon: Icons.folder_outlined,
+        route: '/files',
+      ),
     ];
 
     return Scaffold(
@@ -80,24 +112,20 @@ class ServerDetailPage extends StatelessWidget {
               childAspectRatio: 0.9,
             ),
             itemBuilder: (context, index) {
-              final (title, icon) = moduleItems[index];
+              final module = moduleItems[index];
               return Card(
                 child: InkWell(
                   borderRadius: BorderRadius.circular(AppDesignTokens.radiusMd),
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(context.l10n.commonComingSoon)),
-                    );
-                  },
+                  onTap: () => _navigateToModule(context, module),
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(icon),
+                        Icon(module.icon),
                         const SizedBox(height: 6),
                         Text(
-                          title,
+                          module.title,
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -145,6 +173,32 @@ class ServerDetailPage extends StatelessWidget {
     );
   }
 
+  void _navigateToModule(BuildContext context, _ModuleItem module) {
+    // 根据路由导航到对应页面
+    switch (module.route) {
+      case '/apps':
+        Navigator.pushNamed(context, '/apps');
+        break;
+      case '/containers':
+        Navigator.pushNamed(context, '/containers');
+        break;
+      case '/websites':
+        Navigator.pushNamed(context, '/websites');
+        break;
+      case '/databases':
+        Navigator.pushNamed(context, '/databases');
+        break;
+      case '/files':
+        Navigator.pushNamed(context, '/files');
+        break;
+      default:
+        // 其他模块显示ComingSoon提示
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${module.title} - ${context.l10n.commonComingSoon}')),
+        );
+    }
+  }
+
   String _percent(double? value) {
     if (value == null) {
       return '--';
@@ -173,4 +227,16 @@ class _InfoChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Chip(label: Text('$label: $value'));
   }
+}
+
+class _ModuleItem {
+  final String title;
+  final IconData icon;
+  final String route;
+
+  _ModuleItem({
+    required this.title,
+    required this.icon,
+    required this.route,
+  });
 }
