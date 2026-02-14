@@ -412,13 +412,13 @@ Map<String, dynamic> _$AppstoreUpdateRequestToJson(
 AppInstallInfo _$AppInstallInfoFromJson(Map<String, dynamic> json) =>
     AppInstallInfo(
       appId: json['appId'] as String?,
-      appName: json['appName'] as String,
-      appVersion: json['appVersion'] as String,
+      appName: json['appName'] as String?,
+      appVersion: json['appVersion'] as String?,
       description: json['description'] as String?,
       icon: json['icon'] as String?,
       status: json['status'] as String?,
       createdAt: json['createdAt'] as String?,
-      id: (json['id'] as num).toInt(),
+      id: (json['id'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$AppInstallInfoToJson(AppInstallInfo instance) =>

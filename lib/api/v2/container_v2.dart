@@ -35,9 +35,39 @@ class _Parser {
     return body.map((item) => fromJson(item as Map<String, dynamic>)).toList();
   }
 
+  static List<T> extractListDataFromMap<T>(Response<Map<String, dynamic>> response, T Function(Map<String, dynamic>) fromJson) {
+    final body = response.data!;
+    final data = body['data'];
+    if (data is List) {
+      return data.map((item) => fromJson(item as Map<String, dynamic>)).toList();
+    }
+    if (data is Map<String, dynamic>) {
+      final items = data['items'];
+      if (items is List) {
+        return items.map((item) => fromJson(item as Map<String, dynamic>)).toList();
+      }
+    }
+    return [];
+  }
+
   /// 从1Panel API响应中提取data字段（原始List）
   static List<Map<String, dynamic>> extractRawListData(Response<List<dynamic>> response) {
     return response.data?.map((item) => item as Map<String, dynamic>).toList() ?? [];
+  }
+
+  static List<Map<String, dynamic>> extractRawListDataFromMap(Response<Map<String, dynamic>> response) {
+    final body = response.data!;
+    final data = body['data'];
+    if (data is List) {
+      return data.map((item) => item as Map<String, dynamic>).toList();
+    }
+    if (data is Map<String, dynamic>) {
+      final items = data['items'];
+      if (items is List) {
+        return items.map((item) => item as Map<String, dynamic>).toList();
+      }
+    }
+    return [];
   }
 
   /// 从1Panel API响应中提取data字段（PageResult类型）
@@ -138,11 +168,11 @@ class ContainerV2Api {
 
   /// 获取容器列表
   Future<Response<List<ContainerInfo>>> listContainers() async {
-    final response = await _client.post<List<dynamic>>(
+    final response = await _client.post<Map<String, dynamic>>(
       ApiConstants.buildApiPath('/containers/list'),
     );
     return Response(
-      data: _Parser.extractListData(response, ContainerInfo.fromJson),
+      data: _Parser.extractListDataFromMap(response, ContainerInfo.fromJson),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -177,11 +207,11 @@ class ContainerV2Api {
 
   /// 获取容器列表统计信息
   Future<Response<List<ContainerListStats>>> listContainerStats() async {
-    final response = await _client.get<List<dynamic>>(
+    final response = await _client.get<Map<String, dynamic>>(
       ApiConstants.buildApiPath('/containers/list/stats'),
     );
     return Response(
-      data: _Parser.extractListData(response, ContainerListStats.fromJson),
+      data: _Parser.extractListDataFromMap(response, ContainerListStats.fromJson),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -339,11 +369,11 @@ class ContainerV2Api {
   // 镜像管理相关方法
   /// 获取镜像选项
   Future<Response<List<Map<String, dynamic>>>> getImageOptions() async {
-    final response = await _client.get<List<dynamic>>(
+    final response = await _client.get<Map<String, dynamic>>(
       ApiConstants.buildApiPath('/containers/image'),
     );
     return Response(
-      data: _Parser.extractRawListData(response),
+      data: _Parser.extractRawListDataFromMap(response),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -450,11 +480,11 @@ class ContainerV2Api {
   // 网络管理相关方法
   /// 获取网络选项
   Future<Response<List<Map<String, dynamic>>>> getNetworkOptions() async {
-    final response = await _client.get<List<dynamic>>(
+    final response = await _client.get<Map<String, dynamic>>(
       ApiConstants.buildApiPath('/containers/network'),
     );
     return Response(
-      data: _Parser.extractRawListData(response),
+      data: _Parser.extractRawListDataFromMap(response),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -494,11 +524,11 @@ class ContainerV2Api {
   // 卷管理相关方法
   /// 获取卷选项
   Future<Response<List<Map<String, dynamic>>>> getVolumeOptions() async {
-    final response = await _client.get<List<dynamic>>(
+    final response = await _client.get<Map<String, dynamic>>(
       ApiConstants.buildApiPath('/containers/volume'),
     );
     return Response(
-      data: _Parser.extractRawListData(response),
+      data: _Parser.extractRawListDataFromMap(response),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,

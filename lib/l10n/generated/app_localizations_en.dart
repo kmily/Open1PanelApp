@@ -36,6 +36,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonComingSoon => 'Coming soon';
 
   @override
+  String get commonEmpty => 'No data';
+
+  @override
+  String get commonLoadFailedTitle => 'Failed to load';
+
+  @override
+  String get monitorNetworkLabel => 'Network';
+
+  @override
+  String get monitorMetricCurrent => 'Current';
+
+  @override
+  String get monitorMetricMin => 'Min';
+
+  @override
+  String get monitorMetricAvg => 'Avg';
+
+  @override
+  String get monitorMetricMax => 'Max';
+
+  @override
   String get navServer => 'Servers';
 
   @override
@@ -330,6 +351,126 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get coachServerCardDesc =>
       'Tap a server card to see modules and quick actions.';
+
+  @override
+  String get dashboardTitle => 'Dashboard';
+
+  @override
+  String get dashboardLoadFailedTitle => 'Failed to load';
+
+  @override
+  String get dashboardServerInfoTitle => 'Server info';
+
+  @override
+  String get dashboardServerStatusOk => 'Running';
+
+  @override
+  String get dashboardServerStatusConnecting => 'Connecting...';
+
+  @override
+  String get dashboardHostNameLabel => 'Hostname';
+
+  @override
+  String get dashboardOsLabel => 'Operating system';
+
+  @override
+  String get dashboardUptimeLabel => 'Uptime';
+
+  @override
+  String dashboardUptimeDaysHours(int days, int hours) {
+    return '${days}d ${hours}h';
+  }
+
+  @override
+  String dashboardUptimeHours(int hours) {
+    return '${hours}h';
+  }
+
+  @override
+  String dashboardUpdatedAt(String time) {
+    return 'Updated at $time';
+  }
+
+  @override
+  String get dashboardResourceTitle => 'System resources';
+
+  @override
+  String get dashboardCpuUsage => 'CPU usage';
+
+  @override
+  String get dashboardMemoryUsage => 'Memory usage';
+
+  @override
+  String get dashboardDiskUsage => 'Disk usage';
+
+  @override
+  String get dashboardQuickActionsTitle => 'Quick actions';
+
+  @override
+  String get dashboardActionRestart => 'Restart server';
+
+  @override
+  String get dashboardActionUpdate => 'System update';
+
+  @override
+  String get dashboardActionBackup => 'Create backup';
+
+  @override
+  String get dashboardActionSecurity => 'Security check';
+
+  @override
+  String get dashboardRestartTitle => 'Restart server';
+
+  @override
+  String get dashboardRestartDesc =>
+      'Restarting will temporarily interrupt all services. Continue?';
+
+  @override
+  String get dashboardRestartSuccess => 'Restart request sent';
+
+  @override
+  String dashboardRestartFailed(String error) {
+    return 'Failed to restart: $error';
+  }
+
+  @override
+  String get dashboardUpdateTitle => 'System update';
+
+  @override
+  String get dashboardUpdateDesc =>
+      'Start the update now? The panel may be temporarily unavailable.';
+
+  @override
+  String get dashboardUpdateSuccess => 'Update request sent';
+
+  @override
+  String dashboardUpdateFailed(String error) {
+    return 'Failed to update: $error';
+  }
+
+  @override
+  String get dashboardActivityTitle => 'Recent activity';
+
+  @override
+  String get dashboardActivityEmpty => 'No recent activity';
+
+  @override
+  String dashboardActivityDaysAgo(int count) {
+    return '${count}d ago';
+  }
+
+  @override
+  String dashboardActivityHoursAgo(int count) {
+    return '${count}h ago';
+  }
+
+  @override
+  String dashboardActivityMinutesAgo(int count) {
+    return '${count}m ago';
+  }
+
+  @override
+  String get dashboardActivityJustNow => 'Just now';
 
   @override
   String get coachDone => 'Got it';

@@ -152,6 +152,48 @@ abstract class AppLocalizations {
   /// **'Coming soon'**
   String get commonComingSoon;
 
+  /// No description provided for @commonEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get commonEmpty;
+
+  /// No description provided for @commonLoadFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get commonLoadFailedTitle;
+
+  /// No description provided for @monitorNetworkLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get monitorNetworkLabel;
+
+  /// No description provided for @monitorMetricCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get monitorMetricCurrent;
+
+  /// No description provided for @monitorMetricMin.
+  ///
+  /// In en, this message translates to:
+  /// **'Min'**
+  String get monitorMetricMin;
+
+  /// No description provided for @monitorMetricAvg.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg'**
+  String get monitorMetricAvg;
+
+  /// No description provided for @monitorMetricMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Max'**
+  String get monitorMetricMax;
+
   /// No description provided for @navServer.
   ///
   /// In en, this message translates to:
@@ -721,6 +763,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap a server card to see modules and quick actions.'**
   String get coachServerCardDesc;
+
+  /// No description provided for @dashboardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get dashboardTitle;
+
+  /// No description provided for @dashboardLoadFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get dashboardLoadFailedTitle;
+
+  /// No description provided for @dashboardServerInfoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Server info'**
+  String get dashboardServerInfoTitle;
+
+  /// No description provided for @dashboardServerStatusOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get dashboardServerStatusOk;
+
+  /// No description provided for @dashboardServerStatusConnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting...'**
+  String get dashboardServerStatusConnecting;
+
+  /// No description provided for @dashboardHostNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hostname'**
+  String get dashboardHostNameLabel;
+
+  /// No description provided for @dashboardOsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Operating system'**
+  String get dashboardOsLabel;
+
+  /// No description provided for @dashboardUptimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Uptime'**
+  String get dashboardUptimeLabel;
+
+  /// No description provided for @dashboardUptimeDaysHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d {hours}h'**
+  String dashboardUptimeDaysHours(int days, int hours);
+
+  /// No description provided for @dashboardUptimeHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h'**
+  String dashboardUptimeHours(int hours);
+
+  /// No description provided for @dashboardUpdatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated at {time}'**
+  String dashboardUpdatedAt(String time);
+
+  /// No description provided for @dashboardResourceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'System resources'**
+  String get dashboardResourceTitle;
+
+  /// No description provided for @dashboardCpuUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU usage'**
+  String get dashboardCpuUsage;
+
+  /// No description provided for @dashboardMemoryUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory usage'**
+  String get dashboardMemoryUsage;
+
+  /// No description provided for @dashboardDiskUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk usage'**
+  String get dashboardDiskUsage;
+
+  /// No description provided for @dashboardQuickActionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions'**
+  String get dashboardQuickActionsTitle;
+
+  /// No description provided for @dashboardActionRestart.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart server'**
+  String get dashboardActionRestart;
+
+  /// No description provided for @dashboardActionUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'System update'**
+  String get dashboardActionUpdate;
+
+  /// No description provided for @dashboardActionBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create backup'**
+  String get dashboardActionBackup;
+
+  /// No description provided for @dashboardActionSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Security check'**
+  String get dashboardActionSecurity;
+
+  /// No description provided for @dashboardRestartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart server'**
+  String get dashboardRestartTitle;
+
+  /// No description provided for @dashboardRestartDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Restarting will temporarily interrupt all services. Continue?'**
+  String get dashboardRestartDesc;
+
+  /// No description provided for @dashboardRestartSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart request sent'**
+  String get dashboardRestartSuccess;
+
+  /// No description provided for @dashboardRestartFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to restart: {error}'**
+  String dashboardRestartFailed(String error);
+
+  /// No description provided for @dashboardUpdateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'System update'**
+  String get dashboardUpdateTitle;
+
+  /// No description provided for @dashboardUpdateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Start the update now? The panel may be temporarily unavailable.'**
+  String get dashboardUpdateDesc;
+
+  /// No description provided for @dashboardUpdateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Update request sent'**
+  String get dashboardUpdateSuccess;
+
+  /// No description provided for @dashboardUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update: {error}'**
+  String dashboardUpdateFailed(String error);
+
+  /// No description provided for @dashboardActivityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent activity'**
+  String get dashboardActivityTitle;
+
+  /// No description provided for @dashboardActivityEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent activity'**
+  String get dashboardActivityEmpty;
+
+  /// No description provided for @dashboardActivityDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}d ago'**
+  String dashboardActivityDaysAgo(int count);
+
+  /// No description provided for @dashboardActivityHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}h ago'**
+  String dashboardActivityHoursAgo(int count);
+
+  /// No description provided for @dashboardActivityMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}m ago'**
+  String dashboardActivityMinutesAgo(int count);
+
+  /// No description provided for @dashboardActivityJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get dashboardActivityJustNow;
 
   /// No description provided for @coachDone.
   ///

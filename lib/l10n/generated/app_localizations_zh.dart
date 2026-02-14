@@ -36,6 +36,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get commonComingSoon => '即将支持';
 
   @override
+  String get commonEmpty => '暂无数据';
+
+  @override
+  String get commonLoadFailedTitle => '加载失败';
+
+  @override
+  String get monitorNetworkLabel => '网络';
+
+  @override
+  String get monitorMetricCurrent => '当前';
+
+  @override
+  String get monitorMetricMin => '最小';
+
+  @override
+  String get monitorMetricAvg => '平均';
+
+  @override
+  String get monitorMetricMax => '最大';
+
+  @override
   String get navServer => '服务器';
 
   @override
@@ -323,6 +344,124 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get coachServerCardDesc => '在详情页中访问各个功能模块与快捷操作。';
+
+  @override
+  String get dashboardTitle => '仪表盘';
+
+  @override
+  String get dashboardLoadFailedTitle => '加载失败';
+
+  @override
+  String get dashboardServerInfoTitle => '服务器信息';
+
+  @override
+  String get dashboardServerStatusOk => '运行正常';
+
+  @override
+  String get dashboardServerStatusConnecting => '连接中...';
+
+  @override
+  String get dashboardHostNameLabel => '主机名';
+
+  @override
+  String get dashboardOsLabel => '操作系统';
+
+  @override
+  String get dashboardUptimeLabel => '运行时间';
+
+  @override
+  String dashboardUptimeDaysHours(int days, int hours) {
+    return '$days天 $hours小时';
+  }
+
+  @override
+  String dashboardUptimeHours(int hours) {
+    return '$hours小时';
+  }
+
+  @override
+  String dashboardUpdatedAt(String time) {
+    return '更新时间：$time';
+  }
+
+  @override
+  String get dashboardResourceTitle => '系统资源';
+
+  @override
+  String get dashboardCpuUsage => 'CPU 使用率';
+
+  @override
+  String get dashboardMemoryUsage => '内存使用率';
+
+  @override
+  String get dashboardDiskUsage => '磁盘使用率';
+
+  @override
+  String get dashboardQuickActionsTitle => '快捷操作';
+
+  @override
+  String get dashboardActionRestart => '重启服务器';
+
+  @override
+  String get dashboardActionUpdate => '系统更新';
+
+  @override
+  String get dashboardActionBackup => '创建备份';
+
+  @override
+  String get dashboardActionSecurity => '安全检查';
+
+  @override
+  String get dashboardRestartTitle => '重启服务器';
+
+  @override
+  String get dashboardRestartDesc => '确定要重启服务器吗？这将导致所有服务暂时不可用。';
+
+  @override
+  String get dashboardRestartSuccess => '重启请求已发送';
+
+  @override
+  String dashboardRestartFailed(String error) {
+    return '重启失败：$error';
+  }
+
+  @override
+  String get dashboardUpdateTitle => '系统更新';
+
+  @override
+  String get dashboardUpdateDesc => '现在开始系统更新吗？更新期间面板可能暂时不可用。';
+
+  @override
+  String get dashboardUpdateSuccess => '更新请求已发送';
+
+  @override
+  String dashboardUpdateFailed(String error) {
+    return '更新失败：$error';
+  }
+
+  @override
+  String get dashboardActivityTitle => '最近活动';
+
+  @override
+  String get dashboardActivityEmpty => '暂无活动记录';
+
+  @override
+  String dashboardActivityDaysAgo(int count) {
+    return '$count天前';
+  }
+
+  @override
+  String dashboardActivityHoursAgo(int count) {
+    return '$count小时前';
+  }
+
+  @override
+  String dashboardActivityMinutesAgo(int count) {
+    return '$count分钟前';
+  }
+
+  @override
+  String get dashboardActivityJustNow => '刚刚';
 
   @override
   String get coachDone => '我知道了';

@@ -61,6 +61,56 @@ class FileSearch extends Equatable {
       ];
 }
 
+class FileSearchResponse extends Equatable {
+  final List<FileInfo> items;
+  final int total;
+
+  const FileSearchResponse({
+    required this.items,
+    required this.total,
+  });
+
+  factory FileSearchResponse.fromJson(Map<String, dynamic> json) {
+    final dataField = json['data'];
+    if (dataField is Map<String, dynamic>) {
+      final items = (dataField['items'] as List?)
+              ?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [];
+      final total = dataField['total'];
+      return FileSearchResponse(
+        items: items,
+        total: total is num ? total.toInt() : items.length,
+      );
+    }
+    if (dataField is List) {
+      final items = dataField.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList();
+      return FileSearchResponse(items: items, total: items.length);
+    }
+    if (json['items'] is List) {
+      final items = (json['items'] as List)
+          .map((item) => FileInfo.fromJson(item as Map<String, dynamic>))
+          .toList();
+      final total = json['total'];
+      return FileSearchResponse(
+        items: items,
+        total: total is num ? total.toInt() : items.length,
+      );
+    }
+    return const FileSearchResponse(items: [], total: 0);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'items': items.map((item) => item.toJson()).toList(),
+      'total': total,
+    };
+  }
+
+  @override
+  List<Object?> get props => [items, total];
+}
+
 /// 文件信息模型
 class FileInfo extends Equatable {
   final String name;
@@ -274,19 +324,19 @@ class FileCopy extends Equatable {
 class FileUpload extends Equatable {
   final String path;
   final String? fileName;
-  final bool? override;
+  final bool? overrideExisting;
 
   const FileUpload({
     required this.path,
     this.fileName,
-    this.override,
+    this.overrideExisting,
   });
 
   factory FileUpload.fromJson(Map<String, dynamic> json) {
     return FileUpload(
       path: json['path'] as String,
       fileName: json['fileName'] as String?,
-      override: json['override'] as bool?,
+      overrideExisting: json['override'] as bool?,
     );
   }
 
@@ -294,12 +344,12 @@ class FileUpload extends Equatable {
     return {
       'path': path,
       'fileName': fileName,
-      'override': override,
+      'override': overrideExisting,
     };
   }
 
   @override
-  List<Object?> get props => [path, fileName, override];
+  List<Object?> get props => [path, fileName, overrideExisting];
 }
 
 /// 文件下载模型
@@ -1248,16 +1298,59 @@ class FileTree extends Equatable {
   });
 
   factory FileTree.fromJson(Map<String, dynamic> json) {
+    final path = _resolvePath(json);
+    final childrenJson = json['children'] as List?;
     return FileTree(
-      path: json['path'] as String,
-      name: json['name'] as String,
-      type: json['type'] as String,
+      path: path,
+      name: _resolveName(json, path),
+      type: _resolveType(json, childrenJson),
       size: json['size'] as int? ?? 0,
-      children: (json['children'] as List?)
+      children: childrenJson
           ?.map((item) => FileTree.fromJson(item as Map<String, dynamic>))
           .toList(),
       depth: json['depth'] as int? ?? 0,
     );
+  }
+
+  static String _resolvePath(Map<String, dynamic> json) {
+    final pathValue = json['path'];
+    if (pathValue is String) {
+      return pathValue;
+    }
+    final nameValue = json['name'];
+    if (nameValue is String) {
+      return nameValue;
+    }
+    return '';
+  }
+
+  static String _resolveName(Map<String, dynamic> json, String path) {
+    final nameValue = json['name'];
+    if (nameValue is String && nameValue.isNotEmpty) {
+      return nameValue;
+    }
+    if (path.isEmpty) {
+      return '';
+    }
+    final segments = path.split('/');
+    for (var i = segments.length - 1; i >= 0; i--) {
+      final segment = segments[i];
+      if (segment.isNotEmpty) {
+        return segment;
+      }
+    }
+    return path;
+  }
+
+  static String _resolveType(Map<String, dynamic> json, List? childrenJson) {
+    final typeValue = json['type'];
+    if (typeValue is String && typeValue.isNotEmpty) {
+      return typeValue;
+    }
+    if (childrenJson != null && childrenJson.isNotEmpty) {
+      return 'dir';
+    }
+    return 'file';
   }
 
   Map<String, dynamic> toJson() {

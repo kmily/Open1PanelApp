@@ -9,6 +9,13 @@
   "commonDelete": "删除",
   "commonRefresh": "刷新",
   "commonComingSoon": "即将支持",
+  "commonEmpty": "暂无数据",
+  "commonLoadFailedTitle": "加载失败",
+  "monitorNetworkLabel": "网络",
+  "monitorMetricCurrent": "当前",
+  "monitorMetricMin": "最小",
+  "monitorMetricAvg": "平均",
+  "monitorMetricMax": "最大",
   "navServer": "服务器",
   "navFiles": "文件",
   "navSecurity": "动态验证",
@@ -118,6 +125,99 @@
   "coachServerAddDesc": "点击这里创建服务器配置。",
   "coachServerCardTitle": "点击卡片进入详情",
   "coachServerCardDesc": "在详情页中访问各个功能模块与快捷操作。",
+  "dashboardTitle": "仪表盘",
+  "dashboardLoadFailedTitle": "加载失败",
+  "dashboardServerInfoTitle": "服务器信息",
+  "dashboardServerStatusOk": "运行正常",
+  "dashboardServerStatusConnecting": "连接中...",
+  "dashboardHostNameLabel": "主机名",
+  "dashboardOsLabel": "操作系统",
+  "dashboardUptimeLabel": "运行时间",
+  "dashboardUptimeDaysHours": "{days}天 {hours}小时",
+  "@dashboardUptimeDaysHours": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardUptimeHours": "{hours}小时",
+  "@dashboardUptimeHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardUpdatedAt": "更新时间：{time}",
+  "@dashboardUpdatedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardResourceTitle": "系统资源",
+  "dashboardCpuUsage": "CPU 使用率",
+  "dashboardMemoryUsage": "内存使用率",
+  "dashboardDiskUsage": "磁盘使用率",
+  "dashboardQuickActionsTitle": "快捷操作",
+  "dashboardActionRestart": "重启服务器",
+  "dashboardActionUpdate": "系统更新",
+  "dashboardActionBackup": "创建备份",
+  "dashboardActionSecurity": "安全检查",
+  "dashboardRestartTitle": "重启服务器",
+  "dashboardRestartDesc": "确定要重启服务器吗？这将导致所有服务暂时不可用。",
+  "dashboardRestartSuccess": "重启请求已发送",
+  "dashboardRestartFailed": "重启失败：{error}",
+  "@dashboardRestartFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardUpdateTitle": "系统更新",
+  "dashboardUpdateDesc": "现在开始系统更新吗？更新期间面板可能暂时不可用。",
+  "dashboardUpdateSuccess": "更新请求已发送",
+  "dashboardUpdateFailed": "更新失败：{error}",
+  "@dashboardUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardActivityTitle": "最近活动",
+  "dashboardActivityEmpty": "暂无活动记录",
+  "dashboardActivityDaysAgo": "{count}天前",
+  "@dashboardActivityDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardActivityHoursAgo": "{count}小时前",
+  "@dashboardActivityHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardActivityMinutesAgo": "{count}分钟前",
+  "@dashboardActivityMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardActivityJustNow": "刚刚",
   "coachDone": "我知道了",
   "notFoundTitle": "页面不存在",
   "notFoundDesc": "请求的页面不存在或已迁移。",

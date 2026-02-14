@@ -666,7 +666,7 @@ class _ImageCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '创建时间: ${_formatTime(image.created ?? 0)}',
+            '创建时间: ${_formatTime(_parseTimestamp(image.created))}',
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 14,
@@ -696,6 +696,21 @@ class _ImageCard extends StatelessWidget {
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)}MB';
     }
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)}GB';
+  }
+
+  int _parseTimestamp(dynamic created) {
+    if (created == null) return 0;
+    if (created is int) return created;
+    if (created is DateTime) return created.millisecondsSinceEpoch ~/ 1000;
+    if (created is String) {
+      final parsedInt = int.tryParse(created);
+      if (parsedInt != null) return parsedInt;
+      final parsedDate = DateTime.tryParse(created);
+      if (parsedDate != null) {
+        return parsedDate.millisecondsSinceEpoch ~/ 1000;
+      }
+    }
+    return 0;
   }
 
   String _formatTime(int timestamp) {

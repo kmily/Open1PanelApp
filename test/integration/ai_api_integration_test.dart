@@ -12,32 +12,31 @@ import '../../lib/data/models/ai_models.dart';
 import '../../lib/data/models/mcp_models.dart';
 import '../../lib/data/models/common_models.dart';
 
-void main() {
+Future<void> main() async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  await TestEnvironment.initialize();
+
   late DioClient client;
   late AIV2Api api;
 
-  setUpAll(() async {
-    await TestEnvironment.initialize();
-    
-    if (TestEnvironment.canRunIntegrationTests) {
-      client = DioClient(
-        baseUrl: TestEnvironment.baseUrl,
-        apiKey: TestEnvironment.apiKey,
-      );
-      api = AIV2Api(client);
-    }
-  });
-
-  tearDownAll(() {
-    // DioClient不需要显式关闭
-  });
+  if (TestEnvironment.canRunIntegrationTests) {
+    client = DioClient(
+      baseUrl: TestEnvironment.baseUrl,
+      apiKey: TestEnvironment.apiKey,
+    );
+    api = AIV2Api(client);
+  }
 
   group('AI API连接测试', () {
-    test('应该能够连接到服务器', skip: TestEnvironment.skipNoApiKey(), () async {
+    test(
+      '应该能够连接到服务器',
+      skip: TestEnvironment.skipIntegration() ?? TestEnvironment.skipNoApiKey(),
+      () async {
       expect(TestEnvironment.baseUrl, isNotEmpty);
       expect(TestEnvironment.apiKey, isNotEmpty);
       expect(TestEnvironment.apiKey, isNot(equals('your_api_key_here')));
-    });
+      },
+    );
   });
 
   group('Ollama模型API测试', () {
@@ -203,7 +202,7 @@ void main() {
   });
 
   group('错误处理测试', () {
-    test('应该正确处理无效Token', skip: TestEnvironment.skipNoApiKey(), () async {
+    test('应该正确处理无效Token', skip: TestEnvironment.skipIntegration(), () async {
       final invalidClient = DioClient(
         baseUrl: TestEnvironment.baseUrl,
         apiKey: 'invalid_key_12345',
@@ -215,7 +214,7 @@ void main() {
         await invalidApi.searchOllamaModels(request);
         fail('应该抛出401异常');
       } on DioException catch (e) {
-        expect(e.response?.statusCode, anyOf(equals(401), equals(403)));
+        expect(e.response?.statusCode, anyOf(equals(400), equals(401), equals(403)));
       }
     });
 

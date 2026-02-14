@@ -25,7 +25,7 @@ class AppStats {
 /// 应用数据状态
 class AppsData {
   final List<AppItem> availableApps;
-  final List<InstalledApp> installedApps;
+  final List<AppInstallInfo> installedApps;
   final AppStats stats;
   final bool isLoading;
   final String? error;
@@ -42,7 +42,7 @@ class AppsData {
 
   AppsData copyWith({
     List<AppItem>? availableApps,
-    List<InstalledApp>? installedApps,
+    List<AppInstallInfo>? installedApps,
     AppStats? stats,
     bool? isLoading,
     String? error,
@@ -86,12 +86,14 @@ class AppsProvider extends ChangeNotifier {
       await _ensureApiClient();
 
       // 获取应用列表
-      final response = await _appApi!.listApps(
-        page: 1,
-        pageSize: 100,
+      final response = await _appApi!.searchApps(
+        AppSearchRequest(
+          page: 1,
+          pageSize: 100,
+        ),
       );
 
-      final apps = response.data?.items ?? [];
+      final apps = response.items;
 
       _data = _data.copyWith(
         availableApps: apps,
@@ -116,12 +118,7 @@ class AppsProvider extends ChangeNotifier {
       await _ensureApiClient();
 
       // 获取已安装应用列表
-      final response = await _appApi!.listInstalledApps(
-        page: 1,
-        pageSize: 100,
-      );
-
-      final apps = response.data?.items ?? [];
+      final apps = await _appApi!.getInstalledApps();
 
       // 计算统计
       int running = 0, stopped = 0;
@@ -176,10 +173,10 @@ class AppsProvider extends ChangeNotifier {
   }
 
   /// 安装应用
-  Future<bool> installApp(String appKey) async {
+  Future<bool> installApp(AppInstallCreateRequest request) async {
     try {
       await _ensureApiClient();
-      await _appApi!.installApp(appKey);
+      await _appApi!.installApp(request);
       await loadInstalledApps(); // 刷新已安装列表
       return true;
     } catch (e) {
@@ -207,7 +204,18 @@ class AppsProvider extends ChangeNotifier {
   Future<bool> startApp(String installId) async {
     try {
       await _ensureApiClient();
-      await _appApi!.startApp(installId);
+      final id = int.tryParse(installId);
+      if (id == null) {
+        _data = _data.copyWith(error: '启动应用失败: 无效应用ID');
+        notifyListeners();
+        return false;
+      }
+      await _appApi!.operateApp(
+        AppInstalledOperateRequest(
+          installId: id,
+          operate: 'start',
+        ),
+      );
       await loadInstalledApps(); // 刷新列表
       return true;
     } catch (e) {
@@ -221,7 +229,18 @@ class AppsProvider extends ChangeNotifier {
   Future<bool> stopApp(String installId) async {
     try {
       await _ensureApiClient();
-      await _appApi!.stopApp(installId);
+      final id = int.tryParse(installId);
+      if (id == null) {
+        _data = _data.copyWith(error: '停止应用失败: 无效应用ID');
+        notifyListeners();
+        return false;
+      }
+      await _appApi!.operateApp(
+        AppInstalledOperateRequest(
+          installId: id,
+          operate: 'stop',
+        ),
+      );
       await loadInstalledApps(); // 刷新列表
       return true;
     } catch (e) {
@@ -235,7 +254,18 @@ class AppsProvider extends ChangeNotifier {
   Future<bool> restartApp(String installId) async {
     try {
       await _ensureApiClient();
-      await _appApi!.restartApp(installId);
+      final id = int.tryParse(installId);
+      if (id == null) {
+        _data = _data.copyWith(error: '重启应用失败: 无效应用ID');
+        notifyListeners();
+        return false;
+      }
+      await _appApi!.operateApp(
+        AppInstalledOperateRequest(
+          installId: id,
+          operate: 'restart',
+        ),
+      );
       await loadInstalledApps(); // 刷新列表
       return true;
     } catch (e) {

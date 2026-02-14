@@ -4,8 +4,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import '../../shared/widgets/app_card.dart';
 import '../../widgets/main_layout.dart';
+import '../../data/models/common_models.dart';
 import 'dashboard_provider.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -31,7 +33,7 @@ class _DashboardPageState extends State<DashboardPage> {
       currentIndex: 0,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('仪表盘'),
+          title: Text(context.l10n.dashboardTitle),
           actions: [
             IconButton(
               icon: const Icon(Icons.refresh),
@@ -60,7 +62,7 @@ class _DashboardPageState extends State<DashboardPage> {
             }
 
             // 显示加载状态
-            if (data.isLoading && data.baseInfo == null) {
+            if (data.isLoading && data.systemInfo == null) {
               return const _LoadingView();
             }
 
@@ -103,13 +105,15 @@ class _LoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final l10n = context.l10n;
+
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(),
-          SizedBox(height: 16),
-          Text('加载中...'),
+          const CircularProgressIndicator(),
+          const SizedBox(height: 16),
+          Text(l10n.commonLoading),
         ],
       ),
     );
@@ -128,6 +132,8 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -141,7 +147,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              '加载失败',
+              l10n.dashboardLoadFailedTitle,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
@@ -156,7 +162,7 @@ class _ErrorView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('重试'),
+              label: Text(l10n.commonRetry),
             ),
           ],
         ),
@@ -173,42 +179,43 @@ class _ServerInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseInfo = data.baseInfo;
+    final systemInfo = data.systemInfo;
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return AppCard(
-      title: '服务器信息',
+      title: l10n.dashboardServerInfoTitle,
       subtitle: Text(
-        baseInfo != null ? '运行正常' : '连接中...',
+        systemInfo != null ? l10n.dashboardServerStatusOk : l10n.dashboardServerStatusConnecting,
         style: TextStyle(
-          color: baseInfo != null ? Colors.green : Colors.orange,
+          color: systemInfo != null ? Colors.green : Colors.orange,
         ),
       ),
       trailing: Icon(
         Icons.computer,
-        color: baseInfo != null ? Colors.green : Colors.orange,
+        color: systemInfo != null ? Colors.green : Colors.orange,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _InfoRow(
-            label: '主机名',
-            value: baseInfo?.hostName ?? '--',
+            label: l10n.dashboardHostNameLabel,
+            value: systemInfo?.hostname ?? '--',
           ),
           const SizedBox(height: 8),
           _InfoRow(
-            label: '操作系统',
-            value: _formatOsInfo(baseInfo),
+            label: l10n.dashboardOsLabel,
+            value: _formatOsInfo(systemInfo),
           ),
           const SizedBox(height: 8),
           _InfoRow(
-            label: '运行时间',
-            value: data.uptime,
+            label: l10n.dashboardUptimeLabel,
+            value: _formatUptime(context, data.uptime),
           ),
           if (data.lastUpdated != null) ...[
             const SizedBox(height: 8),
             Text(
-              '更新时间: ${_formatTime(data.lastUpdated!)}',
+              l10n.dashboardUpdatedAt(_formatTime(data.lastUpdated!)),
               style: TextStyle(
                 fontSize: 12,
                 color: colorScheme.onSurfaceVariant,
@@ -220,9 +227,9 @@ class _ServerInfoCard extends StatelessWidget {
     );
   }
 
-  String _formatOsInfo(HostBaseInfo? info) {
+  String _formatOsInfo(SystemInfo? info) {
     if (info == null) return '--';
-    final os = info.os ?? 'Unknown';
+    final os = info.os ?? '--';
     final platform = info.platform ?? '';
     final platformVersion = info.platformVersion ?? '';
     if (platform.isNotEmpty && platformVersion.isNotEmpty) {
@@ -233,6 +240,18 @@ class _ServerInfoCard extends StatelessWidget {
 
   String _formatTime(DateTime time) {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}:${time.second.toString().padLeft(2, '0')}';
+  }
+
+  String _formatUptime(BuildContext context, String uptime) {
+    if (uptime == '--') return uptime;
+    final seconds = int.tryParse(uptime);
+    if (seconds == null) return uptime;
+    final days = seconds ~/ 86400;
+    final hours = (seconds % 86400) ~/ 3600;
+    if (days > 0) {
+      return context.l10n.dashboardUptimeDaysHours(days, hours);
+    }
+    return context.l10n.dashboardUptimeHours(hours);
   }
 }
 
@@ -279,11 +298,11 @@ class _ResourceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard(
-      title: '系统资源',
+      title: context.l10n.dashboardResourceTitle,
       child: Column(
         children: [
           _ResourceItem(
-            title: 'CPU使用率',
+            title: context.l10n.dashboardCpuUsage,
             value: data.cpuPercent != null
                 ? '${data.cpuPercent!.toStringAsFixed(1)}%'
                 : '--',
@@ -292,7 +311,7 @@ class _ResourceCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _ResourceItem(
-            title: '内存使用率',
+            title: context.l10n.dashboardMemoryUsage,
             value: data.memoryPercent != null
                 ? '${data.memoryPercent!.toStringAsFixed(1)}%'
                 : '--',
@@ -302,7 +321,7 @@ class _ResourceCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _ResourceItem(
-            title: '磁盘使用率',
+            title: context.l10n.dashboardDiskUsage,
             value: data.diskPercent != null
                 ? '${data.diskPercent!.toStringAsFixed(1)}%'
                 : '--',
@@ -397,30 +416,26 @@ class _QuickActionsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard(
-      title: '快速操作',
+      title: context.l10n.dashboardQuickActionsTitle,
       child: Wrap(
         spacing: 12,
         runSpacing: 12,
         children: [
           _QuickActionItem(
             icon: Icons.restart_alt,
-            label: '重启服务器',
+            label: context.l10n.dashboardActionRestart,
             color: Colors.red,
             onTap: () => _showRestartDialog(context),
           ),
           _QuickActionItem(
             icon: Icons.update,
-            label: '系统更新',
+            label: context.l10n.dashboardActionUpdate,
             color: Colors.blue,
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('系统更新功能开发中')),
-              );
-            },
+            onTap: () => _showUpdateDialog(context),
           ),
           _QuickActionItem(
             icon: Icons.backup,
-            label: '创建备份',
+            label: context.l10n.dashboardActionBackup,
             color: Colors.green,
             onTap: () {
               Navigator.pushNamed(context, '/backups');
@@ -428,7 +443,7 @@ class _QuickActionsCard extends StatelessWidget {
           ),
           _QuickActionItem(
             icon: Icons.security,
-            label: '安全检查',
+            label: context.l10n.dashboardActionSecurity,
             color: Colors.orange,
             onTap: () {
               Navigator.pushNamed(context, '/security');
@@ -440,25 +455,77 @@ class _QuickActionsCard extends StatelessWidget {
   }
 
   void _showRestartDialog(BuildContext context) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('重启服务器'),
-        content: const Text('确定要重启服务器吗？这将导致所有服务暂时不可用。'),
+        title: Text(l10n.dashboardRestartTitle),
+        content: Text(l10n.dashboardRestartDesc),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              // TODO: 调用重启API
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('重启请求已发送')),
-              );
+              try {
+                await context.read<DashboardProvider>().restartSystem();
+                if (!context.mounted) {
+                  return;
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.dashboardRestartSuccess)),
+                );
+              } catch (e) {
+                if (!context.mounted) {
+                  return;
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.dashboardRestartFailed(e.toString()))),
+                );
+              }
             },
-            child: const Text('确认重启'),
+            child: Text(l10n.commonConfirm),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showUpdateDialog(BuildContext context) {
+    final l10n = context.l10n;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.dashboardUpdateTitle),
+        content: Text(l10n.dashboardUpdateDesc),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await context.read<DashboardProvider>().upgradeSystem();
+                if (!context.mounted) {
+                  return;
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.dashboardUpdateSuccess)),
+                );
+              } catch (e) {
+                if (!context.mounted) {
+                  return;
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.dashboardUpdateFailed(e.toString()))),
+                );
+              }
+            },
+            child: Text(l10n.commonConfirm),
           ),
         ],
       ),
@@ -529,12 +596,12 @@ class _ActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard(
-      title: '最近活动',
+      title: context.l10n.dashboardActivityTitle,
       child: activities.isEmpty
-          ? const Center(
+          ? Center(
               child: Padding(
                 padding: EdgeInsets.all(16),
-                child: Text('暂无活动记录'),
+                child: Text(context.l10n.dashboardActivityEmpty),
               ),
             )
           : Column(
@@ -551,17 +618,18 @@ class _ActivityCard extends StatelessWidget {
   }
 
   String _formatTimeAgo(DateTime time) {
+    final l10n = context.l10n;
     final now = DateTime.now();
     final diff = now.difference(time);
 
     if (diff.inDays > 0) {
-      return '${diff.inDays}天前';
+      return l10n.dashboardActivityDaysAgo(diff.inDays);
     } else if (diff.inHours > 0) {
-      return '${diff.inHours}小时前';
+      return l10n.dashboardActivityHoursAgo(diff.inHours);
     } else if (diff.inMinutes > 0) {
-      return '${diff.inMinutes}分钟前';
+      return l10n.dashboardActivityMinutesAgo(diff.inMinutes);
     } else {
-      return '刚刚';
+      return l10n.dashboardActivityJustNow;
     }
   }
 }

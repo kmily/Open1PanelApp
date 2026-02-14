@@ -70,7 +70,7 @@ class _SecurityVerificationPageState extends State<SecurityVerificationPage> {
                         _MfaQrImage(base64Data: info!.qrImage)
                       else
                         Text(
-                          l10n.securityMockNotice,
+                          l10n.commonEmpty,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                     ],

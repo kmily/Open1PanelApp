@@ -1,4 +1,17 @@
 import 'dio_client.dart';
+import '../config/api_config.dart';
+import '../../api/v2/app_v2.dart';
+import '../../api/v2/container_v2.dart';
+import '../../api/v2/dashboard_v2.dart';
+import '../../api/v2/database_v2.dart';
+import '../../api/v2/firewall_v2.dart';
+import '../../api/v2/host_v2.dart';
+import '../../api/v2/logs_v2.dart';
+import '../../api/v2/monitor_v2.dart';
+import '../../api/v2/setting_v2.dart';
+import '../../api/v2/terminal_v2.dart';
+import '../../api/v2/update_v2.dart';
+import '../../api/v2/website_v2.dart';
 
 /// API客户端管理器
 /// 用于管理多个服务器配置的API客户端实例
@@ -11,7 +24,17 @@ class ApiClientManager {
     return _instance;
   }
 
+  static ApiClientManager get instance => _instance;
+
   ApiClientManager._internal();
+
+  Future<ApiConfig> _getCurrentConfig() async {
+    final config = await ApiConfigManager.getCurrentConfig();
+    if (config == null) {
+      throw StateError('No API config available');
+    }
+    return config;
+  }
 
   /// 获取指定服务器的API客户端
   DioClient getClient(String serverId, String serverUrl, String apiKey) {
@@ -29,6 +52,71 @@ class ApiClientManager {
     _clients[serverId] = client;
     _clientMeta[serverId] = nextMeta;
     return client;
+  }
+
+  Future<DioClient> getCurrentClient() async {
+    final config = await _getCurrentConfig();
+    return getClient(config.id, config.url, config.apiKey);
+  }
+
+  Future<AppV2Api> getAppApi() async {
+    final client = await getCurrentClient();
+    return AppV2Api(client.dio);
+  }
+
+  Future<ContainerV2Api> getContainerApi() async {
+    final client = await getCurrentClient();
+    return ContainerV2Api(client);
+  }
+
+  Future<WebsiteV2Api> getWebsiteApi() async {
+    final client = await getCurrentClient();
+    return WebsiteV2Api(client);
+  }
+
+  Future<DashboardV2Api> getDashboardApi() async {
+    final client = await getCurrentClient();
+    return DashboardV2Api(client);
+  }
+
+  Future<HostV2Api> getHostApi() async {
+    final client = await getCurrentClient();
+    return HostV2Api(client);
+  }
+
+  Future<DatabaseV2Api> getDatabaseApi() async {
+    final client = await getCurrentClient();
+    return DatabaseV2Api(client);
+  }
+
+  Future<FirewallV2Api> getFirewallApi() async {
+    final client = await getCurrentClient();
+    return FirewallV2Api(client);
+  }
+
+  Future<MonitorV2Api> getMonitorApi() async {
+    final client = await getCurrentClient();
+    return MonitorV2Api(client);
+  }
+
+  Future<SettingV2Api> getSettingApi() async {
+    final client = await getCurrentClient();
+    return SettingV2Api(client);
+  }
+
+  Future<TerminalV2Api> getTerminalApi() async {
+    final client = await getCurrentClient();
+    return TerminalV2Api(client);
+  }
+
+  Future<LogsV2Api> getLogsApi() async {
+    final client = await getCurrentClient();
+    return LogsV2Api(client);
+  }
+
+  Future<UpdateV2Api> getUpdateApi() async {
+    final client = await getCurrentClient();
+    return UpdateV2Api(client);
   }
 
   /// 移除指定服务器的API客户端

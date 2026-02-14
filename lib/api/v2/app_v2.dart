@@ -9,6 +9,62 @@ class AppV2Api {
 
   AppV2Api(this._dio);
 
+  List<T> _parseListData<T>(dynamic dataField, T Function(Map<String, dynamic>) fromJson) {
+    if (dataField is List) {
+      return dataField.map((e) => fromJson(e as Map<String, dynamic>)).toList();
+    }
+    if (dataField is Map<String, dynamic>) {
+      final items = dataField['items'];
+      if (items is List) {
+        return items.map((e) => fromJson(e as Map<String, dynamic>)).toList();
+      }
+    }
+    return [];
+  }
+
+  AppSearchResponse _parseAppSearchResponse(dynamic dataField) {
+    if (dataField is Map<String, dynamic>) {
+      return AppSearchResponse.fromJson(dataField);
+    }
+    if (dataField is List) {
+      final items = dataField.map((e) => AppItem.fromJson(e as Map<String, dynamic>)).toList();
+      return AppSearchResponse(items: items, total: items.length);
+    }
+    return AppSearchResponse(items: [], total: 0);
+  }
+
+  AppListResponse _parseAppListResponse(dynamic dataField) {
+    if (dataField is Map<String, dynamic>) {
+      if (dataField.containsKey('apps')) {
+        return AppListResponse.fromJson(dataField);
+      }
+      final items = _parseListData(dataField, AppInstallInfo.fromJson);
+      final total = dataField['total'];
+      return AppListResponse(apps: items, total: total is num ? total.toInt() : items.length);
+    }
+    if (dataField is List) {
+      final items = dataField.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList();
+      return AppListResponse(apps: items, total: items.length);
+    }
+    return AppListResponse(apps: [], total: 0);
+  }
+
+  AppUpdateResponse _parseAppUpdateResponse(dynamic dataField) {
+    if (dataField is Map<String, dynamic>) {
+      if (dataField.containsKey('updates')) {
+        return AppUpdateResponse.fromJson(dataField);
+      }
+      final items = _parseListData(dataField, AppInstallInfo.fromJson);
+      final total = dataField['total'];
+      return AppUpdateResponse(updates: items, total: total is num ? total.toInt() : items.length);
+    }
+    if (dataField is List) {
+      final items = dataField.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList();
+      return AppUpdateResponse(updates: items, total: items.length);
+    }
+    return AppUpdateResponse(updates: [], total: 0);
+  }
+
   /// 安装应用
   Future<AppInstallInfo> installApp(AppInstallCreateRequest request) async {
     final response = await _dio.post<dynamic>(
@@ -40,7 +96,7 @@ class AppV2Api {
       data: request.toJson(),
     );
     final data = response.data as Map<String, dynamic>;
-    return AppSearchResponse.fromJson(data['data'] as Map<String, dynamic>);
+    return _parseAppSearchResponse(data['data']);
   }
 
   /// 获取应用列表
@@ -49,7 +105,7 @@ class AppV2Api {
       ApiConstants.buildApiPath('/apps/list'),
     );
     final data = response.data as Map<String, dynamic>;
-    return AppListResponse.fromJson(data['data'] as Map<String, dynamic>);
+    return _parseAppListResponse(data['data']);
   }
 
   /// 获取应用详情
@@ -76,7 +132,7 @@ class AppV2Api {
       ApiConstants.buildApiPath('/apps/checkupdate'),
     );
     final data = response.data as Map<String, dynamic>;
-    return AppUpdateResponse.fromJson(data['data'] as Map<String, dynamic>);
+    return _parseAppUpdateResponse(data['data']);
   }
 
   /// 获取忽略更新的应用列表
@@ -85,16 +141,7 @@ class AppV2Api {
       ApiConstants.buildApiPath('/apps/ignored'),
     );
     final data = response.data as Map<String, dynamic>;
-    // 处理API返回的data字段可能是Map或List的情况
-    final dataField = data['data'];
-    if (dataField is List) {
-      return dataField.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList();
-    } else if (dataField is Map<String, dynamic>) {
-      // 如果data是Map，尝试从items字段获取列表
-      final items = dataField['items'] as List?;
-      return items?.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList() ?? [];
-    }
-    return [];
+    return _parseListData(data['data'], AppInstallInfo.fromJson);
   }
 
   /// 检查应用安装
@@ -156,16 +203,7 @@ class AppV2Api {
       ApiConstants.buildApiPath('/apps/installed/list'),
     );
     final data = response.data as Map<String, dynamic>;
-    // 处理API返回的data字段可能是Map或List的情况
-    final dataField = data['data'];
-    if (dataField is List) {
-      return dataField.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList();
-    } else if (dataField is Map<String, dynamic>) {
-      // 如果data是Map，尝试从items字段获取列表
-      final items = dataField['items'] as List?;
-      return items?.map((e) => AppInstallInfo.fromJson(e as Map<String, dynamic>)).toList() ?? [];
-    }
-    return [];
+    return _parseListData(data['data'], AppInstallInfo.fromJson);
   }
 
   /// 加载应用端口

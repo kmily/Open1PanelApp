@@ -3,7 +3,7 @@ import 'package:onepanelapp_app/features/security/security_repository.dart';
 
 class SecurityProvider extends ChangeNotifier {
   SecurityProvider({SecurityVerificationRepository? repository})
-      : _repository = repository ?? const MockSecurityVerificationRepository();
+      : _repository = repository ?? ApiSecurityVerificationRepository();
 
   final SecurityVerificationRepository _repository;
   bool _loading = false;

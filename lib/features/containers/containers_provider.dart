@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import '../../api/v2/container_v2.dart';
 import '../../core/network/api_client_manager.dart';
 import '../../data/models/container_models.dart';
+import '../../data/models/container_extension_models.dart';
+import '../../data/models/common_models.dart';
 
 /// 容器统计数据
 class ContainerStats {
@@ -37,8 +39,8 @@ class ImageStats {
 
 /// 容器数据状态
 class ContainersData {
-  final List<ContainerItem> containers;
-  final List<ImageItem> images;
+  final List<ContainerInfo> containers;
+  final List<ContainerImage> images;
   final ContainerStats containerStats;
   final ImageStats imageStats;
   final bool isLoading;
@@ -56,8 +58,8 @@ class ContainersData {
   });
 
   ContainersData copyWith({
-    List<ContainerItem>? containers,
-    List<ImageItem>? images,
+    List<ContainerInfo>? containers,
+    List<ContainerImage>? images,
     ContainerStats? containerStats,
     ImageStats? imageStats,
     bool? isLoading,
@@ -104,13 +106,9 @@ class ContainersProvider extends ChangeNotifier {
       await _ensureApiClient();
 
       // 获取容器列表
-      final response = await _containerApi!.listContainers(
-        page: 1,
-        pageSize: 100,
-        filters: {},
-      );
+      final response = await _containerApi!.listContainers();
 
-      final containers = response.data?.items ?? [];
+      final containers = response.data ?? [];
 
       // 计算统计
       int running = 0, stopped = 0, paused = 0;
@@ -158,12 +156,12 @@ class ContainersProvider extends ChangeNotifier {
       await _ensureApiClient();
 
       // 获取镜像列表
-      final response = await _containerApi!.listImages(
-        page: 1,
-        pageSize: 100,
-      );
+      final response = await _containerApi!.getAllImages();
 
-      final images = response.data?.items ?? [];
+      final images = response.data
+              ?.map((item) => ContainerImage.fromJson(item))
+              .toList() ??
+          [];
 
       // 计算统计（简化处理，实际应该根据是否被使用来判断）
       _data = _data.copyWith(
@@ -211,7 +209,7 @@ class ContainersProvider extends ChangeNotifier {
   Future<bool> startContainer(String containerId) async {
     try {
       await _ensureApiClient();
-      await _containerApi!.startContainer(containerId);
+      await _containerApi!.startContainer([containerId]);
       await loadContainers(); // 刷新列表
       return true;
     } catch (e) {
@@ -225,7 +223,7 @@ class ContainersProvider extends ChangeNotifier {
   Future<bool> stopContainer(String containerId) async {
     try {
       await _ensureApiClient();
-      await _containerApi!.stopContainer(containerId);
+      await _containerApi!.stopContainer([containerId]);
       await loadContainers(); // 刷新列表
       return true;
     } catch (e) {
@@ -239,7 +237,7 @@ class ContainersProvider extends ChangeNotifier {
   Future<bool> restartContainer(String containerId) async {
     try {
       await _ensureApiClient();
-      await _containerApi!.restartContainer(containerId);
+      await _containerApi!.restartContainer([containerId]);
       await loadContainers(); // 刷新列表
       return true;
     } catch (e) {
@@ -253,7 +251,7 @@ class ContainersProvider extends ChangeNotifier {
   Future<bool> deleteContainer(String containerId) async {
     try {
       await _ensureApiClient();
-      await _containerApi!.deleteContainer(containerId);
+      await _containerApi!.deleteContainer([containerId]);
       await loadContainers(); // 刷新列表
       return true;
     } catch (e) {
@@ -267,7 +265,13 @@ class ContainersProvider extends ChangeNotifier {
   Future<bool> deleteImage(String imageId) async {
     try {
       await _ensureApiClient();
-      await _containerApi!.deleteImage(imageId);
+      final id = int.tryParse(imageId);
+      if (id == null) {
+        _data = _data.copyWith(error: '删除镜像失败: 无效镜像ID');
+        notifyListeners();
+        return false;
+      }
+      await _containerApi!.removeImage(BatchDelete(ids: [id]));
       await loadImages(); // 刷新列表
       return true;
     } catch (e) {

@@ -4,11 +4,15 @@ import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/core/services/onboarding_service.dart';
 import 'package:onepanelapp_app/features/onboarding/onboarding_page.dart';
 import 'package:onepanelapp_app/features/security/security_verification_page.dart';
+import 'package:onepanelapp_app/features/databases/databases_page.dart';
+import 'package:onepanelapp_app/features/firewall/firewall_page.dart';
+import 'package:onepanelapp_app/features/monitoring/monitoring_page.dart';
 import 'package:onepanelapp_app/features/server/server_detail_page.dart';
 import 'package:onepanelapp_app/features/server/server_form_page.dart';
 import 'package:onepanelapp_app/features/server/server_list_page.dart';
 import 'package:onepanelapp_app/features/server/server_models.dart';
 import 'package:onepanelapp_app/features/shell/app_shell_page.dart';
+import 'package:onepanelapp_app/features/terminal/terminal_page.dart';
 import 'package:onepanelapp_app/pages/settings/settings_page.dart';
 
 class AppRoutes {
@@ -20,6 +24,10 @@ class AppRoutes {
   static const String serverSelection = '/server-selection';
   static const String serverDetail = '/server-detail';
   static const String files = '/files';
+  static const String databases = '/databases';
+  static const String firewall = '/firewall';
+  static const String terminal = '/terminal';
+  static const String monitoring = '/monitoring';
   static const String securityVerification = '/security-verification';
   static const String settings = '/settings';
 }
@@ -52,6 +60,14 @@ class AppRouter {
       case AppRoutes.files:
         return MaterialPageRoute(
             builder: (_) => const AppShellPage(initialIndex: 1));
+      case AppRoutes.databases:
+        return MaterialPageRoute(builder: (_) => const DatabasesPage());
+      case AppRoutes.firewall:
+        return MaterialPageRoute(builder: (_) => const FirewallPage());
+      case AppRoutes.terminal:
+        return MaterialPageRoute(builder: (_) => const TerminalPage());
+      case AppRoutes.monitoring:
+        return MaterialPageRoute(builder: (_) => const MonitoringPage());
       case AppRoutes.securityVerification:
         return MaterialPageRoute(
             builder: (_) => const SecurityVerificationPage());

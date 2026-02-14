@@ -452,23 +452,23 @@ class AppstoreUpdateRequest {
 @JsonSerializable()
 class AppInstallInfo {
   final String? appId;
-  final String appName;
-  final String appVersion;
+  final String? appName;
+  final String? appVersion;
   final String? description;
   final String? icon;
   final String? status;
   final String? createdAt;
-  final int id;
+  final int? id;
 
   AppInstallInfo({
     this.appId,
-    required this.appName,
-    required this.appVersion,
+    this.appName,
+    this.appVersion,
     this.description,
     this.icon,
     this.status,
     this.createdAt,
-    required this.id,
+    this.id,
   });
 
   factory AppInstallInfo.fromJson(Map<String, dynamic> json) => _$AppInstallInfoFromJson(json);

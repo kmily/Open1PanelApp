@@ -350,13 +350,22 @@ class SettingV2Api {
   /// @param request MFA凭证请求
   /// @return MFA OTP信息
   Future<Response<MfaOtp>> loadMfaInfo(MfaCredential request) async {
-    final response = await _client.post<Map<String, dynamic>>(
+    final response = await _client.post<dynamic>(
       ApiConstants.buildApiPath('/core/settings/mfa'),
       data: request.toJson(),
     );
-    final data = response.data!;
+    final data = response.data;
+    Map<String, dynamic>? payload;
+    if (data is Map<String, dynamic>) {
+      final inner = data['data'];
+      if (inner is Map<String, dynamic>) {
+        payload = inner;
+      } else {
+        payload = data;
+      }
+    }
     return Response(
-      data: MfaOtp.fromJson(data['data'] as Map<String, dynamic>),
+      data: payload == null ? const MfaOtp() : MfaOtp.fromJson(payload),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,

@@ -188,6 +188,15 @@ class ServerDetailPage extends StatelessWidget {
       case '/databases':
         Navigator.pushNamed(context, '/databases');
         break;
+      case '/firewall':
+        Navigator.pushNamed(context, '/firewall');
+        break;
+      case '/terminal':
+        Navigator.pushNamed(context, '/terminal');
+        break;
+      case '/monitoring':
+        Navigator.pushNamed(context, '/monitoring');
+        break;
       case '/files':
         Navigator.pushNamed(context, '/files');
         break;

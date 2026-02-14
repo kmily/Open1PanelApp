@@ -129,9 +129,9 @@ class _AppsPageState extends State<AppsPage> {
                           padding: const EdgeInsets.only(bottom: 12),
                           child: _InstalledAppCard(
                             app: app,
-                            onStart: () => provider.startApp(app.id ?? ''),
-                            onStop: () => provider.stopApp(app.id ?? ''),
-                            onRestart: () => provider.restartApp(app.id ?? ''),
+                            onStart: () => provider.startApp(app.id?.toString() ?? ''),
+                            onStop: () => provider.stopApp(app.id?.toString() ?? ''),
+                            onRestart: () => provider.restartApp(app.id?.toString() ?? ''),
                             onUninstall: () => _showUninstallDialog(context, app, provider),
                           ),
                         );
@@ -163,7 +163,7 @@ class _AppsPageState extends State<AppsPage> {
       builder: (context) => AlertDialog(
         icon: const Icon(Icons.delete_outline, color: Colors.red),
         title: const Text('卸载应用'),
-        content: Text('确定要卸载 ${app.name ?? '此应用'} 吗？此操作不可撤销。'),
+        content: Text('确定要卸载 ${app.appName ?? '此应用'} 吗？此操作不可撤销。'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -172,7 +172,7 @@ class _AppsPageState extends State<AppsPage> {
           FilledButton(
             onPressed: () async {
               Navigator.pop(context);
-              final success = await provider.uninstallApp(app.id ?? '');
+              final success = await provider.uninstallApp(app.id?.toString() ?? '');
               if (success && mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('应用已卸载')),
@@ -524,8 +524,8 @@ class _InstalledAppCard extends StatelessWidget {
     final statusColor = isRunning ? Colors.green : Colors.orange;
     
     return AppCard(
-      title: app.name ?? '未命名应用',
-      subtitle: Text(app.appName ?? '未知应用'),
+      title: app.appName ?? '未命名应用',
+      subtitle: Text(app.appVersion ?? '未知版本'),
       trailing: _StatusChip(
         status: isRunning ? '运行中' : '已停止',
         color: statusColor,
@@ -540,9 +540,9 @@ class _InstalledAppCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (app.version != null)
+        if (app.appVersion != null)
             Text(
-              '版本: ${app.version}',
+            '版本: ${app.appVersion}',
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 14,

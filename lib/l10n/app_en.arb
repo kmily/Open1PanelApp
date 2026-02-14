@@ -9,6 +9,13 @@
   "commonDelete": "Delete",
   "commonRefresh": "Refresh",
   "commonComingSoon": "Coming soon",
+  "commonEmpty": "No data",
+  "commonLoadFailedTitle": "Failed to load",
+  "monitorNetworkLabel": "Network",
+  "monitorMetricCurrent": "Current",
+  "monitorMetricMin": "Min",
+  "monitorMetricAvg": "Avg",
+  "monitorMetricMax": "Max",
   "navServer": "Servers",
   "navFiles": "Files",
   "navSecurity": "Verification",
@@ -118,6 +125,99 @@
   "coachServerAddDesc": "Tap here to create a server profile.",
   "coachServerCardTitle": "Open server details",
   "coachServerCardDesc": "Tap a server card to see modules and quick actions.",
+  "dashboardTitle": "Dashboard",
+  "dashboardLoadFailedTitle": "Failed to load",
+  "dashboardServerInfoTitle": "Server info",
+  "dashboardServerStatusOk": "Running",
+  "dashboardServerStatusConnecting": "Connecting...",
+  "dashboardHostNameLabel": "Hostname",
+  "dashboardOsLabel": "Operating system",
+  "dashboardUptimeLabel": "Uptime",
+  "dashboardUptimeDaysHours": "{days}d {hours}h",
+  "@dashboardUptimeDaysHours": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardUptimeHours": "{hours}h",
+  "@dashboardUptimeHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardUpdatedAt": "Updated at {time}",
+  "@dashboardUpdatedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardResourceTitle": "System resources",
+  "dashboardCpuUsage": "CPU usage",
+  "dashboardMemoryUsage": "Memory usage",
+  "dashboardDiskUsage": "Disk usage",
+  "dashboardQuickActionsTitle": "Quick actions",
+  "dashboardActionRestart": "Restart server",
+  "dashboardActionUpdate": "System update",
+  "dashboardActionBackup": "Create backup",
+  "dashboardActionSecurity": "Security check",
+  "dashboardRestartTitle": "Restart server",
+  "dashboardRestartDesc": "Restarting will temporarily interrupt all services. Continue?",
+  "dashboardRestartSuccess": "Restart request sent",
+  "dashboardRestartFailed": "Failed to restart: {error}",
+  "@dashboardRestartFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardUpdateTitle": "System update",
+  "dashboardUpdateDesc": "Start the update now? The panel may be temporarily unavailable.",
+  "dashboardUpdateSuccess": "Update request sent",
+  "dashboardUpdateFailed": "Failed to update: {error}",
+  "@dashboardUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardActivityTitle": "Recent activity",
+  "dashboardActivityEmpty": "No recent activity",
+  "dashboardActivityDaysAgo": "{count}d ago",
+  "@dashboardActivityDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardActivityHoursAgo": "{count}h ago",
+  "@dashboardActivityHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardActivityMinutesAgo": "{count}m ago",
+  "@dashboardActivityMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardActivityJustNow": "Just now",
   "coachDone": "Got it",
   "notFoundTitle": "Page not found",
   "notFoundDesc": "The requested page does not exist.",
