@@ -216,9 +216,17 @@ class DashboardProvider extends ChangeNotifier {
     try {
       final api = await _getApi();
 
+      debugPrint('[DashboardProvider] Loading OS info...');
       final osResponse = await api.getOperatingSystemInfo();
+      debugPrint('[DashboardProvider] OS response: ${osResponse.data}');
+
+      debugPrint('[DashboardProvider] Loading base info...');
       final baseResponse = await api.getDashboardBase();
+      debugPrint('[DashboardProvider] Base response: ${baseResponse.data}');
+
+      debugPrint('[DashboardProvider] Loading current metrics...');
       final currentResponse = await api.getCurrentMetrics();
+      debugPrint('[DashboardProvider] Current response: ${currentResponse.data}');
 
       final systemInfo = osResponse.data;
       final baseData = baseResponse.data;
@@ -227,6 +235,8 @@ class DashboardProvider extends ChangeNotifier {
       final cpuPercent = currentMetrics?.current ?? baseData?['cpuPercent'] as double?;
       final memoryPercent = baseData?['memoryPercent'] as double?;
       final diskPercent = baseData?['diskPercent'] as double?;
+
+      debugPrint('[DashboardProvider] cpuPercent: $cpuPercent, memoryPercent: $memoryPercent, diskPercent: $diskPercent');
 
       _data = DashboardData(
         systemInfo: systemInfo,
@@ -242,7 +252,9 @@ class DashboardProvider extends ChangeNotifier {
 
       _status = DashboardStatus.loaded;
       _errorMessage = '';
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('[DashboardProvider] Error: $e');
+      debugPrint('[DashboardProvider] Stack: $stack');
       _status = DashboardStatus.error;
       _errorMessage = e.toString();
     }
@@ -404,18 +416,28 @@ class DashboardProvider extends ChangeNotifier {
     }
   }
 
-  List<ProcessInfo> _parseProcessList(Map<String, dynamic>? data) {
+  List<ProcessInfo> _parseProcessList(dynamic data) {
     if (data == null) return [];
     
-    final list = data['list'] as List<dynamic>? ?? 
-                 data['processes'] as List<dynamic>? ??
-                 data['items'] as List<dynamic>?;
+    if (data is List) {
+      return data
+          .map((item) => ProcessInfo.fromJson(item as Map<String, dynamic>))
+          .toList();
+    }
     
-    if (list == null) return [];
+    if (data is Map<String, dynamic>) {
+      final list = data['list'] as List<dynamic>? ?? 
+                   data['processes'] as List<dynamic>? ??
+                   data['items'] as List<dynamic>?;
+      
+      if (list == null) return [];
 
-    return list
-        .map((item) => ProcessInfo.fromJson(item as Map<String, dynamic>))
-        .toList();
+      return list
+          .map((item) => ProcessInfo.fromJson(item as Map<String, dynamic>))
+          .toList();
+    }
+    
+    return [];
   }
 
   String _formatMemoryUsage(Map<String, dynamic>? baseData) {

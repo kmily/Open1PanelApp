@@ -75,8 +75,14 @@ class MonitoringProvider extends ChangeNotifier {
     try {
       await _ensureService();
       
+      debugPrint('[MonitoringProvider] Loading current metrics...');
       final currentMetrics = await _service!.getCurrentMetrics();
+      debugPrint('[MonitoringProvider] currentMetrics: $currentMetrics');
+      
+      debugPrint('[MonitoringProvider] Loading CPU time series...');
       final cpuTimeSeries = await _service!.getCPUTimeSeries();
+      debugPrint('[MonitoringProvider] cpuTimeSeries: ${cpuTimeSeries.data.length} points');
+      
       final memoryTimeSeries = await _service!.getMemoryTimeSeries();
       final loadTimeSeries = await _service!.getLoadTimeSeries();
       final ioTimeSeries = await _service!.getIOTimeSeries();
@@ -92,7 +98,9 @@ class MonitoringProvider extends ChangeNotifier {
         isLoading: false,
         lastUpdated: DateTime.now(),
       );
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('[MonitoringProvider] Error: $e');
+      debugPrint('[MonitoringProvider] Stack: $stack');
       _data = _data.copyWith(
         isLoading: false,
         error: e.toString(),

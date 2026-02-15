@@ -23,6 +23,12 @@ class ApiResponseParser {
     }
     return {};
   }
+
+  /// 从1Panel API响应中提取data字段（动态类型）
+  static dynamic extractDynamicData(Response<Map<String, dynamic>> response) {
+    final body = response.data!;
+    return body['data'];
+  }
 }
 
 /// Dashboard V2 API客户端
@@ -116,12 +122,12 @@ class DashboardV2Api {
   /// 
   /// GET /dashboard/current/top/cpu
   /// @return Top CPU进程列表
-  Future<Response<Map<String, dynamic>>> getTopCPUProcesses() async {
+  Future<Response<dynamic>> getTopCPUProcesses() async {
     final response = await _client.get<Map<String, dynamic>>(
       ApiConstants.buildApiPath('/dashboard/current/top/cpu'),
     );
     return Response(
-      data: ApiResponseParser.extractMapData(response),
+      data: ApiResponseParser.extractDynamicData(response),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -132,12 +138,12 @@ class DashboardV2Api {
   /// 
   /// GET /dashboard/current/top/mem
   /// @return Top内存进程列表
-  Future<Response<Map<String, dynamic>>> getTopMemoryProcesses() async {
+  Future<Response<dynamic>> getTopMemoryProcesses() async {
     final response = await _client.get<Map<String, dynamic>>(
       ApiConstants.buildApiPath('/dashboard/current/top/mem'),
     );
     return Response(
-      data: ApiResponseParser.extractMapData(response),
+      data: ApiResponseParser.extractDynamicData(response),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,

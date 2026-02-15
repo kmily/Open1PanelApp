@@ -83,6 +83,7 @@ class MonitorRepository {
       final now = DateTime.now();
       final startTime = now.subtract(const Duration(hours: 1));
 
+      debugPrint('[MonitorRepository] Calling API...');
       final response = await client.post(
         '/api/v2/hosts/monitor/search',
         data: {
@@ -92,9 +93,14 @@ class MonitorRepository {
         },
       );
 
+      debugPrint('[MonitorRepository] Response type: ${response.runtimeType}');
+      debugPrint('[MonitorRepository] Response.data type: ${response.data.runtimeType}');
+      debugPrint('[MonitorRepository] Response.data: ${response.data}');
+
       return _parseMetricsResponse(response.data, now);
-    } catch (e) {
+    } catch (e, stack) {
       debugPrint('[MonitorRepository] getCurrentMetrics error: $e');
+      debugPrint('[MonitorRepository] Stack: $stack');
       return const MonitorMetricsSnapshot();
     }
   }
