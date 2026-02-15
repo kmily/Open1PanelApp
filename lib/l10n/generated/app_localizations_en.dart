@@ -572,4 +572,45 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get legacyRouteRedirect =>
       'This legacy route is redirected to the new shell.';
+
+  @override
+  String get monitorDataPoints => 'Data points';
+
+  @override
+  String monitorDataPointsCount(int count, String time) {
+    return '$count points ($time)';
+  }
+
+  @override
+  String get monitorRefreshInterval => 'Refresh interval';
+
+  @override
+  String monitorSeconds(int count) {
+    return '$count seconds';
+  }
+
+  @override
+  String monitorSecondsDefault(int count) {
+    return '$count seconds (default)';
+  }
+
+  @override
+  String monitorMinute(int count) {
+    return '$count minute';
+  }
+
+  @override
+  String monitorTimeMinutes(int count) {
+    return '$count min';
+  }
+
+  @override
+  String monitorTimeHours(int count) {
+    return '$count hour';
+  }
+
+  @override
+  String monitorDataPointsLabel(int count) {
+    return '$count data points';
+  }
 }

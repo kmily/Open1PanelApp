@@ -561,4 +561,45 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get legacyRouteRedirect => '该旧路由已跳转到新版主界面。';
+
+  @override
+  String get monitorDataPoints => '数据点数量';
+
+  @override
+  String monitorDataPointsCount(int count, String time) {
+    return '$count个点 ($time)';
+  }
+
+  @override
+  String get monitorRefreshInterval => '刷新间隔';
+
+  @override
+  String monitorSeconds(int count) {
+    return '$count秒';
+  }
+
+  @override
+  String monitorSecondsDefault(int count) {
+    return '$count秒 (默认)';
+  }
+
+  @override
+  String monitorMinute(int count) {
+    return '$count分钟';
+  }
+
+  @override
+  String monitorTimeMinutes(int count) {
+    return '$count分钟';
+  }
+
+  @override
+  String monitorTimeHours(int count) {
+    return '$count小时';
+  }
+
+  @override
+  String monitorDataPointsLabel(int count) {
+    return '$count 个数据点';
+  }
 }

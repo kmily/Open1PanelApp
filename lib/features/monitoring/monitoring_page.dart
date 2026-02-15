@@ -19,7 +19,10 @@ class _MonitoringPageState extends State<MonitoringPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      context.read<MonitoringProvider>().load();
+      final provider = context.read<MonitoringProvider>();
+      provider.load();
+      // 默认启用自动刷新
+      provider.toggleAutoRefresh(true);
     });
   }
 
@@ -30,6 +33,60 @@ class _MonitoringPageState extends State<MonitoringPage> {
       appBar: AppBar(
         title: Text(l10n.serverModuleMonitoring),
         actions: [
+          PopupMenuButton<int>(
+            icon: const Icon(Icons.show_chart),
+            tooltip: l10n.monitorDataPoints,
+            onSelected: (count) {
+              context.read<MonitoringProvider>().setMaxDataPoints(count);
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 6,
+                child: Text(l10n.monitorDataPointsCount(6, l10n.monitorTimeMinutes(30))),
+              ),
+              PopupMenuItem(
+                value: 12,
+                child: Text(l10n.monitorDataPointsCount(12, l10n.monitorTimeHours(1))),
+              ),
+              PopupMenuItem(
+                value: 24,
+                child: Text(l10n.monitorDataPointsCount(24, l10n.monitorTimeHours(2))),
+              ),
+              PopupMenuItem(
+                value: 48,
+                child: Text(l10n.monitorDataPointsCount(48, l10n.monitorTimeHours(4))),
+              ),
+            ],
+          ),
+          PopupMenuButton<Duration>(
+            icon: const Icon(Icons.timer),
+            tooltip: l10n.monitorRefreshInterval,
+            onSelected: (duration) {
+              context.read<MonitoringProvider>().setRefreshInterval(duration);
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: const Duration(seconds: 3),
+                child: Text(l10n.monitorSeconds(3)),
+              ),
+              PopupMenuItem(
+                value: const Duration(seconds: 5),
+                child: Text(l10n.monitorSecondsDefault(5)),
+              ),
+              PopupMenuItem(
+                value: const Duration(seconds: 10),
+                child: Text(l10n.monitorSeconds(10)),
+              ),
+              PopupMenuItem(
+                value: const Duration(seconds: 30),
+                child: Text(l10n.monitorSeconds(30)),
+              ),
+              PopupMenuItem(
+                value: const Duration(minutes: 1),
+                child: Text(l10n.monitorMinute(1)),
+              ),
+            ],
+          ),
           Consumer<MonitoringProvider>(
             builder: (context, provider, _) => IconButton(
               icon: const Icon(Icons.refresh),
@@ -79,36 +136,36 @@ class _MonitoringPageState extends State<MonitoringPage> {
           _buildCurrentMetrics(context, data.currentMetrics),
           const SizedBox(height: AppDesignTokens.spacingMd),
           _buildTimeSeriesCard(
-            context, 
-            l10n.serverCpuLabel, 
+            context,
+            l10n.serverCpuLabel,
             data.cpuTimeSeries,
             '%',
           ),
           const SizedBox(height: AppDesignTokens.spacingSm),
           _buildTimeSeriesCard(
-            context, 
-            l10n.serverMemoryLabel, 
+            context,
+            l10n.serverMemoryLabel,
             data.memoryTimeSeries,
             '%',
           ),
           const SizedBox(height: AppDesignTokens.spacingSm),
           _buildTimeSeriesCard(
-            context, 
-            'Load', 
+            context,
+            l10n.serverLoadLabel,
             data.loadTimeSeries,
             '',
           ),
           const SizedBox(height: AppDesignTokens.spacingSm),
           _buildTimeSeriesCard(
-            context, 
-            l10n.serverDiskLabel, 
+            context,
+            '${l10n.serverDiskLabel} IO',
             data.ioTimeSeries,
             '%',
           ),
           const SizedBox(height: AppDesignTokens.spacingSm),
           _buildTimeSeriesCard(
-            context, 
-            l10n.monitorNetworkLabel, 
+            context,
+            l10n.monitorNetworkLabel,
             data.networkTimeSeries,
             'KB/s',
           ),
@@ -123,35 +180,39 @@ class _MonitoringPageState extends State<MonitoringPage> {
 
     return AppCard(
       title: l10n.monitorMetricCurrent,
-      child: Wrap(
-        spacing: AppDesignTokens.spacingMd,
-        runSpacing: AppDesignTokens.spacingSm,
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        mainAxisSpacing: AppDesignTokens.spacingSm,
+        crossAxisSpacing: AppDesignTokens.spacingSm,
+        childAspectRatio: 3.5,
         children: [
           _MetricChip(
             label: l10n.serverCpuLabel,
-            value: metrics.cpuPercent != null 
-                ? '${metrics.cpuPercent!.toStringAsFixed(1)}%' 
+            value: metrics.cpuPercent != null
+                ? '${metrics.cpuPercent!.toStringAsFixed(1)}%'
                 : '--',
             icon: Icons.memory_outlined,
           ),
           _MetricChip(
             label: l10n.serverMemoryLabel,
-            value: metrics.memoryPercent != null 
-                ? '${metrics.memoryPercent!.toStringAsFixed(1)}%' 
+            value: metrics.memoryPercent != null
+                ? '${metrics.memoryPercent!.toStringAsFixed(1)}%'
                 : '--',
             icon: Icons.storage_outlined,
           ),
           _MetricChip(
             label: l10n.serverDiskLabel,
-            value: metrics.diskPercent != null 
-                ? '${metrics.diskPercent!.toStringAsFixed(1)}%' 
+            value: metrics.diskPercent != null
+                ? '${metrics.diskPercent!.toStringAsFixed(1)}%'
                 : '--',
             icon: Icons.folder_outlined,
           ),
           _MetricChip(
-            label: 'Load',
-            value: metrics.load1 != null 
-                ? metrics.load1!.toStringAsFixed(2) 
+            label: l10n.serverLoadLabel,
+            value: metrics.load1 != null
+                ? metrics.load1!.toStringAsFixed(2)
                 : '--',
             icon: Icons.speed_outlined,
           ),
@@ -166,83 +227,13 @@ class _MonitoringPageState extends State<MonitoringPage> {
     MonitorTimeSeries? timeSeries,
     String unit,
   ) {
-    final l10n = context.l10n;
-    
-    return AppCard(
+    return _ExpandableChartCard(
       title: title,
-      subtitle: timeSeries != null && timeSeries.data.isNotEmpty
-          ? Text('Points: ${timeSeries.data.length}')
-          : null,
-      child: timeSeries == null || timeSeries.data.isEmpty
-          ? _EmptyView(title: l10n.commonEmpty)
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildStatsRow(context, timeSeries, unit),
-                const SizedBox(height: AppDesignTokens.spacingSm),
-                _buildSimpleChart(context, timeSeries, unit),
-              ],
-            ),
+      timeSeries: timeSeries,
+      unit: unit,
     );
   }
 
-  Widget _buildStatsRow(
-    BuildContext context,
-    MonitorTimeSeries timeSeries,
-    String unit,
-  ) {
-    final l10n = context.l10n;
-    
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _StatItem(
-          label: l10n.monitorMetricMin,
-          value: timeSeries.min != null 
-              ? '${timeSeries.min!.toStringAsFixed(1)}$unit' 
-              : '--',
-        ),
-        _StatItem(
-          label: l10n.monitorMetricAvg,
-          value: timeSeries.avg != null 
-              ? '${timeSeries.avg!.toStringAsFixed(1)}$unit' 
-              : '--',
-        ),
-        _StatItem(
-          label: l10n.monitorMetricMax,
-          value: timeSeries.max != null 
-              ? '${timeSeries.max!.toStringAsFixed(1)}$unit' 
-              : '--',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSimpleChart(
-    BuildContext context,
-    MonitorTimeSeries timeSeries,
-    String unit,
-  ) {
-    if (timeSeries.data.isEmpty) return const SizedBox.shrink();
-
-    final values = timeSeries.data.map((e) => e.value).toList();
-    final maxVal = values.reduce((a, b) => a > b ? a : b);
-    final minVal = values.reduce((a, b) => a < b ? a : b);
-    final range = maxVal - minVal;
-    final safeRange = range == 0 ? 1.0 : range;
-
-    return SizedBox(
-      height: 80,
-      child: CustomPaint(
-        painter: _SimpleChartPainter(
-          values: values,
-          minVal: minVal,
-          range: safeRange,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-      ),
-    );
-  }
 }
 
 class _MetricChip extends StatelessWidget {
@@ -293,42 +284,119 @@ class _StatItem extends StatelessWidget {
 
 class _SimpleChartPainter extends CustomPainter {
   final List<double> values;
+  final List<DateTime> times;
   final double minVal;
   final double range;
   final Color color;
+  final String unit;
 
   _SimpleChartPainter({
     required this.values,
+    required this.times,
     required this.minVal,
     required this.range,
     required this.color,
+    required this.unit,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     if (values.isEmpty) return;
 
+    final leftPadding = 40.0; // Y轴标签空间
+    final rightPadding = 16.0; // 右边距
+    final bottomPadding = 24.0; // X轴标签空间
+    final topPadding = 8.0; // 上边距
+    
+    final chartWidth = size.width - leftPadding - rightPadding;
+    final chartHeight = size.height - bottomPadding - topPadding;
+
+    // 绘制背景网格线
+    _drawGrid(canvas, size, leftPadding, rightPadding, topPadding, bottomPadding, chartWidth, chartHeight);
+
+    // 绘制坐标轴
+    _drawAxes(canvas, size, leftPadding, rightPadding, topPadding, bottomPadding, chartWidth, chartHeight);
+
+    // 绘制数据线
+    _drawLine(canvas, leftPadding, rightPadding, topPadding, bottomPadding, chartWidth, chartHeight);
+
+    // 绘制坐标轴标签
+    _drawLabels(canvas, size, leftPadding, rightPadding, topPadding, bottomPadding, chartWidth, chartHeight);
+  }
+
+  void _drawGrid(Canvas canvas, Size size, double leftPadding, double rightPadding, double topPadding, double bottomPadding, double chartWidth, double chartHeight) {
+    final gridPaint = Paint()
+      ..color = Colors.grey.withValues(alpha: 0.15)
+      ..strokeWidth = 1;
+
+    // 水平网格线 (5条，包括0%和100%)
+    for (var i = 0; i <= 4; i++) {
+      final y = topPadding + (chartHeight / 4) * i;
+      canvas.drawLine(
+        Offset(leftPadding, y),
+        Offset(size.width - rightPadding, y),
+        gridPaint,
+      );
+    }
+
+    // 垂直网格线
+    final stepX = chartWidth / (values.length - 1);
+    final gridStep = (values.length ~/ 4).clamp(1, values.length);
+    for (var i = 0; i < values.length; i += gridStep) {
+      final x = leftPadding + i * stepX;
+      canvas.drawLine(
+        Offset(x, topPadding),
+        Offset(x, topPadding + chartHeight),
+        gridPaint,
+      );
+    }
+  }
+
+  void _drawAxes(Canvas canvas, Size size, double leftPadding, double rightPadding, double topPadding, double bottomPadding, double chartWidth, double chartHeight) {
+    final axisPaint = Paint()
+      ..color = Colors.grey.withValues(alpha: 0.5)
+      ..strokeWidth = 1;
+
+    // Y轴
+    canvas.drawLine(
+      Offset(leftPadding, topPadding),
+      Offset(leftPadding, topPadding + chartHeight),
+      axisPaint,
+    );
+
+    // X轴
+    canvas.drawLine(
+      Offset(leftPadding, topPadding + chartHeight),
+      Offset(size.width - rightPadding, topPadding + chartHeight),
+      axisPaint,
+    );
+  }
+
+  void _drawLine(Canvas canvas, double leftPadding, double rightPadding, double topPadding, double bottomPadding, double chartWidth, double chartHeight) {
     final paint = Paint()
       ..color = color
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
+      ..strokeWidth = 2.5
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
     final fillPaint = Paint()
-      ..color = color.withValues(alpha: 0.2)
+      ..color = color.withValues(alpha: 0.15)
       ..style = PaintingStyle.fill;
 
     final path = Path();
     final fillPath = Path();
 
-    final stepX = size.width / (values.length - 1);
+    final stepX = chartWidth / (values.length - 1);
 
     for (var i = 0; i < values.length; i++) {
-      final x = i * stepX;
-      final y = size.height - ((values[i] - minVal) / range) * size.height;
+      final x = leftPadding + i * stepX;
+      final normalizedY = range == 0 ? 0.5 : (values[i] - minVal) / range;
+      final y = topPadding + chartHeight - (normalizedY * chartHeight);
 
       if (i == 0) {
         path.moveTo(x, y);
-        fillPath.moveTo(x, size.height);
+        fillPath.moveTo(x, topPadding + chartHeight);
         fillPath.lineTo(x, y);
       } else {
         path.lineTo(x, y);
@@ -336,19 +404,86 @@ class _SimpleChartPainter extends CustomPainter {
       }
     }
 
-    fillPath.lineTo(size.width, size.height);
+    fillPath.lineTo(leftPadding + chartWidth, topPadding + chartHeight);
     fillPath.close();
 
     canvas.drawPath(fillPath, fillPaint);
     canvas.drawPath(path, paint);
+
+    // 绘制数据点
+    final pointPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final maxValue = values.reduce((a, b) => a > b ? a : b);
+
+    for (var i = 0; i < values.length; i++) {
+      final x = leftPadding + i * stepX;
+      final normalizedY = range == 0 ? 0.5 : (values[i] - minVal) / range;
+      final y = topPadding + chartHeight - (normalizedY * chartHeight);
+
+      // 只绘制第一个、最后一个和极值点
+      if (i == 0 || i == values.length - 1 || values[i] == minVal || values[i] == maxValue) {
+        canvas.drawCircle(Offset(x, y), 3, pointPaint);
+        canvas.drawCircle(Offset(x, y), 5, paint..color = color.withValues(alpha: 0.3));
+      }
+    }
+  }
+
+  void _drawLabels(Canvas canvas, Size size, double leftPadding, double rightPadding, double topPadding, double bottomPadding, double chartWidth, double chartHeight) {
+    final labelStyle = TextStyle(
+      color: Colors.grey.withValues(alpha: 0.8),
+      fontSize: 10,
+    );
+    final labelPainter = TextPainter(
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.right,
+    );
+
+    // Y轴标签 (5个)
+    for (var i = 0; i <= 4; i++) {
+      final value = minVal + (range * (4 - i) / 4);
+      final label = '${value.toStringAsFixed(0)}$unit';
+      
+      labelPainter.text = TextSpan(text: label, style: labelStyle);
+      labelPainter.layout();
+      
+      final y = topPadding + (chartHeight / 4) * i;
+      labelPainter.paint(
+        canvas,
+        Offset(leftPadding - labelPainter.width - 4, y - labelPainter.height / 2),
+      );
+    }
+
+    // X轴标签 (时间)
+    if (times.isNotEmpty) {
+      final timeStep = (values.length ~/ 4).clamp(1, values.length);
+      for (var i = 0; i < values.length && i < times.length; i += timeStep) {
+        final time = times[i];
+        final label = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+        
+        labelPainter.text = TextSpan(text: label, style: labelStyle);
+        labelPainter.layout();
+        
+        final stepX = chartWidth / (values.length - 1);
+        final x = leftPadding + i * stepX;
+        
+        labelPainter.paint(
+          canvas,
+          Offset(x - labelPainter.width / 2, topPadding + chartHeight + 4),
+        );
+      }
+    }
   }
 
   @override
   bool shouldRepaint(covariant _SimpleChartPainter oldDelegate) {
     return oldDelegate.values != values ||
+        oldDelegate.times != times ||
         oldDelegate.minVal != minVal ||
         oldDelegate.range != range ||
-        oldDelegate.color != color;
+        oldDelegate.color != color ||
+        oldDelegate.unit != unit;
   }
 }
 
@@ -366,6 +501,167 @@ class _LoadingView extends StatelessWidget {
           const SizedBox(height: AppDesignTokens.spacingMd),
           Text(l10n.commonLoading),
         ],
+      ),
+    );
+  }
+}
+
+class _ExpandableChartCard extends StatefulWidget {
+  final String title;
+  final MonitorTimeSeries? timeSeries;
+  final String unit;
+
+  const _ExpandableChartCard({
+    required this.title,
+    required this.timeSeries,
+    required this.unit,
+  });
+
+  @override
+  State<_ExpandableChartCard> createState() => _ExpandableChartCardState();
+}
+
+class _ExpandableChartCardState extends State<_ExpandableChartCard> {
+  bool _isExpanded = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final timeSeries = widget.timeSeries;
+
+    return Card(
+      child: Column(
+        children: [
+          // 标题栏（可点击折叠）
+          InkWell(
+            onTap: () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(AppDesignTokens.spacingMd),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.title,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        if (timeSeries != null && timeSeries.data.isNotEmpty)
+                          Text(
+                            l10n.monitorDataPointsLabel(timeSeries.data.length),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                      ],
+                    ),
+                  ),
+                  // 当前值
+                  if (timeSeries != null && timeSeries.data.isNotEmpty)
+                    Text(
+                      '${timeSeries.data.last.value.toStringAsFixed(1)}${widget.unit}',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  const SizedBox(width: AppDesignTokens.spacingSm),
+                  // 折叠图标
+                  AnimatedRotation(
+                    turns: _isExpanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: const Icon(Icons.keyboard_arrow_down),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // 展开内容
+          AnimatedCrossFade(
+            firstChild: const SizedBox.shrink(),
+            secondChild: timeSeries == null || timeSeries.data.isEmpty
+                ? _EmptyView(title: l10n.commonEmpty)
+                : Padding(
+                    padding: const EdgeInsets.all(AppDesignTokens.spacingMd),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildStatsRow(context, timeSeries, widget.unit),
+                        const SizedBox(height: AppDesignTokens.spacingSm),
+                        _buildSimpleChart(context, timeSeries, widget.unit),
+                      ],
+                    ),
+                  ),
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 200),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsRow(
+    BuildContext context,
+    MonitorTimeSeries timeSeries,
+    String unit,
+  ) {
+    final l10n = context.l10n;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _StatItem(
+          label: l10n.monitorMetricMin,
+          value: timeSeries.min != null
+              ? '${timeSeries.min!.toStringAsFixed(1)}$unit'
+              : '--',
+        ),
+        _StatItem(
+          label: l10n.monitorMetricAvg,
+          value: timeSeries.avg != null
+              ? '${timeSeries.avg!.toStringAsFixed(1)}$unit'
+              : '--',
+        ),
+        _StatItem(
+          label: l10n.monitorMetricMax,
+          value: timeSeries.max != null
+              ? '${timeSeries.max!.toStringAsFixed(1)}$unit'
+              : '--',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSimpleChart(
+    BuildContext context,
+    MonitorTimeSeries timeSeries,
+    String unit,
+  ) {
+    if (timeSeries.data.isEmpty) return const SizedBox.shrink();
+
+    final values = timeSeries.data.map((e) => e.value).toList();
+    final times = timeSeries.data.map((e) => e.time).toList();
+    final maxVal = values.reduce((a, b) => a > b ? a : b);
+    final minVal = values.reduce((a, b) => a < b ? a : b);
+    final range = maxVal - minVal;
+    final safeRange = range == 0 ? 1.0 : range;
+
+    return SizedBox(
+      height: 140,
+      child: CustomPaint(
+        painter: _SimpleChartPainter(
+          values: values,
+          times: times,
+          minVal: minVal,
+          range: safeRange,
+          color: Theme.of(context).colorScheme.primary,
+          unit: unit,
+        ),
+        size: Size.infinite,
       ),
     );
   }

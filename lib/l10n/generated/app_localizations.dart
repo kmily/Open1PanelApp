@@ -1165,6 +1165,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This legacy route is redirected to the new shell.'**
   String get legacyRouteRedirect;
+
+  /// No description provided for @monitorDataPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Data points'**
+  String get monitorDataPoints;
+
+  /// No description provided for @monitorDataPointsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} points ({time})'**
+  String monitorDataPointsCount(int count, String time);
+
+  /// No description provided for @monitorRefreshInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh interval'**
+  String get monitorRefreshInterval;
+
+  /// No description provided for @monitorSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} seconds'**
+  String monitorSeconds(int count);
+
+  /// No description provided for @monitorSecondsDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} seconds (default)'**
+  String monitorSecondsDefault(int count);
+
+  /// No description provided for @monitorMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} minute'**
+  String monitorMinute(int count);
+
+  /// No description provided for @monitorTimeMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min'**
+  String monitorTimeMinutes(int count);
+
+  /// No description provided for @monitorTimeHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} hour'**
+  String monitorTimeHours(int count);
+
+  /// No description provided for @monitorDataPointsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} data points'**
+  String monitorDataPointsLabel(int count);
 }
 
 class _AppLocalizationsDelegate

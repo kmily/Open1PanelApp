@@ -251,5 +251,66 @@
   "coachDone": "Got it",
   "notFoundTitle": "Page not found",
   "notFoundDesc": "The requested page does not exist.",
-  "legacyRouteRedirect": "This legacy route is redirected to the new shell."
+  "legacyRouteRedirect": "This legacy route is redirected to the new shell.",
+  "monitorDataPoints": "Data points",
+  "monitorDataPointsCount": "{count} points ({time})",
+  "@monitorDataPointsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "monitorRefreshInterval": "Refresh interval",
+  "monitorSeconds": "{count} seconds",
+  "@monitorSeconds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monitorSecondsDefault": "{count} seconds (default)",
+  "@monitorSecondsDefault": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monitorMinute": "{count} minute",
+  "@monitorMinute": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monitorTimeMinutes": "{count} min",
+  "@monitorTimeMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monitorTimeHours": "{count} hour",
+  "@monitorTimeHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monitorDataPointsLabel": "{count} data points",
+  "@monitorDataPointsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

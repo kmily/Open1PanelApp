@@ -251,5 +251,14 @@
   "coachDone": "我知道了",
   "notFoundTitle": "页面不存在",
   "notFoundDesc": "请求的页面不存在或已迁移。",
-  "legacyRouteRedirect": "该旧路由已跳转到新版主界面。"
+  "legacyRouteRedirect": "该旧路由已跳转到新版主界面。",
+  "monitorDataPoints": "数据点数量",
+  "monitorDataPointsCount": "{count}个点 ({time})",
+  "monitorRefreshInterval": "刷新间隔",
+  "monitorSeconds": "{count}秒",
+  "monitorSecondsDefault": "{count}秒 (默认)",
+  "monitorMinute": "{count}分钟",
+  "monitorTimeMinutes": "{count}分钟",
+  "monitorTimeHours": "{count}小时",
+  "monitorDataPointsLabel": "{count} 个数据点"
 }
