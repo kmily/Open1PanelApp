@@ -326,6 +326,12 @@ abstract class AppLocalizations {
   /// **'Modules'**
   String get serverModulesTitle;
 
+  /// No description provided for @serverModuleDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get serverModuleDashboard;
+
   /// No description provided for @serverModuleApps.
   ///
   /// In en, this message translates to:

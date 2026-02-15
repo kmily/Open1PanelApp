@@ -16,6 +16,11 @@ class ServerDetailPage extends StatelessWidget {
     final l10n = context.l10n;
     final moduleItems = [
       _ModuleItem(
+        title: l10n.serverModuleDashboard,
+        icon: Icons.dashboard_outlined,
+        route: '/dashboard',
+      ),
+      _ModuleItem(
         title: l10n.serverModuleApps,
         icon: Icons.apps_outlined,
         route: '/apps',
@@ -174,8 +179,10 @@ class ServerDetailPage extends StatelessWidget {
   }
 
   void _navigateToModule(BuildContext context, _ModuleItem module) {
-    // 根据路由导航到对应页面
     switch (module.route) {
+      case '/dashboard':
+        Navigator.pushNamed(context, '/dashboard');
+        break;
       case '/apps':
         Navigator.pushNamed(context, '/apps');
         break;

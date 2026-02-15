@@ -123,6 +123,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverModulesTitle => '功能模块';
 
   @override
+  String get serverModuleDashboard => '概览';
+
+  @override
   String get serverModuleApps => '应用';
 
   @override

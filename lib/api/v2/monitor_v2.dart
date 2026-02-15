@@ -1,296 +1,92 @@
 import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
-import '../../data/models/monitoring_models.dart';
-
-class MonitorV2Api {
-  final DioClient _client;
-
-  MonitorV2Api(this._client);
-
-  /// 获取监控数据
-  ///
-  /// 获取系统监控指标数据
-  /// @param request 监控搜索请求
-  /// @return 监控数据列表
-  Future<Response<List<MonitorData>>> getMonitorData(MonitorSearch request) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/hosts/monitor/search'),
-      data: request.toJson(),
-    );
-    return Response(
-      data: (response.data as List?)
-          ?.map((item) => MonitorData.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取GPU监控数据
-  ///
-  /// 获取GPU监控指标数据
-  /// @param request GPU监控搜索请求
-  /// @return GPU监控数据
-  Future<Response<MonitorGPUData>> getGPUMonitorData(MonitorGPUSearch request) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/hosts/monitor/gpu/search'),
-      data: request.toJson(),
-    );
-    return Response(
-      data: MonitorGPUData.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 清理监控数据
-  ///
-  /// 清理历史监控数据
-  /// @return 清理结果
-  Future<Response> cleanMonitorData() async {
-    return await _client.post(
-      ApiConstants.buildApiPath('/hosts/monitor/clean'),
-    );
-  }
-
-  /// 获取监控设置
-  ///
-  /// 获取系统监控设置
-  /// @return 监控设置
-  Future<Response<MonitorSetting>> getMonitorSetting() async {
-    final response = await _client.get(
-      ApiConstants.buildApiPath('/hosts/monitor/setting'),
-    );
-    return Response(
-      data: MonitorSetting.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 更新监控设置
-  ///
-  /// 更新系统监控设置
-  /// @param request 监控设置更新请求
-  /// @return 更新结果
-  Future<Response> updateMonitorSetting(MonitorSettingUpdate request) async {
-    return await _client.post(
-      ApiConstants.buildApiPath('/hosts/monitor/setting/update'),
-      data: request.toJson(),
-    );
-  }
-
-  /// 获取系统指标
-  ///
-  /// 获取系统监控指标数据
-  /// @param metricType 指标类型（可选）
-  /// @param timeRange 时间范围（可选，默认为1h）
-  /// @return 系统指标数据
-  Future<Response<SystemMetrics>> getSystemMetrics({
-    MetricType? metricType,
-    String timeRange = '1h',
-  }) async {
-    final request = MonitorSearch(
-      timeRange: timeRange,
-      metricType: metricType?.value,
-    );
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/hosts/monitor/search'),
-      data: request.toJson(),
-    );
-    return Response(
-      data: SystemMetrics.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取CPU指标
-  ///
-  /// 获取CPU监控指标数据
-  /// @param timeRange 时间范围（可选，默认为1h）
-  /// @return CPU指标数据
-  Future<Response<CPUMetrics>> getCPUMetrics({String timeRange = '1h'}) async {
-    final request = MonitorSearch(timeRange: timeRange);
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/hosts/monitor/search'),
-      data: request.toJson(),
-    );
-    return Response(
-      data: CPUMetrics.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取内存指标
-  ///
-  /// 获取内存监控指标数据
-  /// @param timeRange 时间范围（可选，默认为1h）
-  /// @return 内存指标数据
-  Future<Response<MemoryMetrics>> getMemoryMetrics({String timeRange = '1h'}) async {
-    final request = MonitorSearch(timeRange: timeRange);
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/hosts/monitor/search'),
-      data: request.toJson(),
-    );
-    return Response(
-      data: MemoryMetrics.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取磁盘指标
-  ///
-  /// 获取磁盘监控指标数据
-  /// @param device 磁盘设备（可选）
-  /// @param timeRange 时间范围（可选，默认为1h）
-  /// @return 磁盘指标数据
-  Future<Response<List<DiskMetrics>>> getDiskMetrics({
-    String? device,
-    String timeRange = '1h',
-  }) async {
-    final request = MonitorSearch(
-      timeRange: timeRange,
-      device: device,
-    );
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/hosts/monitor/search'),
-      data: request.toJson(),
-    );
-    return Response(
-      data: (response.data as List?)
-          ?.map((item) => DiskMetrics.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取网络指标
-  ///
-  /// 获取网络监控指标数据
-  /// @param interface 网络接口（可选）
-  /// @param timeRange 时间范围（可选，默认为1h）
-  /// @return 网络指标数据
-  Future<Response<List<NetworkMetrics>>> getNetworkMetrics({
-    String? interface,
-    String timeRange = '1h',
-  }) async {
-    final request = MonitorSearch(
-      timeRange: timeRange,
-      networkInterface: interface,
-    );
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/hosts/monitor/search'),
-      data: request.toJson(),
-    );
-    return Response(
-      data: (response.data as List?)
-          ?.map((item) => NetworkMetrics.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-}
 
 /// 监控搜索请求
+/// 
+/// 根据1PanelV2OpenAPI规范，请求参数为：
+/// - param: 监控参数类型 (cpu/memory/load/io/network/all/base)
+/// - startTime: 开始时间 (UTC ISO8601格式)
+/// - endTime: 结束时间 (UTC ISO8601格式)
 class MonitorSearch {
-  final String? timeRange;
-  final String? metricType;
-  final String? device;
-  final String? networkInterface;
+  final String param;
+  final String? startTime;
+  final String? endTime;
 
   const MonitorSearch({
-    this.timeRange,
-    this.metricType,
-    this.device,
-    this.networkInterface,
+    this.param = 'all',
+    this.startTime,
+    this.endTime,
   });
 
   Map<String, dynamic> toJson() => {
-        if (timeRange != null) 'timeRange': timeRange,
-        if (metricType != null) 'metricType': metricType,
-        if (device != null) 'device': device,
-        if (networkInterface != null) 'networkInterface': networkInterface,
+        'param': param,
+        if (startTime != null) 'startTime': startTime,
+        if (endTime != null) 'endTime': endTime,
       };
 }
 
 /// GPU监控搜索请求
 class MonitorGPUSearch {
-  final String? timeRange;
+  final String? startTime;
+  final String? endTime;
 
-  const MonitorGPUSearch({this.timeRange});
+  const MonitorGPUSearch({this.startTime, this.endTime});
 
   Map<String, dynamic> toJson() => {
-        if (timeRange != null) 'timeRange': timeRange,
+        if (startTime != null) 'startTime': startTime,
+        if (endTime != null) 'endTime': endTime,
       };
 }
 
-/// 监控数据
-class MonitorData {
-  final String? time;
-  final double? cpu;
-  final double? memory;
-  final double? disk;
-  final double? network;
+/// 监控数据项
+/// 
+/// API响应格式: {param: 'base', date: [...], value: [...]}
+class MonitorDataItem {
+  final String? param;
+  final List<String>? date;
+  final List<Map<String, dynamic>>? value;
 
-  const MonitorData({
-    this.time,
-    this.cpu,
-    this.memory,
-    this.disk,
-    this.network,
+  const MonitorDataItem({
+    this.param,
+    this.date,
+    this.value,
   });
 
-  factory MonitorData.fromJson(Map<String, dynamic> json) {
-    return MonitorData(
-      time: json['time'] as String?,
-      cpu: (json['cpu'] as num?)?.toDouble(),
-      memory: (json['memory'] as num?)?.toDouble(),
-      disk: (json['disk'] as num?)?.toDouble(),
-      network: (json['network'] as num?)?.toDouble(),
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        if (time != null) 'time': time,
-        if (cpu != null) 'cpu': cpu,
-        if (memory != null) 'memory': memory,
-        if (disk != null) 'disk': disk,
-        if (network != null) 'network': network,
-      };
-}
-
-/// GPU监控数据
-class MonitorGPUData {
-  final List<GPUInfo>? data;
-
-  const MonitorGPUData({this.data});
-
-  factory MonitorGPUData.fromJson(Map<String, dynamic> json) {
-    return MonitorGPUData(
-      data: (json['data'] as List?)
-          ?.map((item) => GPUInfo.fromJson(item as Map<String, dynamic>))
+  factory MonitorDataItem.fromJson(Map<String, dynamic> json) {
+    return MonitorDataItem(
+      param: json['param'] as String?,
+      date: (json['date'] as List?)?.map((e) => e.toString()).toList(),
+      value: (json['value'] as List?)
+          ?.map((e) => e as Map<String, dynamic>)
           .toList(),
     );
   }
+}
 
-  Map<String, dynamic> toJson() => {
-        if (data != null)
-          'data': data!.map((item) => item.toJson()).toList(),
-      };
+/// 监控搜索响应
+/// 
+/// API响应格式: {code: 200, message: '', data: [MonitorDataItem...]}
+class MonitorSearchResponse {
+  final int? code;
+  final String? message;
+  final List<MonitorDataItem>? data;
+
+  const MonitorSearchResponse({
+    this.code,
+    this.message,
+    this.data,
+  });
+
+  factory MonitorSearchResponse.fromJson(Map<String, dynamic> json) {
+    return MonitorSearchResponse(
+      code: json['code'] as int?,
+      message: json['message'] as String?,
+      data: (json['data'] as List?)
+          ?.map((e) => MonitorDataItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 }
 
 /// GPU信息
@@ -322,6 +118,21 @@ class GPUInfo {
         if (memory != null) 'memory': memory,
         if (temperature != null) 'temperature': temperature,
       };
+}
+
+/// GPU监控数据
+class MonitorGPUData {
+  final List<GPUInfo>? data;
+
+  const MonitorGPUData({this.data});
+
+  factory MonitorGPUData.fromJson(Map<String, dynamic> json) {
+    return MonitorGPUData(
+      data: (json['data'] as List?)
+          ?.map((item) => GPUInfo.fromJson(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 }
 
 /// 监控设置
@@ -368,4 +179,132 @@ class MonitorSettingUpdate {
         if (retention != null) 'retention': retention,
         if (enabled != null) 'enabled': enabled,
       };
+}
+
+/// Monitor V2 API客户端
+/// 
+/// 基于1PanelV2OpenAPI规范实现
+/// 端点: /hosts/monitor/search, /hosts/monitor/setting, /hosts/monitor/clean
+class MonitorV2Api {
+  final DioClient _client;
+
+  MonitorV2Api(this._client);
+
+  /// 搜索监控数据
+  /// 
+  /// POST /hosts/monitor/search
+  /// @param request 监控搜索请求
+  /// @return 监控搜索响应
+  Future<Response<MonitorSearchResponse>> search(MonitorSearch request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/hosts/monitor/search'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: MonitorSearchResponse.fromJson(response.data as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 获取GPU监控数据
+  /// 
+  /// POST /hosts/monitor/gpu/search
+  Future<Response<MonitorGPUData>> searchGPU(MonitorGPUSearch request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/hosts/monitor/gpu/search'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: MonitorGPUData.fromJson(response.data as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 清理监控数据
+  /// 
+  /// POST /hosts/monitor/clean
+  Future<Response> clean() async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/hosts/monitor/clean'),
+    );
+  }
+
+  /// 获取监控设置
+  /// 
+  /// GET /hosts/monitor/setting
+  Future<Response<MonitorSetting>> getSetting() async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/hosts/monitor/setting'),
+    );
+    return Response(
+      data: MonitorSetting.fromJson(response.data as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 更新监控设置
+  /// 
+  /// POST /hosts/monitor/setting/update
+  Future<Response> updateSetting(MonitorSettingUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/hosts/monitor/setting/update'),
+      data: request.toJson(),
+    );
+  }
+
+  // ==================== 便捷方法 ====================
+
+  /// 获取所有监控数据
+  Future<Response<MonitorSearchResponse>> getAllMetrics({
+    String? startTime,
+    String? endTime,
+  }) async {
+    return search(MonitorSearch(
+      param: 'all',
+      startTime: startTime,
+      endTime: endTime,
+    ));
+  }
+
+  /// 获取基础监控数据 (CPU, 内存, 负载)
+  Future<Response<MonitorSearchResponse>> getBaseMetrics({
+    String? startTime,
+    String? endTime,
+  }) async {
+    return search(MonitorSearch(
+      param: 'base',
+      startTime: startTime,
+      endTime: endTime,
+    ));
+  }
+
+  /// 获取IO监控数据 (磁盘)
+  Future<Response<MonitorSearchResponse>> getIOMetrics({
+    String? startTime,
+    String? endTime,
+  }) async {
+    return search(MonitorSearch(
+      param: 'io',
+      startTime: startTime,
+      endTime: endTime,
+    ));
+  }
+
+  /// 获取网络监控数据
+  Future<Response<MonitorSearchResponse>> getNetworkMetrics({
+    String? startTime,
+    String? endTime,
+  }) async {
+    return search(MonitorSearch(
+      param: 'network',
+      startTime: startTime,
+      endTime: endTime,
+    ));
+  }
 }

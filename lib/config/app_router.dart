@@ -13,6 +13,7 @@ import 'package:onepanelapp_app/features/server/server_list_page.dart';
 import 'package:onepanelapp_app/features/server/server_models.dart';
 import 'package:onepanelapp_app/features/shell/app_shell_page.dart';
 import 'package:onepanelapp_app/features/terminal/terminal_page.dart';
+import 'package:onepanelapp_app/features/dashboard/dashboard_page.dart';
 import 'package:onepanelapp_app/pages/settings/settings_page.dart';
 
 class AppRoutes {
@@ -23,6 +24,7 @@ class AppRoutes {
   static const String serverConfig = '/server-config';
   static const String serverSelection = '/server-selection';
   static const String serverDetail = '/server-detail';
+  static const String dashboard = '/dashboard';
   static const String files = '/files';
   static const String databases = '/databases';
   static const String firewall = '/firewall';
@@ -68,6 +70,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const TerminalPage());
       case AppRoutes.monitoring:
         return MaterialPageRoute(builder: (_) => const MonitoringPage());
+      case AppRoutes.dashboard:
+        return MaterialPageRoute(builder: (_) => const DashboardPage());
       case AppRoutes.securityVerification:
         return MaterialPageRoute(
             builder: (_) => const SecurityVerificationPage());
@@ -75,7 +79,6 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const SettingsPage());
 
       // Legacy routes redirect to the new shell.
-      case '/dashboard':
       case '/apps':
       case '/containers':
       case '/websites':

@@ -124,6 +124,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverModulesTitle => 'Modules';
 
   @override
+  String get serverModuleDashboard => 'Overview';
+
+  @override
   String get serverModuleApps => 'Apps';
 
   @override

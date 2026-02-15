@@ -1,11 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:onepanelapp_app/core/config/api_config.dart';
 import 'package:onepanelapp_app/core/network/api_client_manager.dart';
+import 'package:onepanelapp_app/data/repositories/monitor_repository.dart';
 import 'server_models.dart';
 
+/// 服务器仓库
+/// 
+/// 提供服务器列表管理和监控数据获取功能
 class ServerRepository {
   const ServerRepository();
 
+  /// 加载服务器卡片列表
   Future<List<ServerCardViewModel>> loadServerCards() async {
     final configs = await ApiConfigManager.getConfigs();
     final current = await ApiConfigManager.getCurrentConfig();
@@ -21,6 +26,9 @@ class ServerRepository {
         .toList();
   }
 
+  /// 加载服务器监控指标
+  /// 
+  /// 使用统一的 MonitorRepository 获取监控数据
   Future<ServerMetricsSnapshot> loadServerMetrics(String serverId) async {
     try {
       final configs = await ApiConfigManager.getConfigs();
@@ -32,80 +40,14 @@ class ServerRepository {
       final manager = ApiClientManager.instance;
       final client = manager.getClient(serverId, config.url, config.apiKey);
 
-      double? cpuPercent;
-      double? memoryPercent;
-      double? diskPercent;
-      double? load;
-
-      try {
-        final now = DateTime.now();
-        final startTime = now.subtract(const Duration(hours: 1));
-        
-        final response = await client.post(
-          '/api/v2/hosts/monitor/search',
-          data: {
-            'param': 'all',
-            'startTime': startTime.toUtc().toIso8601String(),
-            'endTime': now.toUtc().toIso8601String(),
-          },
-        );
-        
-        if (response.data != null && response.data is Map) {
-          final responseData = response.data as Map<String, dynamic>;
-          final dataList = responseData['data'] as List?;
-          
-          if (dataList != null) {
-            for (final item in dataList) {
-              if (item is Map<String, dynamic>) {
-                final param = item['param'] as String?;
-                final values = item['value'] as List?;
-                
-                if (values != null && values.isNotEmpty) {
-                  final lastValue = values.last;
-                  
-                  if (lastValue is Map<String, dynamic>) {
-                    switch (param) {
-                      case 'base':
-                        cpuPercent = (lastValue['cpu'] as num?)?.toDouble();
-                        memoryPercent = (lastValue['memory'] as num?)?.toDouble();
-                        load = (lastValue['cpuLoad1'] as num?)?.toDouble();
-                        break;
-                      case 'cpu':
-                        if (cpuPercent == null) {
-                          cpuPercent = (lastValue['cpu'] as num?)?.toDouble();
-                        }
-                        break;
-                      case 'memory':
-                        if (memoryPercent == null) {
-                          memoryPercent = (lastValue['memory'] as num?)?.toDouble();
-                        }
-                        break;
-                      case 'load':
-                        if (load == null) {
-                          load = (lastValue['cpuLoad1'] as num?)?.toDouble();
-                        }
-                        break;
-                      case 'io':
-                        if (diskPercent == null) {
-                          diskPercent = (lastValue['disk'] as num?)?.toDouble();
-                        }
-                        break;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      } catch (e) {
-        debugPrint('[ServerRepository] Metrics fetch error: $e');
-      }
+      final monitorRepo = const MonitorRepository();
+      final metrics = await monitorRepo.getCurrentMetrics(client);
 
       return ServerMetricsSnapshot(
-        cpuPercent: cpuPercent,
-        memoryPercent: memoryPercent,
-        diskPercent: diskPercent,
-        load: load,
+        cpuPercent: metrics.cpuPercent,
+        memoryPercent: metrics.memoryPercent,
+        diskPercent: metrics.diskPercent,
+        load: metrics.load1,
       );
     } catch (e, stack) {
       debugPrint('[ServerRepository] Error loading metrics: $e');
@@ -114,14 +56,17 @@ class ServerRepository {
     }
   }
 
+  /// 设置当前服务器
   Future<void> setCurrent(String id) async {
     await ApiConfigManager.setCurrentConfig(id);
   }
 
+  /// 删除服务器配置
   Future<void> removeConfig(String id) async {
     await ApiConfigManager.deleteConfig(id);
   }
 
+  /// 保存服务器配置
   Future<void> saveConfig(ApiConfig config) async {
     await ApiConfigManager.saveConfig(config);
     await ApiConfigManager.setCurrentConfig(config.id);

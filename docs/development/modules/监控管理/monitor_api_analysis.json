@@ -1,0 +1,139 @@
+{
+  "module": "monitor",
+  "generatedAt": "2026-02-15T15:17:30.931096",
+  "summary": {
+    "endpointCount": 5,
+    "methodCount": 5
+  },
+  "endpoints": [
+    {
+      "path": "/hosts/monitor/clean",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Clean monitor data",
+          "description": "",
+          "tags": [
+            "Monitor"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/monitor/gpu/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load monitor data",
+          "description": "",
+          "tags": [
+            "Monitor"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/monitor/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load monitor data",
+          "description": "",
+          "tags": [
+            "Monitor"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/monitor/setting",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load monitor setting",
+          "description": "",
+          "tags": [
+            "Monitor"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/monitor/setting/update",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update monitor setting",
+          "description": "",
+          "tags": [
+            "Monitor"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    }
+  ]
+}

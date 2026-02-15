@@ -1,49 +1,117 @@
-import '../../api/v2/monitor_v2.dart';
 import '../../core/services/base_component.dart';
-import '../../data/models/monitoring_models.dart';
+import '../../data/repositories/monitor_repository.dart';
+import '../../api/v2/monitor_v2.dart';
 
+/// 监控服务
+/// 
+/// 提供监控数据获取和处理功能
+/// 使用统一的 MonitorRepository 获取数据
 class MonitoringService extends BaseComponent {
   MonitoringService({
-    MonitorV2Api? api,
     super.clientManager,
     super.permissionResolver,
-  }) : _api = api;
+  });
 
-  MonitorV2Api? _api;
+  final MonitorRepository _monitorRepo = const MonitorRepository();
 
-  Future<MonitorV2Api> _ensureApi() async {
-    if (_api != null) {
-      return _api!;
-    }
-    _api = await clientManager.getMonitorApi();
-    return _api!;
-  }
-
-  Future<SystemMetrics> getSystemMetrics({
-    required MetricType metricType,
-    String timeRange = '1h',
-  }) {
+  /// 获取当前监控指标
+  /// 
+  /// 返回最新的CPU、内存、磁盘、负载数据
+  Future<MonitorMetricsSnapshot> getCurrentMetrics() async {
     return runGuarded(() async {
-      final api = await _ensureApi();
-      final response = await api.getSystemMetrics(
-        metricType: metricType,
-        timeRange: timeRange,
-      );
-      return response.data ?? const SystemMetrics();
+      final client = await clientManager.getCurrentClient();
+      return _monitorRepo.getCurrentMetrics(client);
     });
   }
 
-  Future<List<NetworkMetrics>> getNetworkMetrics({
-    String? networkInterface,
-    String timeRange = '1h',
-  }) {
+  /// 获取CPU时间序列数据
+  Future<MonitorTimeSeries> getCPUTimeSeries({
+    Duration duration = const Duration(hours: 1),
+  }) async {
     return runGuarded(() async {
-      final api = await _ensureApi();
-      final response = await api.getNetworkMetrics(
-        interface: networkInterface,
-        timeRange: timeRange,
+      final client = await clientManager.getCurrentClient();
+      return _monitorRepo.getTimeSeries(client, 'cpu', 'cpu', duration: duration);
+    });
+  }
+
+  /// 获取内存时间序列数据
+  Future<MonitorTimeSeries> getMemoryTimeSeries({
+    Duration duration = const Duration(hours: 1),
+  }) async {
+    return runGuarded(() async {
+      final client = await clientManager.getCurrentClient();
+      return _monitorRepo.getTimeSeries(client, 'memory', 'memory', duration: duration);
+    });
+  }
+
+  /// 获取负载时间序列数据
+  Future<MonitorTimeSeries> getLoadTimeSeries({
+    Duration duration = const Duration(hours: 1),
+  }) async {
+    return runGuarded(() async {
+      final client = await clientManager.getCurrentClient();
+      return _monitorRepo.getTimeSeries(client, 'load', 'cpuLoad1', duration: duration);
+    });
+  }
+
+  /// 获取IO时间序列数据
+  Future<MonitorTimeSeries> getIOTimeSeries({
+    Duration duration = const Duration(hours: 1),
+  }) async {
+    return runGuarded(() async {
+      final client = await clientManager.getCurrentClient();
+      return _monitorRepo.getTimeSeries(client, 'io', 'disk', duration: duration);
+    });
+  }
+
+  /// 获取网络时间序列数据
+  Future<MonitorTimeSeries> getNetworkTimeSeries({
+    Duration duration = const Duration(hours: 1),
+  }) async {
+    return runGuarded(() async {
+      final client = await clientManager.getCurrentClient();
+      return _monitorRepo.getTimeSeries(client, 'network', 'networkIn', duration: duration);
+    });
+  }
+
+  /// 获取监控设置
+  Future<MonitorSetting?> getSetting() async {
+    return runGuarded(() async {
+      final client = await clientManager.getCurrentClient();
+      return _monitorRepo.getSetting(client);
+    });
+  }
+
+  /// 更新监控设置
+  Future<bool> updateSetting({
+    int? interval,
+    int? retention,
+    bool? enabled,
+  }) async {
+    return runGuarded(() async {
+      final client = await clientManager.getCurrentClient();
+      return _monitorRepo.updateSetting(
+        client,
+        interval: interval,
+        retention: retention,
+        enabled: enabled,
       );
-      return response.data ?? [];
+    });
+  }
+
+  /// 清理监控数据
+  Future<bool> cleanData() async {
+    return runGuarded(() async {
+      final client = await clientManager.getCurrentClient();
+      return _monitorRepo.cleanData(client);
+    });
+  }
+
+  /// 获取GPU监控数据
+  Future<List<GPUInfo>> getGPUInfo() async {
+    return runGuarded(() async {
+      final client = await clientManager.getCurrentClient();
+      return _monitorRepo.getGPUInfo(client);
     });
   }
 }

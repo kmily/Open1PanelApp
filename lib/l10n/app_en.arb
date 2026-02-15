@@ -38,6 +38,7 @@
   "serverOpenDetail": "Open details",
   "serverDetailTitle": "Server Details",
   "serverModulesTitle": "Modules",
+  "serverModuleDashboard": "Overview",
   "serverModuleApps": "Apps",
   "serverModuleContainers": "Containers",
   "serverModuleWebsites": "Websites",
