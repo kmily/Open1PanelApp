@@ -142,7 +142,12 @@ class _ServerListPageState extends State<ServerListPage> {
           return Stack(
             children: [
               RefreshIndicator(
-                onRefresh: _provider.load,
+                onRefresh: () async {
+                  await _provider.load();
+                  if (_provider.servers.isNotEmpty) {
+                    await _provider.loadMetrics();
+                  }
+                },
                 child: CustomScrollView(
                   slivers: [
                     SliverToBoxAdapter(
@@ -315,7 +320,9 @@ class _ServerCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    l10n.serverMetricsUnavailable,
+                    _hasMetrics(data.metrics)
+                        ? l10n.serverMetricsAvailable
+                        : l10n.serverMetricsUnavailable,
                     style: TextStyle(color: scheme.onSurfaceVariant),
                   ),
                   Text(
@@ -351,6 +358,13 @@ class _ServerCard extends StatelessWidget {
       return '--';
     }
     return value.toStringAsFixed(2);
+  }
+
+  bool _hasMetrics(ServerMetricsSnapshot metrics) {
+    return metrics.cpuPercent != null ||
+        metrics.memoryPercent != null ||
+        metrics.diskPercent != null ||
+        metrics.load != null;
   }
 }
 

@@ -17,6 +17,7 @@ class _ServerFormPageState extends State<ServerFormPage> {
   final _nameController = TextEditingController();
   final _urlController = TextEditingController();
   final _apiKeyController = TextEditingController();
+  final _tokenValidityController = TextEditingController(text: '0');
   final _repository = const ServerRepository();
   final _connectionService = ServerConnectionService();
 
@@ -29,6 +30,7 @@ class _ServerFormPageState extends State<ServerFormPage> {
     _nameController.dispose();
     _urlController.dispose();
     _apiKeyController.dispose();
+    _tokenValidityController.dispose();
     super.dispose();
   }
 
@@ -100,6 +102,7 @@ class _ServerFormPageState extends State<ServerFormPage> {
         name: _nameController.text.trim(),
         url: _urlController.text.trim(),
         apiKey: _apiKeyController.text.trim(),
+        tokenValidity: int.tryParse(_tokenValidityController.text.trim()) ?? 0,
         isDefault: true,
       );
 
@@ -172,6 +175,16 @@ class _ServerFormPageState extends State<ServerFormPage> {
                 validator: (value) => (value == null || value.trim().isEmpty)
                     ? l10n.serverFormRequired
                     : null,
+              ),
+              const SizedBox(height: AppDesignTokens.spacingLg),
+              TextFormField(
+                controller: _tokenValidityController,
+                decoration: InputDecoration(
+                  labelText: l10n.serverTokenValidity,
+                  hintText: l10n.serverTokenValidityHint,
+                  suffixText: l10n.serverFormMinutes,
+                ),
+                keyboardType: TextInputType.number,
               ),
               const SizedBox(height: AppDesignTokens.spacingLg),
               SizedBox(

@@ -500,6 +500,30 @@ abstract class AppLocalizations {
   /// **'Testing connection...'**
   String get serverTestTesting;
 
+  /// No description provided for @serverMetricsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Metrics loaded'**
+  String get serverMetricsAvailable;
+
+  /// No description provided for @serverTokenValidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Token validity (minutes)'**
+  String get serverTokenValidity;
+
+  /// No description provided for @serverTokenValidityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Set to 0 to skip timestamp validation'**
+  String get serverTokenValidityHint;
+
+  /// No description provided for @serverFormMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'minutes'**
+  String get serverFormMinutes;
+
   /// No description provided for @filesPageTitle.
   ///
   /// In en, this message translates to:

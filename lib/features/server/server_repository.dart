@@ -1,6 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:onepanelapp_app/core/config/api_config.dart';
 import 'package:onepanelapp_app/core/network/api_client_manager.dart';
-import 'package:onepanelapp_app/api/v2/dashboard_v2.dart';
 import 'server_models.dart';
 
 class ServerRepository {
@@ -31,32 +31,82 @@ class ServerRepository {
 
       final manager = ApiClientManager.instance;
       final client = manager.getClient(serverId, config.url, config.apiKey);
-      final api = DashboardV2Api(client);
 
-      final response = await api.getDashboardBase();
-      final data = response.data;
+      double? cpuPercent;
+      double? memoryPercent;
+      double? diskPercent;
+      double? load;
 
-      if (data != null) {
-        return ServerMetricsSnapshot(
-          cpuPercent: _parseDouble(data['cpuPercent']),
-          memoryPercent: _parseDouble(data['memoryPercent']),
-          diskPercent: _parseDouble(data['diskPercent']),
-          load: _parseDouble(data['load']),
+      try {
+        final now = DateTime.now();
+        final startTime = now.subtract(const Duration(hours: 1));
+        
+        final response = await client.post(
+          '/api/v2/hosts/monitor/search',
+          data: {
+            'param': 'all',
+            'startTime': startTime.toUtc().toIso8601String(),
+            'endTime': now.toUtc().toIso8601String(),
+          },
         );
+        
+        if (response.data != null && response.data is Map) {
+          final responseData = response.data as Map<String, dynamic>;
+          final dataList = responseData['data'] as List?;
+          
+          if (dataList != null) {
+            for (final item in dataList) {
+              if (item is Map<String, dynamic>) {
+                final param = item['param'] as String?;
+                final values = item['value'] as List?;
+                
+                if (values != null && values.isNotEmpty) {
+                  final lastValue = values.last;
+                  
+                  if (lastValue is Map<String, dynamic>) {
+                    switch (param) {
+                      case 'base':
+                        cpuPercent = (lastValue['cpu'] as num?)?.toDouble();
+                        memoryPercent = (lastValue['memory'] as num?)?.toDouble();
+                        diskPercent = (lastValue['disk'] as num?)?.toDouble();
+                        final load1 = lastValue['load1'] as num?;
+                        load = load1?.toDouble();
+                        break;
+                      case 'cpu':
+                        cpuPercent = (lastValue['cpu'] as num?)?.toDouble();
+                        break;
+                      case 'memory':
+                        memoryPercent = (lastValue['memory'] as num?)?.toDouble();
+                        break;
+                      case 'disk':
+                        diskPercent = (lastValue['disk'] as num?)?.toDouble();
+                        break;
+                      case 'load':
+                        final load1 = lastValue['load1'] as num?;
+                        load = load1?.toDouble();
+                        break;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('[ServerRepository] Metrics fetch error: $e');
       }
 
-      return const ServerMetricsSnapshot();
-    } catch (e) {
+      return ServerMetricsSnapshot(
+        cpuPercent: cpuPercent,
+        memoryPercent: memoryPercent,
+        diskPercent: diskPercent,
+        load: load,
+      );
+    } catch (e, stack) {
+      debugPrint('[ServerRepository] Error loading metrics: $e');
+      debugPrint('[ServerRepository] Stack: $stack');
       return const ServerMetricsSnapshot();
     }
-  }
-
-  double? _parseDouble(dynamic value) {
-    if (value == null) return null;
-    if (value is double) return value;
-    if (value is int) return value.toDouble();
-    if (value is String) return double.tryParse(value);
-    return null;
   }
 
   Future<void> setCurrent(String id) async {

@@ -6,6 +6,7 @@ class ApiConfig {
   final String name;
   final String url;
   final String apiKey;
+  final int tokenValidity;
   final bool isDefault;
   final DateTime lastUsed;
 
@@ -14,6 +15,7 @@ class ApiConfig {
     required this.name,
     required this.url,
     required this.apiKey,
+    this.tokenValidity = 0,
     this.isDefault = false,
     DateTime? lastUsed,
   }) : lastUsed = lastUsed ?? DateTime.now();
@@ -24,6 +26,7 @@ class ApiConfig {
       'name': name,
       'url': url,
       'apiKey': apiKey,
+      'tokenValidity': tokenValidity,
       'isDefault': isDefault,
       'lastUsed': lastUsed.toIso8601String(),
     };
@@ -35,6 +38,7 @@ class ApiConfig {
       name: json['name'],
       url: json['url'],
       apiKey: json['apiKey'],
+      tokenValidity: json['tokenValidity'] as int? ?? 0,
       isDefault: json['isDefault'] ?? false,
       lastUsed: DateTime.parse(json['lastUsed']),
     );

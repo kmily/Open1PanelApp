@@ -212,6 +212,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverTestTesting => '正在测试连接...';
 
   @override
+  String get serverMetricsAvailable => '监控数据已加载';
+
+  @override
+  String get serverTokenValidity => '接口密钥有效期';
+
+  @override
+  String get serverTokenValidityHint => '设置为0时不校验时间戳';
+
+  @override
+  String get serverFormMinutes => '分钟';
+
+  @override
   String get filesPageTitle => '文件';
 
   @override

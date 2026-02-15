@@ -214,6 +214,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverTestTesting => 'Testing connection...';
 
   @override
+  String get serverMetricsAvailable => 'Metrics loaded';
+
+  @override
+  String get serverTokenValidity => 'Token validity (minutes)';
+
+  @override
+  String get serverTokenValidityHint => 'Set to 0 to skip timestamp validation';
+
+  @override
+  String get serverFormMinutes => 'minutes';
+
+  @override
   String get filesPageTitle => 'Files';
 
   @override
