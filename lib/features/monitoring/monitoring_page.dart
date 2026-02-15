@@ -48,14 +48,6 @@ class _MonitoringPageState extends State<MonitoringPage> {
                 value: 12,
                 child: Text(l10n.monitorDataPointsCount(12, l10n.monitorTimeHours(1))),
               ),
-              PopupMenuItem(
-                value: 24,
-                child: Text(l10n.monitorDataPointsCount(24, l10n.monitorTimeHours(2))),
-              ),
-              PopupMenuItem(
-                value: 48,
-                child: Text(l10n.monitorDataPointsCount(48, l10n.monitorTimeHours(4))),
-              ),
             ],
           ),
           PopupMenuButton<Duration>(
@@ -459,7 +451,7 @@ class _SimpleChartPainter extends CustomPainter {
     if (times.isNotEmpty) {
       final timeStep = (values.length ~/ 4).clamp(1, values.length);
       for (var i = 0; i < values.length && i < times.length; i += timeStep) {
-        final time = times[i];
+        final time = times[i].toLocal(); // 转换为本地时间
         final label = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
         
         labelPainter.text = TextSpan(text: label, style: labelStyle);

@@ -396,8 +396,8 @@ class MonitorRepository {
 
     debugPrint('[MonitorRepository] dates count: ${dates?.length ?? 0}, values count: ${values?.length ?? 0}');
 
-    if (dates == null || values == null || dates.length != values.length) {
-      debugPrint('[MonitorRepository] Date/value mismatch or null');
+    if (values == null || values.isEmpty) {
+      debugPrint('[MonitorRepository] values is null or empty');
       return MonitorTimeSeries.empty(param);
     }
 
@@ -408,7 +408,7 @@ class MonitorRepository {
     int count = 0;
     final now = DateTime.now();
 
-    for (var i = 0; i < dates.length; i++) {
+    for (var i = 0; i < values.length; i++) {
       final valueMap = values[i] as Map<String, dynamic>?;
       if (valueMap == null) continue;
 
@@ -418,7 +418,17 @@ class MonitorRepository {
         continue;
       }
 
-      final time = DateTime.tryParse(dates[i]) ?? now;
+      // 优先使用 value 中的 createdAt 字段，其次使用 date 数组
+      DateTime time;
+      final createdAt = valueMap['createdAt'] as String?;
+      if (createdAt != null) {
+        time = DateTime.tryParse(createdAt) ?? now;
+      } else if (dates != null && i < dates.length) {
+        time = DateTime.tryParse(dates[i]) ?? now;
+      } else {
+        time = now;
+      }
+      
       dataPoints.add(MonitorDataPoint(time: time, value: value));
 
       if (min == null || value < min) min = value;

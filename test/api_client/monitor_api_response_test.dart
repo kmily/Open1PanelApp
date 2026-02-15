@@ -160,22 +160,28 @@ void main() {
         debugPrint('code: ${response.data!.code}');
         debugPrint('data项数: ${response.data!.data?.length ?? 0}');
         
-        if (response.data!.data != null && response.data!.data!.isNotEmpty) {
-          final item = response.data!.data!.first;
-          debugPrint('param: ${item.param}');
+        // 打印所有数据项
+        for (final item in response.data!.data ?? []) {
+          debugPrint('\n--- 数据项 ${item.param} ---');
           debugPrint('date数量: ${item.date?.length ?? 0}');
           debugPrint('value数量: ${item.value?.length ?? 0}');
           
-          if (item.value != null && item.value!.length >= 3) {
-            debugPrint('\n--- 前三个value ---');
-            for (var i = 0; i < 3 && i < item.value!.length; i++) {
-              debugPrint('value[$i]: ${item.value![i]}');
+          // 打印date数组内容
+          if (item.date != null && item.date!.isNotEmpty) {
+            debugPrint('date数组前3个:');
+            for (var i = 0; i < item.date!.length && i < 3; i++) {
+              debugPrint('  date[$i]: "${item.date![i]}" (类型: ${item.date![i].runtimeType})');
+            }
+          }
+          
+          // 打印最后一个value
+          if (item.value != null && item.value!.isNotEmpty) {
+            final lastVal = item.value!.last;
+            if (lastVal is Map) {
+              debugPrint('最后一个value keys: ${lastVal.keys.toList()}');
             }
           }
         }
-        
-        final jsonStr = const JsonEncoder.withIndent('  ').convert(response.data);
-        debugPrint('\n完整响应数据:\n$jsonStr');
       }
       debugPrint('========================================\n');
     });
