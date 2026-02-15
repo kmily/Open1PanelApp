@@ -613,4 +613,83 @@ class AppLocalizationsEn extends AppLocalizations {
   String monitorDataPointsLabel(int count) {
     return '$count data points';
   }
+
+  @override
+  String get monitorSettings => 'Monitor Settings';
+
+  @override
+  String get monitorEnable => 'Enable Monitoring';
+
+  @override
+  String get monitorInterval => 'Monitor Interval';
+
+  @override
+  String get monitorIntervalUnit => 'seconds';
+
+  @override
+  String get monitorRetention => 'Data Retention';
+
+  @override
+  String get monitorRetentionUnit => 'days';
+
+  @override
+  String get monitorCleanData => 'Clean Monitor Data';
+
+  @override
+  String get monitorCleanConfirm =>
+      'Are you sure you want to clean all monitor data? This action cannot be undone.';
+
+  @override
+  String get monitorCleanSuccess => 'Monitor data cleaned successfully';
+
+  @override
+  String get monitorCleanFailed => 'Failed to clean monitor data';
+
+  @override
+  String get monitorSettingsSaved => 'Settings saved successfully';
+
+  @override
+  String get monitorSettingsFailed => 'Failed to save settings';
+
+  @override
+  String get monitorGPU => 'GPU Monitor';
+
+  @override
+  String get monitorGPUName => 'Name';
+
+  @override
+  String get monitorGPUUtilization => 'Utilization';
+
+  @override
+  String get monitorGPUMemory => 'Memory';
+
+  @override
+  String get monitorGPUTemperature => 'Temperature';
+
+  @override
+  String get monitorGPUNotAvailable => 'GPU monitoring not available';
+
+  @override
+  String get monitorTimeRange => 'Time Range';
+
+  @override
+  String get monitorTimeRangeLast1h => 'Last 1 hour';
+
+  @override
+  String get monitorTimeRangeLast6h => 'Last 6 hours';
+
+  @override
+  String get monitorTimeRangeLast24h => 'Last 24 hours';
+
+  @override
+  String get monitorTimeRangeLast7d => 'Last 7 days';
+
+  @override
+  String get monitorTimeRangeCustom => 'Custom';
+
+  @override
+  String get monitorTimeRangeFrom => 'From';
+
+  @override
+  String get monitorTimeRangeTo => 'To';
 }

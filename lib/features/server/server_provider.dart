@@ -10,7 +10,7 @@ class ServerProvider extends ChangeNotifier {
   final ServerRepository _repository;
   bool _isLoading = false;
   List<ServerCardViewModel> _servers = const [];
-  Map<String, ServerMetricsSnapshot> _metrics = {};
+  final Map<String, ServerMetricsSnapshot> _metrics = {};
   bool _isLoadingMetrics = false;
 
   bool get isLoading => _isLoading;

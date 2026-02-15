@@ -3,8 +3,10 @@ import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/core/theme/app_design_tokens.dart';
 import 'package:onepanelapp_app/shared/widgets/app_card.dart';
 import 'package:provider/provider.dart';
+import '../../api/v2/monitor_v2.dart';
 import '../../data/repositories/monitor_repository.dart';
 import 'monitoring_provider.dart';
+import 'widgets/monitor_chart.dart';
 
 class MonitoringPage extends StatefulWidget {
   const MonitoringPage({super.key});
@@ -21,6 +23,7 @@ class _MonitoringPageState extends State<MonitoringPage> {
       if (!mounted) return;
       final provider = context.read<MonitoringProvider>();
       provider.load();
+      provider.loadGPUInfo();
       // 默认启用自动刷新
       provider.toggleAutoRefresh(true);
     });
@@ -79,12 +82,45 @@ class _MonitoringPageState extends State<MonitoringPage> {
               ),
             ],
           ),
+          // 时间范围选择器
+          Consumer<MonitoringProvider>(
+            builder: (context, provider, _) => PopupMenuButton<Duration>(
+              icon: const Icon(Icons.history),
+              tooltip: l10n.monitorTimeRange,
+              onSelected: (duration) {
+                provider.setTimeRange(duration);
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: const Duration(hours: 1),
+                  child: Text(l10n.monitorTimeRangeLast1h),
+                ),
+                PopupMenuItem(
+                  value: const Duration(hours: 6),
+                  child: Text(l10n.monitorTimeRangeLast6h),
+                ),
+                PopupMenuItem(
+                  value: const Duration(hours: 24),
+                  child: Text(l10n.monitorTimeRangeLast24h),
+                ),
+                PopupMenuItem(
+                  value: const Duration(days: 7),
+                  child: Text(l10n.monitorTimeRangeLast7d),
+                ),
+              ],
+            ),
+          ),
           Consumer<MonitoringProvider>(
             builder: (context, provider, _) => IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: provider.data.isLoading ? null : provider.refresh,
               tooltip: l10n.commonRefresh,
             ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: l10n.monitorSettings,
+            onPressed: () => _showSettingsDialog(context),
           ),
         ],
       ),
@@ -160,6 +196,75 @@ class _MonitoringPageState extends State<MonitoringPage> {
             l10n.monitorNetworkLabel,
             data.networkTimeSeries,
             'KB/s',
+          ),
+          // GPU监控卡片（如果有GPU）
+          if (data.gpuInfo.isNotEmpty) ...[
+            const SizedBox(height: AppDesignTokens.spacingSm),
+            _buildGPUCard(context, data.gpuInfo),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _showSettingsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const _MonitorSettingsDialog(),
+    );
+  }
+
+  Widget _buildGPUCard(BuildContext context, List<GPUInfo> gpuInfo) {
+    final l10n = context.l10n;
+    
+    return AppCard(
+      title: l10n.monitorGPU,
+      child: Column(
+        children: gpuInfo.map((gpu) => _buildGPUItem(context, gpu)).toList(),
+      ),
+    );
+  }
+
+  Widget _buildGPUItem(BuildContext context, GPUInfo gpu) {
+    final l10n = context.l10n;
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppDesignTokens.spacingSm),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            gpu.name ?? 'GPU',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: AppDesignTokens.spacingXs),
+          Row(
+            children: [
+              Expanded(
+                child: _GPUStatItem(
+                  label: l10n.monitorGPUUtilization,
+                  value: gpu.utilization != null 
+                      ? '${gpu.utilization!.toStringAsFixed(1)}%' 
+                      : '--',
+                ),
+              ),
+              Expanded(
+                child: _GPUStatItem(
+                  label: l10n.monitorGPUMemory,
+                  value: gpu.memory != null 
+                      ? '${gpu.memory!.toStringAsFixed(1)}%' 
+                      : '--',
+                ),
+              ),
+              Expanded(
+                child: _GPUStatItem(
+                  label: l10n.monitorGPUTemperature,
+                  value: gpu.temperature != null 
+                      ? '${gpu.temperature!.toStringAsFixed(0)}°C' 
+                      : '--',
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -271,211 +376,6 @@ class _StatItem extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-class _SimpleChartPainter extends CustomPainter {
-  final List<double> values;
-  final List<DateTime> times;
-  final double minVal;
-  final double range;
-  final Color color;
-  final String unit;
-
-  _SimpleChartPainter({
-    required this.values,
-    required this.times,
-    required this.minVal,
-    required this.range,
-    required this.color,
-    required this.unit,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (values.isEmpty) return;
-
-    final leftPadding = 40.0; // Y轴标签空间
-    final rightPadding = 16.0; // 右边距
-    final bottomPadding = 24.0; // X轴标签空间
-    final topPadding = 8.0; // 上边距
-    
-    final chartWidth = size.width - leftPadding - rightPadding;
-    final chartHeight = size.height - bottomPadding - topPadding;
-
-    // 绘制背景网格线
-    _drawGrid(canvas, size, leftPadding, rightPadding, topPadding, bottomPadding, chartWidth, chartHeight);
-
-    // 绘制坐标轴
-    _drawAxes(canvas, size, leftPadding, rightPadding, topPadding, bottomPadding, chartWidth, chartHeight);
-
-    // 绘制数据线
-    _drawLine(canvas, leftPadding, rightPadding, topPadding, bottomPadding, chartWidth, chartHeight);
-
-    // 绘制坐标轴标签
-    _drawLabels(canvas, size, leftPadding, rightPadding, topPadding, bottomPadding, chartWidth, chartHeight);
-  }
-
-  void _drawGrid(Canvas canvas, Size size, double leftPadding, double rightPadding, double topPadding, double bottomPadding, double chartWidth, double chartHeight) {
-    final gridPaint = Paint()
-      ..color = Colors.grey.withValues(alpha: 0.15)
-      ..strokeWidth = 1;
-
-    // 水平网格线 (5条，包括0%和100%)
-    for (var i = 0; i <= 4; i++) {
-      final y = topPadding + (chartHeight / 4) * i;
-      canvas.drawLine(
-        Offset(leftPadding, y),
-        Offset(size.width - rightPadding, y),
-        gridPaint,
-      );
-    }
-
-    // 垂直网格线
-    final stepX = chartWidth / (values.length - 1);
-    final gridStep = (values.length ~/ 4).clamp(1, values.length);
-    for (var i = 0; i < values.length; i += gridStep) {
-      final x = leftPadding + i * stepX;
-      canvas.drawLine(
-        Offset(x, topPadding),
-        Offset(x, topPadding + chartHeight),
-        gridPaint,
-      );
-    }
-  }
-
-  void _drawAxes(Canvas canvas, Size size, double leftPadding, double rightPadding, double topPadding, double bottomPadding, double chartWidth, double chartHeight) {
-    final axisPaint = Paint()
-      ..color = Colors.grey.withValues(alpha: 0.5)
-      ..strokeWidth = 1;
-
-    // Y轴
-    canvas.drawLine(
-      Offset(leftPadding, topPadding),
-      Offset(leftPadding, topPadding + chartHeight),
-      axisPaint,
-    );
-
-    // X轴
-    canvas.drawLine(
-      Offset(leftPadding, topPadding + chartHeight),
-      Offset(size.width - rightPadding, topPadding + chartHeight),
-      axisPaint,
-    );
-  }
-
-  void _drawLine(Canvas canvas, double leftPadding, double rightPadding, double topPadding, double bottomPadding, double chartWidth, double chartHeight) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 2.5
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final fillPaint = Paint()
-      ..color = color.withValues(alpha: 0.15)
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    final fillPath = Path();
-
-    final stepX = chartWidth / (values.length - 1);
-
-    for (var i = 0; i < values.length; i++) {
-      final x = leftPadding + i * stepX;
-      final normalizedY = range == 0 ? 0.5 : (values[i] - minVal) / range;
-      final y = topPadding + chartHeight - (normalizedY * chartHeight);
-
-      if (i == 0) {
-        path.moveTo(x, y);
-        fillPath.moveTo(x, topPadding + chartHeight);
-        fillPath.lineTo(x, y);
-      } else {
-        path.lineTo(x, y);
-        fillPath.lineTo(x, y);
-      }
-    }
-
-    fillPath.lineTo(leftPadding + chartWidth, topPadding + chartHeight);
-    fillPath.close();
-
-    canvas.drawPath(fillPath, fillPaint);
-    canvas.drawPath(path, paint);
-
-    // 绘制数据点
-    final pointPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    final maxValue = values.reduce((a, b) => a > b ? a : b);
-
-    for (var i = 0; i < values.length; i++) {
-      final x = leftPadding + i * stepX;
-      final normalizedY = range == 0 ? 0.5 : (values[i] - minVal) / range;
-      final y = topPadding + chartHeight - (normalizedY * chartHeight);
-
-      // 只绘制第一个、最后一个和极值点
-      if (i == 0 || i == values.length - 1 || values[i] == minVal || values[i] == maxValue) {
-        canvas.drawCircle(Offset(x, y), 3, pointPaint);
-        canvas.drawCircle(Offset(x, y), 5, paint..color = color.withValues(alpha: 0.3));
-      }
-    }
-  }
-
-  void _drawLabels(Canvas canvas, Size size, double leftPadding, double rightPadding, double topPadding, double bottomPadding, double chartWidth, double chartHeight) {
-    final labelStyle = TextStyle(
-      color: Colors.grey.withValues(alpha: 0.8),
-      fontSize: 10,
-    );
-    final labelPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-      textAlign: TextAlign.right,
-    );
-
-    // Y轴标签 (5个)
-    for (var i = 0; i <= 4; i++) {
-      final value = minVal + (range * (4 - i) / 4);
-      final label = '${value.toStringAsFixed(0)}$unit';
-      
-      labelPainter.text = TextSpan(text: label, style: labelStyle);
-      labelPainter.layout();
-      
-      final y = topPadding + (chartHeight / 4) * i;
-      labelPainter.paint(
-        canvas,
-        Offset(leftPadding - labelPainter.width - 4, y - labelPainter.height / 2),
-      );
-    }
-
-    // X轴标签 (时间)
-    if (times.isNotEmpty) {
-      final timeStep = (values.length ~/ 4).clamp(1, values.length);
-      for (var i = 0; i < values.length && i < times.length; i += timeStep) {
-        final time = times[i].toLocal(); // 转换为本地时间
-        final label = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-        
-        labelPainter.text = TextSpan(text: label, style: labelStyle);
-        labelPainter.layout();
-        
-        final stepX = chartWidth / (values.length - 1);
-        final x = leftPadding + i * stepX;
-        
-        labelPainter.paint(
-          canvas,
-          Offset(x - labelPainter.width / 2, topPadding + chartHeight + 4),
-        );
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _SimpleChartPainter oldDelegate) {
-    return oldDelegate.values != values ||
-        oldDelegate.times != times ||
-        oldDelegate.minVal != minVal ||
-        oldDelegate.range != range ||
-        oldDelegate.color != color ||
-        oldDelegate.unit != unit;
   }
 }
 
@@ -635,25 +535,13 @@ class _ExpandableChartCardState extends State<_ExpandableChartCard> {
   ) {
     if (timeSeries.data.isEmpty) return const SizedBox.shrink();
 
-    final values = timeSeries.data.map((e) => e.value).toList();
-    final times = timeSeries.data.map((e) => e.time).toList();
-    final maxVal = values.reduce((a, b) => a > b ? a : b);
-    final minVal = values.reduce((a, b) => a < b ? a : b);
-    final range = maxVal - minVal;
-    final safeRange = range == 0 ? 1.0 : range;
-
     return SizedBox(
-      height: 140,
-      child: CustomPaint(
-        painter: _SimpleChartPainter(
-          values: values,
-          times: times,
-          minVal: minVal,
-          range: safeRange,
-          color: Theme.of(context).colorScheme.primary,
-          unit: unit,
-        ),
-        size: Size.infinite,
+      height: 200, // 增加高度以容纳更详细的图表
+      child: MonitorChart(
+        data: timeSeries.data,
+        unit: unit,
+        label: timeSeries.name,
+        color: Theme.of(context).colorScheme.primary,
       ),
     );
   }
@@ -717,6 +605,206 @@ class _ErrorView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _GPUStatItem extends StatelessWidget {
+  const _GPUStatItem({
+    required this.label,
+    required this.value,
+  });
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+}
+
+class _MonitorSettingsDialog extends StatefulWidget {
+  const _MonitorSettingsDialog();
+
+  @override
+  State<_MonitorSettingsDialog> createState() => _MonitorSettingsDialogState();
+}
+
+class _MonitorSettingsDialogState extends State<_MonitorSettingsDialog> {
+  bool _isLoading = true;
+  bool _isSaving = false;
+  bool _enabled = true;
+  int _retention = 30;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final provider = context.read<MonitoringProvider>();
+    await provider.loadSettings();
+    final settings = provider.data.settings;
+    if (mounted && settings != null) {
+      setState(() {
+        _enabled = settings.enabled ?? true;
+        _retention = settings.retention ?? 30;
+        _isLoading = false;
+      });
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _saveSettings() async {
+    setState(() {
+      _isSaving = true;
+    });
+
+    final provider = context.read<MonitoringProvider>();
+    final success = await provider.updateSettings(
+      enabled: _enabled,
+      retention: _retention,
+    );
+
+    if (mounted) {
+      setState(() {
+        _isSaving = false;
+      });
+      
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.monitorSettingsSaved)),
+        );
+        Navigator.of(context).pop();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.monitorSettingsFailed)),
+        );
+      }
+    }
+  }
+
+  Future<void> _cleanData() async {
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.monitorCleanData),
+        content: Text(l10n.monitorCleanConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.commonConfirm),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      final provider = context.read<MonitoringProvider>();
+      final success = await provider.cleanData();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(success ? l10n.monitorCleanSuccess : l10n.monitorCleanFailed),
+          ),
+        );
+        // 清理后重新加载数据
+        if (success) {
+          provider.load();
+        }
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return AlertDialog(
+      title: Text(l10n.monitorSettings),
+      content: _isLoading
+          ? const SizedBox(
+              width: 200,
+              child: Center(child: CircularProgressIndicator()),
+            )
+          : SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SwitchListTile(
+                    title: Text(l10n.monitorEnable),
+                    value: _enabled,
+                    onChanged: (value) {
+                      setState(() {
+                        _enabled = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: AppDesignTokens.spacingMd),
+                  Text(l10n.monitorRetention),
+                  Slider(
+                    value: _retention.toDouble(),
+                    min: 1,
+                    max: 365,
+                    divisions: 364,
+                    label: '$_retention ${l10n.monitorRetentionUnit}',
+                    onChanged: (value) {
+                      setState(() {
+                        _retention = value.round();
+                      });
+                    },
+                  ),
+                  Text('$_retention ${l10n.monitorRetentionUnit}'),
+                  const SizedBox(height: AppDesignTokens.spacingLg),
+                  OutlinedButton.icon(
+                    onPressed: _cleanData,
+                    icon: const Icon(Icons.delete_outline),
+                    label: Text(l10n.monitorCleanData),
+                  ),
+                ],
+              ),
+            ),
+      actions: [
+        TextButton(
+          onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+          child: Text(l10n.commonCancel),
+        ),
+        FilledButton(
+          onPressed: _isSaving ? null : _saveSettings,
+          child: _isSaving
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(l10n.commonSave),
+        ),
+      ],
     );
   }
 }

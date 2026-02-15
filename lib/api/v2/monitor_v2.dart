@@ -62,6 +62,12 @@ class MonitorDataItem {
           .toList(),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        if (param != null) 'param': param,
+        if (date != null) 'date': date,
+        if (value != null) 'value': value,
+      };
 }
 
 /// 监控搜索响应
@@ -87,6 +93,12 @@ class MonitorSearchResponse {
           .toList(),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        if (code != null) 'code': code,
+        if (message != null) 'message': message,
+        if (data != null) 'data': data?.map((e) => e.toJson()).toList(),
+      };
 }
 
 /// GPU信息

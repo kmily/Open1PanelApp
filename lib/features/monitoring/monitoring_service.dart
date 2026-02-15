@@ -117,4 +117,16 @@ class MonitoringService extends BaseComponent {
       return _monitorRepo.getGPUInfo(client);
     });
   }
+
+  /// 批量获取监控数据（含当前指标与趋势图）
+  Future<MonitorDataPackage> getMonitorData({
+    Duration duration = const Duration(hours: 1),
+    DateTime? startTime,
+  }) async {
+    return runGuarded(() async {
+      final client = await clientManager.getCurrentClient();
+      return _monitorRepo.getMonitorData(client, duration: duration, startTime: startTime);
+    });
+  }
 }
+

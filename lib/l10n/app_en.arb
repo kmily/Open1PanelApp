@@ -312,5 +312,31 @@
         "type": "int"
       }
     }
-  }
+  },
+  "monitorSettings": "Monitor Settings",
+  "monitorEnable": "Enable Monitoring",
+  "monitorInterval": "Monitor Interval",
+  "monitorIntervalUnit": "seconds",
+  "monitorRetention": "Data Retention",
+  "monitorRetentionUnit": "days",
+  "monitorCleanData": "Clean Monitor Data",
+  "monitorCleanConfirm": "Are you sure you want to clean all monitor data? This action cannot be undone.",
+  "monitorCleanSuccess": "Monitor data cleaned successfully",
+  "monitorCleanFailed": "Failed to clean monitor data",
+  "monitorSettingsSaved": "Settings saved successfully",
+  "monitorSettingsFailed": "Failed to save settings",
+  "monitorGPU": "GPU Monitor",
+  "monitorGPUName": "Name",
+  "monitorGPUUtilization": "Utilization",
+  "monitorGPUMemory": "Memory",
+  "monitorGPUTemperature": "Temperature",
+  "monitorGPUNotAvailable": "GPU monitoring not available",
+  "monitorTimeRange": "Time Range",
+  "monitorTimeRangeLast1h": "Last 1 hour",
+  "monitorTimeRangeLast6h": "Last 6 hours",
+  "monitorTimeRangeLast24h": "Last 24 hours",
+  "monitorTimeRangeLast7d": "Last 7 days",
+  "monitorTimeRangeCustom": "Custom",
+  "monitorTimeRangeFrom": "From",
+  "monitorTimeRangeTo": "To"
 }

@@ -24,6 +24,15 @@ class ApiResponseParser {
     return {};
   }
 
+  /// 从1Panel API响应中提取data字段（List类型）
+  static List<dynamic> extractListData(Response<Map<String, dynamic>> response) {
+    final body = response.data!;
+    if (body.containsKey('data') && body['data'] != null) {
+      return body['data'] as List<dynamic>;
+    }
+    return [];
+  }
+
   /// 从1Panel API响应中提取data字段（动态类型）
   static dynamic extractDynamicData(Response<Map<String, dynamic>> response) {
     final body = response.data!;
@@ -156,12 +165,12 @@ class DashboardV2Api {
   /// 
   /// GET /dashboard/app/launcher
   /// @return 应用启动器列表
-  Future<Response<Map<String, dynamic>>> getAppLauncher() async {
+  Future<Response<List<dynamic>>> getAppLauncher() async {
     final response = await _client.get<Map<String, dynamic>>(
       ApiConstants.buildApiPath('/dashboard/app/launcher'),
     );
     return Response(
-      data: ApiResponseParser.extractMapData(response),
+      data: ApiResponseParser.extractListData(response),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -173,7 +182,7 @@ class DashboardV2Api {
   /// POST /dashboard/app/launcher/option
   /// @param request 请求参数
   /// @return 应用启动器选项
-  Future<Response<Map<String, dynamic>>> getAppLauncherOption({
+  Future<Response<List<dynamic>>> getAppLauncherOption({
     Map<String, dynamic>? request,
   }) async {
     final response = await _client.post<Map<String, dynamic>>(
@@ -181,7 +190,7 @@ class DashboardV2Api {
       data: request,
     );
     return Response(
-      data: ApiResponseParser.extractMapData(response),
+      data: ApiResponseParser.extractListData(response),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -193,7 +202,7 @@ class DashboardV2Api {
   /// POST /dashboard/app/launcher/show
   /// @param request 请求参数
   /// @return 操作结果
-  Future<Response<Map<String, dynamic>>> updateAppLauncherShow({
+  Future<Response<dynamic>> updateAppLauncherShow({
     Map<String, dynamic>? request,
   }) async {
     final response = await _client.post<Map<String, dynamic>>(
@@ -201,7 +210,7 @@ class DashboardV2Api {
       data: request,
     );
     return Response(
-      data: ApiResponseParser.extractMapData(response),
+      data: ApiResponseParser.extractDynamicData(response),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -214,12 +223,12 @@ class DashboardV2Api {
   /// 
   /// GET /dashboard/quick/option
   /// @return 快捷跳转选项列表
-  Future<Response<Map<String, dynamic>>> getQuickOption() async {
+  Future<Response<List<dynamic>>> getQuickOption() async {
     final response = await _client.get<Map<String, dynamic>>(
       ApiConstants.buildApiPath('/dashboard/quick/option'),
     );
     return Response(
-      data: ApiResponseParser.extractMapData(response),
+      data: ApiResponseParser.extractListData(response),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,

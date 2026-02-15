@@ -602,4 +602,82 @@ class AppLocalizationsZh extends AppLocalizations {
   String monitorDataPointsLabel(int count) {
     return '$count 个数据点';
   }
+
+  @override
+  String get monitorSettings => '监控设置';
+
+  @override
+  String get monitorEnable => '启用监控';
+
+  @override
+  String get monitorInterval => '监控间隔';
+
+  @override
+  String get monitorIntervalUnit => '秒';
+
+  @override
+  String get monitorRetention => '数据保留时间';
+
+  @override
+  String get monitorRetentionUnit => '天';
+
+  @override
+  String get monitorCleanData => '清理监控数据';
+
+  @override
+  String get monitorCleanConfirm => '确定要清理所有监控数据吗？此操作无法撤销。';
+
+  @override
+  String get monitorCleanSuccess => '监控数据清理成功';
+
+  @override
+  String get monitorCleanFailed => '清理监控数据失败';
+
+  @override
+  String get monitorSettingsSaved => '设置保存成功';
+
+  @override
+  String get monitorSettingsFailed => '保存设置失败';
+
+  @override
+  String get monitorGPU => 'GPU监控';
+
+  @override
+  String get monitorGPUName => '名称';
+
+  @override
+  String get monitorGPUUtilization => '利用率';
+
+  @override
+  String get monitorGPUMemory => '显存';
+
+  @override
+  String get monitorGPUTemperature => '温度';
+
+  @override
+  String get monitorGPUNotAvailable => 'GPU监控不可用';
+
+  @override
+  String get monitorTimeRange => '时间范围';
+
+  @override
+  String get monitorTimeRangeLast1h => '最近1小时';
+
+  @override
+  String get monitorTimeRangeLast6h => '最近6小时';
+
+  @override
+  String get monitorTimeRangeLast24h => '最近24小时';
+
+  @override
+  String get monitorTimeRangeLast7d => '最近7天';
+
+  @override
+  String get monitorTimeRangeCustom => '自定义';
+
+  @override
+  String get monitorTimeRangeFrom => '从';
+
+  @override
+  String get monitorTimeRangeTo => '到';
 }

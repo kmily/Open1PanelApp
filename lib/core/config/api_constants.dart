@@ -11,9 +11,9 @@ class ApiConstants {
   static const bool isDebugMode = true;
 
   // 网络配置
-  static const int connectTimeout = 30; // 秒
-  static const int receiveTimeout = 30; // 秒
-  static const int sendTimeout = 30; // 秒
+  static const int connectTimeout = 8; // 秒
+  static const int receiveTimeout = 8; // 秒
+  static const int sendTimeout = 8; // 秒
 
   // 重试配置
   static const int maxRetryAttempts = 3;

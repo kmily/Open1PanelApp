@@ -4,8 +4,6 @@ import '../api_client_test_base.dart';
 import '../core/test_config_manager.dart';
 import 'package:onepanelapp_app/api/v2/dashboard_v2.dart';
 import 'package:onepanelapp_app/core/network/dio_client.dart';
-import 'package:onepanelapp_app/data/models/common_models.dart';
-import 'package:onepanelapp_app/data/models/monitoring_models.dart';
 
 /// Dashboard API 补充测试用例
 /// 
@@ -65,29 +63,22 @@ void main() {
 
       expect(response.statusCode, equals(200));
       expect(response.data, isNotNull);
-      expect(response.data, isA<Map<String, dynamic>>());
+      expect(response.data, isA<List>());
 
-      final data = response.data!;
+      final data = response.data as List;
       debugPrint('\n========================================');
       debugPrint('CPU占用Top进程测试成功');
       debugPrint('========================================');
       
       // 检查进程列表
-      final listKey = data.containsKey('list') ? 'list' : 
-                      data.containsKey('processes') ? 'processes' : 
-                      data.containsKey('items') ? 'items' : null;
+      debugPrint('进程数量: ${data.length}');
       
-      if (listKey != null && data[listKey] is List) {
-        final processes = data[listKey] as List;
-        debugPrint('进程数量: ${processes.length}');
-        
-        if (processes.isNotEmpty) {
-          final firstProcess = processes.first as Map<String, dynamic>;
-          debugPrint('示例进程:');
-          debugPrint('  PID: ${firstProcess['pid']}');
-          debugPrint('  名称: ${firstProcess['name'] ?? firstProcess['cmd']}');
-          debugPrint('  CPU: ${firstProcess['cpuPercent'] ?? firstProcess['cpu']}%');
-        }
+      if (data.isNotEmpty) {
+        final firstProcess = data.first as Map<String, dynamic>;
+        debugPrint('示例进程:');
+        debugPrint('  PID: ${firstProcess['pid']}');
+        debugPrint('  名称: ${firstProcess['name'] ?? firstProcess['cmd']}');
+        debugPrint('  CPU: ${firstProcess['cpuPercent'] ?? firstProcess['cpu']}%');
       }
       debugPrint('========================================\n');
     });
@@ -115,29 +106,22 @@ void main() {
 
       expect(response.statusCode, equals(200));
       expect(response.data, isNotNull);
-      expect(response.data, isA<Map<String, dynamic>>());
+      expect(response.data, isA<List>());
 
-      final data = response.data!;
+      final data = response.data as List;
       debugPrint('\n========================================');
       debugPrint('内存占用Top进程测试成功');
       debugPrint('========================================');
       
       // 检查进程列表
-      final listKey = data.containsKey('list') ? 'list' : 
-                      data.containsKey('processes') ? 'processes' : 
-                      data.containsKey('items') ? 'items' : null;
+      debugPrint('进程数量: ${data.length}');
       
-      if (listKey != null && data[listKey] is List) {
-        final processes = data[listKey] as List;
-        debugPrint('进程数量: ${processes.length}');
-        
-        if (processes.isNotEmpty) {
-          final firstProcess = processes.first as Map<String, dynamic>;
-          debugPrint('示例进程:');
-          debugPrint('  PID: ${firstProcess['pid']}');
-          debugPrint('  名称: ${firstProcess['name'] ?? firstProcess['cmd']}');
-          debugPrint('  内存: ${firstProcess['memoryPercent'] ?? firstProcess['mem']}%');
-        }
+      if (data.isNotEmpty) {
+        final firstProcess = data.first as Map<String, dynamic>;
+        debugPrint('示例进程:');
+        debugPrint('  PID: ${firstProcess['pid']}');
+        debugPrint('  名称: ${firstProcess['name'] ?? firstProcess['cmd']}');
+        debugPrint('  内存: ${firstProcess['memoryPercent'] ?? firstProcess['mem']}%');
       }
       debugPrint('========================================\n');
     });
@@ -166,20 +150,16 @@ void main() {
 
       expect(response.statusCode, equals(200));
       expect(response.data, isNotNull);
-      expect(response.data, isA<Map<String, dynamic>>());
+      expect(response.data, isA<List>());
 
-      final data = response.data!;
+      final data = response.data as List;
       debugPrint('\n========================================');
       debugPrint('应用启动器列表测试成功');
       debugPrint('========================================');
       
-      data.forEach((key, value) {
-        if (value != null && value.toString().length < 100) {
-          debugPrint('$key: $value');
-        } else if (value is List) {
-          debugPrint('$key: [${value.length} items]');
-        }
-      });
+      for (var item in data) {
+        debugPrint(item.toString());
+      }
       debugPrint('========================================\n');
     });
 
@@ -240,7 +220,8 @@ void main() {
       );
 
       expect(response.statusCode, equals(200));
-      expect(response.data, isNotNull);
+      // updateAppLauncherShow returns null data on success
+      // expect(response.data, isNotNull);
 
       debugPrint('\n========================================');
       debugPrint('更新应用启动器展示测试成功');
@@ -260,20 +241,16 @@ void main() {
 
       expect(response.statusCode, equals(200));
       expect(response.data, isNotNull);
-      expect(response.data, isA<Map<String, dynamic>>());
+      expect(response.data, isA<List>());
 
-      final data = response.data!;
+      final data = response.data as List;
       debugPrint('\n========================================');
       debugPrint('快捷跳转选项测试成功');
       debugPrint('========================================');
       
-      data.forEach((key, value) {
-        if (value != null && value.toString().length < 100) {
-          debugPrint('$key: $value');
-        } else if (value is List) {
-          debugPrint('$key: [${value.length} items]');
-        }
-      });
+      for (var item in data) {
+        debugPrint(item.toString());
+      }
       debugPrint('========================================\n');
     });
 

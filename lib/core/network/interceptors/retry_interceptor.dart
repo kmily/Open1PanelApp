@@ -9,11 +9,12 @@ class RetryInterceptor extends Interceptor {
   final AppLogger _logger = AppLogger();
 
   RetryInterceptor({
-    this.maxRetries = 3,
+    this.maxRetries = 4,
     this.retryDelays = const [
       Duration(seconds: 1),
       Duration(seconds: 2),
-      Duration(seconds: 3),
+      Duration(seconds: 5),
+      Duration(seconds: 30),
     ],
   });
 

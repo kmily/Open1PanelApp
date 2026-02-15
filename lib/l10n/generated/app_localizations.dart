@@ -1219,6 +1219,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} data points'**
   String monitorDataPointsLabel(int count);
+
+  /// No description provided for @monitorSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor Settings'**
+  String get monitorSettings;
+
+  /// No description provided for @monitorEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Monitoring'**
+  String get monitorEnable;
+
+  /// No description provided for @monitorInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor Interval'**
+  String get monitorInterval;
+
+  /// No description provided for @monitorIntervalUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'seconds'**
+  String get monitorIntervalUnit;
+
+  /// No description provided for @monitorRetention.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Retention'**
+  String get monitorRetention;
+
+  /// No description provided for @monitorRetentionUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get monitorRetentionUnit;
+
+  /// No description provided for @monitorCleanData.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean Monitor Data'**
+  String get monitorCleanData;
+
+  /// No description provided for @monitorCleanConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clean all monitor data? This action cannot be undone.'**
+  String get monitorCleanConfirm;
+
+  /// No description provided for @monitorCleanSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor data cleaned successfully'**
+  String get monitorCleanSuccess;
+
+  /// No description provided for @monitorCleanFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to clean monitor data'**
+  String get monitorCleanFailed;
+
+  /// No description provided for @monitorSettingsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings saved successfully'**
+  String get monitorSettingsSaved;
+
+  /// No description provided for @monitorSettingsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save settings'**
+  String get monitorSettingsFailed;
+
+  /// No description provided for @monitorGPU.
+  ///
+  /// In en, this message translates to:
+  /// **'GPU Monitor'**
+  String get monitorGPU;
+
+  /// No description provided for @monitorGPUName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get monitorGPUName;
+
+  /// No description provided for @monitorGPUUtilization.
+  ///
+  /// In en, this message translates to:
+  /// **'Utilization'**
+  String get monitorGPUUtilization;
+
+  /// No description provided for @monitorGPUMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get monitorGPUMemory;
+
+  /// No description provided for @monitorGPUTemperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get monitorGPUTemperature;
+
+  /// No description provided for @monitorGPUNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'GPU monitoring not available'**
+  String get monitorGPUNotAvailable;
+
+  /// No description provided for @monitorTimeRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Range'**
+  String get monitorTimeRange;
+
+  /// No description provided for @monitorTimeRangeLast1h.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 1 hour'**
+  String get monitorTimeRangeLast1h;
+
+  /// No description provided for @monitorTimeRangeLast6h.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 6 hours'**
+  String get monitorTimeRangeLast6h;
+
+  /// No description provided for @monitorTimeRangeLast24h.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 24 hours'**
+  String get monitorTimeRangeLast24h;
+
+  /// No description provided for @monitorTimeRangeLast7d.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 days'**
+  String get monitorTimeRangeLast7d;
+
+  /// No description provided for @monitorTimeRangeCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get monitorTimeRangeCustom;
+
+  /// No description provided for @monitorTimeRangeFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get monitorTimeRangeFrom;
+
+  /// No description provided for @monitorTimeRangeTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get monitorTimeRangeTo;
 }
 
 class _AppLocalizationsDelegate

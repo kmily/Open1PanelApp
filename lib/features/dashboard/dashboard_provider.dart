@@ -304,9 +304,9 @@ class DashboardProvider extends ChangeNotifier {
       }
 
       // 负载
-      final load1 = (currentInfo?['load1'] as num?)?.toDouble();
-      final load5 = (currentInfo?['load5'] as num?)?.toDouble();
-      final load15 = (currentInfo?['load15'] as num?)?.toDouble();
+      // final load1 = (currentInfo?['load1'] as num?)?.toDouble();
+      // final load5 = (currentInfo?['load5'] as num?)?.toDouble();
+      // final load15 = (currentInfo?['load15'] as num?)?.toDouble();
 
       // 运行时间
       final uptime = currentInfo?['uptime'] as int?;
@@ -362,34 +362,17 @@ class DashboardProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  String _formatMemoryUsageFromNode(Map<String, dynamic>? nodeData) {
-    if (nodeData == null) return '--';
-    
-    final used = nodeData['memoryUsed'] as int?;
-    final total = nodeData['memoryTotal'] as int?;
-    final percent = nodeData['memoryUsedPercent'] as num?;
-    
-    if (percent != null) {
-      return '${percent.toStringAsFixed(1)}%';
-    }
-    
-    if (used != null && total != null) {
-      return '${_formatBytes(used)} / ${_formatBytes(total)}';
-    }
-    return '--';
-  }
-
   String _formatUptime(int seconds) {
     final days = seconds ~/ 86400;
     final hours = (seconds % 86400) ~/ 3600;
     final minutes = (seconds % 3600) ~/ 60;
     
     if (days > 0) {
-      return '${days}天 ${hours}小时';
+      return '$days天 $hours小时';
     } else if (hours > 0) {
-      return '${hours}小时 ${minutes}分钟';
+      return '$hours小时 $minutes分钟';
     } else {
-      return '${minutes}分钟';
+      return '$minutes分钟';
     }
   }
 
@@ -428,12 +411,9 @@ class DashboardProvider extends ChangeNotifier {
       final data = response.data;
 
       if (data != null) {
-        final list = data['list'] as List<dynamic>? ?? 
-                     data['launchers'] as List<dynamic>? ?? 
-                     data['items'] as List<dynamic>? ?? [];
-
-        final launchers = list
-            .map((item) => AppLauncherItem.fromJson(item as Map<String, dynamic>))
+        final launchers = data
+            .whereType<Map<String, dynamic>>()
+            .map((item) => AppLauncherItem.fromJson(item))
             .toList();
 
         _data = _data.copyWith(appLaunchers: launchers);
@@ -453,12 +433,9 @@ class DashboardProvider extends ChangeNotifier {
       final data = response.data;
 
       if (data != null) {
-        final list = data['list'] as List<dynamic>? ?? 
-                     data['options'] as List<dynamic>? ?? 
-                     data['items'] as List<dynamic>? ?? [];
-
-        final options = list
-            .map((item) => AppLauncherOption.fromJson(item as Map<String, dynamic>))
+        final options = data
+            .whereType<Map<String, dynamic>>()
+            .map((item) => AppLauncherOption.fromJson(item))
             .toList();
 
         _data = _data.copyWith(appLauncherOptions: options);
@@ -513,12 +490,9 @@ class DashboardProvider extends ChangeNotifier {
       final data = response.data;
 
       if (data != null) {
-        final list = data['list'] as List<dynamic>? ?? 
-                     data['options'] as List<dynamic>? ?? 
-                     data['items'] as List<dynamic>? ?? [];
-
-        final options = list
-            .map((item) => QuickJumpOption.fromJson(item as Map<String, dynamic>))
+        final options = data
+            .whereType<Map<String, dynamic>>()
+            .map((item) => QuickJumpOption.fromJson(item))
             .toList();
 
         _data = _data.copyWith(quickOptions: options);
@@ -569,25 +543,6 @@ class DashboardProvider extends ChangeNotifier {
     }
     
     return [];
-  }
-
-  String _formatMemoryUsage(Map<String, dynamic>? baseData) {
-    final used = baseData?['memoryUsed'] as int?;
-    final total = baseData?['memoryTotal'] as int?;
-    
-    if (used != null && total != null) {
-      return '${_formatBytes(used)} / ${_formatBytes(total)}';
-    }
-    return '--';
-  }
-
-  String _formatDiskUsage(Map<String, dynamic>? baseData) {
-    final used = baseData?['diskUsed'] as int?;
-    final total = baseData?['diskTotal'] as int?;
-    if (used != null && total != null) {
-      return '${_formatBytes(used)} / ${_formatBytes(total)}';
-    }
-    return '--';
   }
 
   String _formatBytes(int bytes) {
