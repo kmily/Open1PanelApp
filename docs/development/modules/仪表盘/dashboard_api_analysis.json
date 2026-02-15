@@ -1,0 +1,324 @@
+{
+  "module": "dashboard",
+  "generatedAt": "2026-02-15T11:24:12.416979",
+  "summary": {
+    "endpointCount": 12,
+    "methodCount": 12
+  },
+  "endpoints": [
+    {
+      "path": "/dashboard/app/launcher",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load app launcher",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/app/launcher/option",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load app launcher options",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/app/launcher/show",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update app Launcher",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/base/:ioOption/:netOption",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load dashboard base info",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [
+            {
+              "name": "ioOption",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            },
+            {
+              "name": "netOption",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/base/os",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load os info",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/current/:ioOption/:netOption",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load dashboard current info",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [
+            {
+              "name": "ioOption",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            },
+            {
+              "name": "netOption",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/current/node",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load dashboard current info for node",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/current/top/cpu",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load top cpu processes",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/current/top/mem",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load top memory processes",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/quick/change",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update quick jump",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/quick/option",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load quick jump options",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/system/restart/:operation",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "System restart",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [
+            {
+              "name": "operation",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    }
+  ]
+}

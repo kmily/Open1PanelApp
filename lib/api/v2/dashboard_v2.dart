@@ -25,16 +25,22 @@ class ApiResponseParser {
   }
 }
 
+/// Dashboard V2 API客户端
+/// 
+/// 基于1PanelV2OpenAPI.json规范实现
+/// 包含12个端点：8个GET + 4个POST
 class DashboardV2Api {
   final DioClient _client;
 
   DashboardV2Api(this._client);
 
-  /// 获取仪表板基础指标
-  ///
-  /// 获取仪表板基础监控指标
-  /// @param ioOption IO选项
-  /// @param netOption 网络选项
+  // ==================== 基础信息模块 (2个端点) ====================
+
+  /// 获取仪表盘基础信息
+  /// 
+  /// GET /dashboard/base/:ioOption/:netOption
+  /// @param ioOption IO选项 (default/custom)
+  /// @param netOption 网络选项 (default/custom)
   /// @return 基础指标数据
   Future<Response<Map<String, dynamic>>> getDashboardBase({
     String? ioOption,
@@ -52,8 +58,8 @@ class DashboardV2Api {
   }
 
   /// 获取操作系统信息
-  ///
-  /// 获取操作系统详细信息
+  /// 
+  /// GET /dashboard/base/os
   /// @return 操作系统信息
   Future<Response<SystemInfo>> getOperatingSystemInfo() async {
     final response = await _client.get<Map<String, dynamic>>(
@@ -67,11 +73,13 @@ class DashboardV2Api {
     );
   }
 
-  /// 获取当前指标
-  ///
-  /// 获取当前系统性能指标
-  /// @param ioOption IO选项
-  /// @param netOption 网络选项
+  // ==================== 实时监控模块 (4个端点) ====================
+
+  /// 获取当前实时指标
+  /// 
+  /// GET /dashboard/current/:ioOption/:netOption
+  /// @param ioOption IO选项 (default/custom)
+  /// @param netOption 网络选项 (default/custom)
   /// @return 当前指标数据
   Future<Response<SystemMetrics>> getCurrentMetrics({
     String? ioOption,
@@ -89,8 +97,8 @@ class DashboardV2Api {
   }
 
   /// 获取当前节点信息
-  ///
-  /// 获取当前节点详细信息
+  /// 
+  /// GET /dashboard/current/node
   /// @return 节点信息
   Future<Response<Map<String, dynamic>>> getCurrentNode() async {
     final response = await _client.get<Map<String, dynamic>>(
@@ -104,230 +112,144 @@ class DashboardV2Api {
     );
   }
 
-  /// 系统重启操作
-  ///
-  /// 执行系统重启操作
-  /// @param operation 操作类型
+  /// 获取CPU占用Top进程
+  /// 
+  /// GET /dashboard/current/top/cpu
+  /// @return Top CPU进程列表
+  Future<Response<Map<String, dynamic>>> getTopCPUProcesses() async {
+    final response = await _client.get<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/dashboard/current/top/cpu'),
+    );
+    return Response(
+      data: ApiResponseParser.extractMapData(response),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 获取内存占用Top进程
+  /// 
+  /// GET /dashboard/current/top/mem
+  /// @return Top内存进程列表
+  Future<Response<Map<String, dynamic>>> getTopMemoryProcesses() async {
+    final response = await _client.get<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/dashboard/current/top/mem'),
+    );
+    return Response(
+      data: ApiResponseParser.extractMapData(response),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  // ==================== 应用启动器模块 (3个端点) ====================
+
+  /// 获取应用启动器列表
+  /// 
+  /// GET /dashboard/app/launcher
+  /// @return 应用启动器列表
+  Future<Response<Map<String, dynamic>>> getAppLauncher() async {
+    final response = await _client.get<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/dashboard/app/launcher'),
+    );
+    return Response(
+      data: ApiResponseParser.extractMapData(response),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 获取应用启动器选项
+  /// 
+  /// POST /dashboard/app/launcher/option
+  /// @param request 请求参数
+  /// @return 应用启动器选项
+  Future<Response<Map<String, dynamic>>> getAppLauncherOption({
+    Map<String, dynamic>? request,
+  }) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/dashboard/app/launcher/option'),
+      data: request,
+    );
+    return Response(
+      data: ApiResponseParser.extractMapData(response),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 更新应用启动器展示
+  /// 
+  /// POST /dashboard/app/launcher/show
+  /// @param request 请求参数
+  /// @return 操作结果
+  Future<Response<Map<String, dynamic>>> updateAppLauncherShow({
+    Map<String, dynamic>? request,
+  }) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/dashboard/app/launcher/show'),
+      data: request,
+    );
+    return Response(
+      data: ApiResponseParser.extractMapData(response),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  // ==================== 快捷跳转模块 (2个端点) ====================
+
+  /// 获取快捷跳转选项
+  /// 
+  /// GET /dashboard/quick/option
+  /// @return 快捷跳转选项列表
+  Future<Response<Map<String, dynamic>>> getQuickOption() async {
+    final response = await _client.get<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/dashboard/quick/option'),
+    );
+    return Response(
+      data: ApiResponseParser.extractMapData(response),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 更新快捷跳转配置
+  /// 
+  /// POST /dashboard/quick/change
+  /// @param request 请求参数
+  /// @return 操作结果
+  Future<Response<Map<String, dynamic>>> updateQuickChange({
+    Map<String, dynamic>? request,
+  }) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      ApiConstants.buildApiPath('/dashboard/quick/change'),
+      data: request,
+    );
+    return Response(
+      data: ApiResponseParser.extractMapData(response),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  // ==================== 系统操作模块 (1个端点) ====================
+
+  /// 系统重启/关机操作
+  /// 
+  /// POST /dashboard/system/restart/:operation
+  /// @param operation 操作类型 (restart/shutdown)
   /// @return 操作结果
   Future<Response<Map<String, dynamic>>> systemRestart(String operation) async {
-    final response = await _client.get<Map<String, dynamic>>(
+    final response = await _client.post<Map<String, dynamic>>(
       ApiConstants.buildApiPath('/dashboard/system/restart/$operation'),
-    );
-    return Response(
-      data: ApiResponseParser.extractMapData(response),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取系统负载信息
-  ///
-  /// 获取系统负载详细信息
-  /// @return 系统负载信息
-  Future<Response<Map<String, dynamic>>> getSystemLoad() async {
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath('/dashboard/load'),
-    );
-    return Response(
-      data: ApiResponseParser.extractMapData(response),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取网络统计信息
-  ///
-  /// 获取网络接口统计信息
-  /// @param interface 网络接口名称（可选）
-  /// @return 网络统计信息
-  Future<Response<Map<String, dynamic>>> getNetworkStats({String? interface}) async {
-    final path = interface != null
-        ? '/dashboard/network/stats/$interface'
-        : '/dashboard/network/stats';
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath(path),
-    );
-    return Response(
-      data: ApiResponseParser.extractMapData(response),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取磁盘使用情况
-  ///
-  /// 获取磁盘分区使用情况
-  /// @return 磁盘使用信息
-  Future<Response<Map<String, dynamic>>> getDiskUsage() async {
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath('/dashboard/disk/usage'),
-    );
-    return Response(
-      data: ApiResponseParser.extractMapData(response),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取内存使用情况
-  ///
-  /// 获取内存使用详细信息
-  /// @return 内存使用信息
-  Future<Response<MemoryMetrics>> getMemoryUsage() async {
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath('/dashboard/memory/usage'),
-    );
-    return Response(
-      data: ApiResponseParser.extractData(response, MemoryMetrics.fromJson),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取CPU使用情况
-  ///
-  /// 获取CPU使用详细信息
-  /// @return CPU使用信息
-  Future<Response<CPUMetrics>> getCPUUsage() async {
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath('/dashboard/cpu/usage'),
-    );
-    return Response(
-      data: ApiResponseParser.extractData(response, CPUMetrics.fromJson),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取进程信息
-  ///
-  /// 获取系统进程信息
-  /// @param limit 限制数量（可选）
-  /// @return 进程信息列表
-  Future<Response<Map<String, dynamic>>> getProcesses({int? limit}) async {
-    final path = limit != null
-        ? '/dashboard/processes/$limit'
-        : '/dashboard/processes';
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath(path),
-    );
-    return Response(
-      data: ApiResponseParser.extractMapData(response),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取服务状态
-  ///
-  /// 获取系统服务状态
-  /// @return 服务状态信息
-  Future<Response<Map<String, dynamic>>> getServiceStatus() async {
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath('/dashboard/services/status'),
-    );
-    return Response(
-      data: ApiResponseParser.extractMapData(response),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取端口使用情况
-  ///
-  /// 获取端口使用统计信息
-  /// @return 端口使用信息
-  Future<Response<Map<String, dynamic>>> getPortUsage() async {
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath('/dashboard/ports/usage'),
-    );
-    return Response(
-      data: ApiResponseParser.extractMapData(response),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取系统时间信息
-  ///
-  /// 获取系统时间和时区信息
-  /// @return 系统时间信息
-  Future<Response<Map<String, dynamic>>> getSystemTime() async {
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath('/dashboard/time/info'),
-    );
-    return Response(
-      data: ApiResponseParser.extractMapData(response),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取系统更新信息
-  ///
-  /// 获取系统可用更新信息
-  /// @return 系统更新信息
-  Future<Response<Map<String, dynamic>>> getSystemUpdates() async {
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath('/dashboard/updates/info'),
-    );
-    return Response(
-      data: ApiResponseParser.extractMapData(response),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取安全状态
-  ///
-  /// 获取系统安全状态信息
-  /// @return 安全状态信息
-  Future<Response<Map<String, dynamic>>> getSecurityStatus() async {
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath('/dashboard/security/status'),
-    );
-    return Response(
-      data: ApiResponseParser.extractMapData(response),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取备份状态
-  ///
-  /// 获取系统备份状态信息
-  /// @return 备份状态信息
-  Future<Response<Map<String, dynamic>>> getBackupStatus() async {
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath('/dashboard/backup/status'),
-    );
-    return Response(
-      data: ApiResponseParser.extractMapData(response),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取应用状态
-  ///
-  /// 获取应用程序状态信息
-  /// @return 应用状态信息
-  Future<Response<Map<String, dynamic>>> getApplicationStatus() async {
-    final response = await _client.get<Map<String, dynamic>>(
-      ApiConstants.buildApiPath('/dashboard/applications/status'),
     );
     return Response(
       data: ApiResponseParser.extractMapData(response),

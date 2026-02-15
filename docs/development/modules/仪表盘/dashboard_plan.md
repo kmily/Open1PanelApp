@@ -2,112 +2,172 @@
 
 ## 里程碑定义
 
-### M1: 系统概览 (第1-2周)
-- 仪表盘基础布局
-- 系统信息卡片
-- 版本信息展示
+### M1: 核心功能完善 (第1-2周)
+- Top进程API对接
+- Top进程卡片UI
+- 数据刷新优化
 
-### M2: 资源监控 (第3-4周)
-- CPU监控图表
-- 内存监控图表
-- 磁盘监控图表
-- 网络流量图表
+### M2: 应用启动器 (第3-4周)
+- 应用启动器API对接
+- 应用启动器UI
+- 快捷启动功能
 
-### M3: 快捷操作与通知 (第5-6周)
-- 快捷操作入口
-- 通知中心组件
-- 实时数据更新
+### M3: 快捷跳转配置 (第5-6周)
+- 快捷跳转API对接
+- 快捷跳转配置UI
+- 个性化配置持久化
 
-### M4: 测试与优化 (第7-8周)
-- 单元测试覆盖
-- 集成测试
+### M4: 增强与优化 (第7-8周)
+- 实时图表展示
 - 性能优化
+- 测试覆盖
 
 ## 任务分解
 
 ### API层任务
-| 任务 | 优先级 | 预估工时 | 依赖 |
-|------|--------|----------|------|
-| DashboardClient完善 | P0 | 3h | 无 |
-| 概览数据API封装 | P0 | 2h | DashboardClient |
-| 资源监控API封装 | P0 | 2h | DashboardClient |
-| 通知API封装 | P1 | 2h | DashboardClient |
+
+| 任务 | 端点 | 优先级 | 预估工时 | 状态 |
+|------|------|--------|----------|------|
+| getTopCPUProcesses | GET /dashboard/current/top/cpu | P0 | 1h | ❌ 待开发 |
+| getTopMemProcesses | GET /dashboard/current/top/mem | P0 | 1h | ❌ 待开发 |
+| getAppLauncher | GET /dashboard/app/launcher | P1 | 1h | ❌ 待开发 |
+| getAppLauncherOption | POST /dashboard/app/launcher/option | P1 | 1h | ❌ 待开发 |
+| updateAppLauncherShow | POST /dashboard/app/launcher/show | P1 | 1h | ❌ 待开发 |
+| getQuickOption | GET /dashboard/quick/option | P1 | 1h | ❌ 待开发 |
+| updateQuickChange | POST /dashboard/quick/change | P1 | 1h | ❌ 待开发 |
 
 ### 数据层任务
-| 任务 | 优先级 | 预估工时 | 依赖 |
+
+| 任务 | 优先级 | 预估工时 | 状态 |
 |------|--------|----------|------|
-| DashboardOverview模型 | P0 | 2h | 无 |
-| ResourceStats模型 | P0 | 2h | 无 |
-| Notification模型 | P1 | 2h | 无 |
-| SystemInfo模型 | P0 | 2h | 无 |
+| TopProcessInfo模型 | P0 | 1h | ❌ 待开发 |
+| AppLauncherInfo模型 | P1 | 1h | ❌ 待开发 |
+| QuickJumpOption模型 | P1 | 1h | ❌ 待开发 |
 
 ### UI层任务
-| 任务 | 优先级 | 预估工时 | 依赖 |
+
+| 任务 | 优先级 | 预估工时 | 依赖 | 状态 |
+|------|--------|----------|------|------|
+| Top进程卡片组件 | P0 | 4h | TopProcessInfo模型 | ❌ 待开发 |
+| 应用启动器卡片 | P1 | 4h | AppLauncherInfo模型 | ❌ 待开发 |
+| 快捷跳转配置页面 | P1 | 3h | QuickJumpOption模型 | ❌ 待开发 |
+| 实时图表组件 | P1 | 6h | 无 | ❌ 待开发 |
+| 网络流量卡片 | P2 | 4h | 无 | ❌ 待开发 |
+
+### Provider层任务
+
+| 任务 | 优先级 | 预估工时 | 状态 |
 |------|--------|----------|------|
-| 仪表盘布局框架 | P0 | 4h | 无 |
-| 系统概览卡片 | P0 | 4h | Overview模型 |
-| CPU监控图表 | P0 | 4h | ResourceStats模型 |
-| 内存监控图表 | P0 | 4h | ResourceStats模型 |
-| 磁盘监控图表 | P0 | 4h | ResourceStats模型 |
-| 网络流量图表 | P1 | 4h | ResourceStats模型 |
-| 快捷操作组件 | P1 | 3h | 无 |
-| 通知中心组件 | P1 | 4h | Notification模型 |
+| loadTopProcesses方法 | P0 | 2h | ❌ 待开发 |
+| loadAppLauncher方法 | P1 | 2h | ❌ 待开发 |
+| loadQuickOptions方法 | P1 | 1h | ❌ 待开发 |
+| updateQuickOptions方法 | P1 | 1h | ❌ 待开发 |
+| 数据缓存机制 | P1 | 2h | ❌ 待开发 |
 
 ### 测试任务
-| 任务 | 优先级 | 预估工时 | 依赖 |
-|------|--------|----------|------|
-| API客户端单元测试 | P0 | 3h | API层完成 |
-| 模型单元测试 | P0 | 2h | 数据层完成 |
-| Widget测试 | P1 | 4h | UI层完成 |
-| 集成测试 | P1 | 4h | 全部完成 |
 
-### 文档任务
 | 任务 | 优先级 | 预估工时 | 依赖 |
 |------|--------|----------|------|
-| 仪表盘使用说明 | P1 | 2h | UI层完成 |
-| 监控指标说明 | P2 | 2h | 功能完成 |
+| Top进程API测试 | P0 | 1h | API层完成 |
+| 应用启动器API测试 | P1 | 1h | API层完成 |
+| 快捷跳转API测试 | P1 | 1h | API层完成 |
+| Provider单元测试 | P1 | 3h | Provider层完成 |
+| Widget测试 | P2 | 4h | UI层完成 |
+| 集成测试 | P2 | 4h | 全部完成 |
+
+## API端点实现状态
+
+基于1PanelV2OpenAPI.json的12个端点：
+
+| 端点 | 方法 | 实现状态 | 备注 |
+|------|------|----------|------|
+| `/dashboard/base/:ioOption/:netOption` | GET | ✅ 已实现 | |
+| `/dashboard/base/os` | GET | ✅ 已实现 | |
+| `/dashboard/current/:ioOption/:netOption` | GET | ✅ 已实现 | |
+| `/dashboard/current/node` | GET | ✅ 已实现 | |
+| `/dashboard/current/top/cpu` | GET | ✅ 已实现 | 新增 |
+| `/dashboard/current/top/mem` | GET | ✅ 已实现 | 新增 |
+| `/dashboard/app/launcher` | GET | ✅ 已实现 | 新增 |
+| `/dashboard/app/launcher/option` | POST | ✅ 已实现 | 新增 |
+| `/dashboard/app/launcher/show` | POST | ✅ 已实现 | 新增 |
+| `/dashboard/quick/option` | GET | ✅ 已实现 | 新增 |
+| `/dashboard/quick/change` | POST | ✅ 已实现 | 新增 |
+| `/dashboard/system/restart/:operation` | POST | ✅ 已实现 | 已修复HTTP方法 |
+
+**实现进度**: 12/12 = **100%** ✅
 
 ## 风险与应对策略
 
 ### 技术风险
+
 | 风险 | 影响 | 概率 | 应对策略 |
 |------|------|------|----------|
-| 实时数据更新性能 | 中 | 中 | 使用合理的刷新间隔和数据缓存 |
-| 图表渲染性能 | 中 | 中 | 使用高效的图表库和数据采样 |
-| 并发请求过多 | 低 | 中 | 合并请求，使用批量接口 |
+| Top进程数据量大 | 中 | 中 | 分页加载，限制显示数量 |
+| 实时更新性能 | 中 | 中 | 合理刷新间隔，增量更新 |
+| 应用启动器兼容性 | 低 | 低 | 按API规范实现 |
 
 ### 业务风险
+
 | 风险 | 影响 | 概率 | 应对策略 |
 |------|------|------|----------|
-| 数据展示不准确 | 高 | 低 | 提供数据刷新和校验机制 |
-| 监控数据延迟 | 中 | 中 | 显示数据更新时间戳 |
-| 告警通知遗漏 | 中 | 低 | 提供通知历史和未读标记 |
+| 数据展示不准确 | 高 | 低 | 提供刷新机制，数据校验 |
+| 系统操作误触 | 高 | 中 | 二次确认对话框 |
+| 配置丢失 | 中 | 低 | 本地缓存 + 服务端同步 |
 
 ### 进度风险
+
 | 风险 | 影响 | 概率 | 应对策略 |
 |------|------|------|----------|
-| 图表组件复杂度 | 中 | 中 | 使用成熟图表库 |
-| 测试覆盖不足 | 低 | 中 | 优先完成核心功能测试 |
+| API文档不完整 | 中 | 中 | 参考源码，测试验证 |
+| UI组件复杂度 | 中 | 中 | 使用成熟组件库 |
 
 ## 验收标准
 
 ### 功能验收
-- [ ] 系统概览正确显示
-- [ ] 资源监控图表实时更新
-- [ ] 快捷操作功能正常
-- [ ] 通知中心功能正常
+- [ ] 12个API端点全部实现
+- [ ] Top进程卡片正确显示
+- [ ] 应用启动器功能正常
+- [ ] 快捷跳转配置可保存
+- [ ] 系统重启/关机功能正常
 
 ### 质量验收
-- [ ] 单元测试覆盖率≥80%
+- [ ] API客户端单元测试覆盖率≥80%
+- [ ] Provider单元测试覆盖率≥80%
 - [ ] 页面加载时间<1s
-- [ ] 图表刷新间隔合理
+- [ ] 数据刷新间隔可配置
 - [ ] 无严重Bug
 
 ### 文档验收
-- [ ] 仪表盘使用说明完整
+- [ ] API端点文档完整
+- [ ] 使用说明清晰
 - [ ] FAQ覆盖常见问题
+
+## 代码清理任务
+
+### 需要处理的额外API方法
+
+当前 `dashboard_v2.dart` 中存在以下非OpenAPI规范的方法，需要评估处理：
+
+| 方法 | 建议 |
+|------|------|
+| getCPUUsage | 移除或标记为扩展功能 |
+| getMemoryUsage | 移除或标记为扩展功能 |
+| getDiskUsage | 移除或标记为扩展功能 |
+| getNetworkStats | 移除或标记为扩展功能 |
+| getProcesses | 移除或标记为扩展功能 |
+| getSystemLoad | 移除或标记为扩展功能 |
+| getServiceStatus | 移除或标记为扩展功能 |
+| getPortUsage | 移除或标记为扩展功能 |
+| getSystemTime | 移除或标记为扩展功能 |
+| getSystemUpdates | 移除或标记为扩展功能 |
+| getSecurityStatus | 移除或标记为扩展功能 |
+| getBackupStatus | 移除或标记为扩展功能 |
+| getApplicationStatus | 移除或标记为扩展功能 |
+
+**建议**: 这些方法可能是为未来功能预留或从其他版本迁移，应标记为 `@experimental` 或移到扩展API类中。
 
 ---
 
-**文档版本**: 1.0
-**最后更新**: 2026-02-14
+**文档版本**: 2.0
+**最后更新**: 2026-02-15
+**数据来源**: 1PanelV2OpenAPI.json
