@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../api/v2/dashboard_v2.dart';
 import '../../data/models/common_models.dart';
@@ -6,9 +7,99 @@ import '../../core/network/api_client_manager.dart';
 
 enum DashboardStatus { initial, loading, loaded, error }
 
+class NodeInfo {
+  final String? name;
+  final String? status;
+  final String? version;
+  final String? ip;
+
+  const NodeInfo({
+    this.name,
+    this.status,
+    this.version,
+    this.ip,
+  });
+
+  factory NodeInfo.fromJson(Map<String, dynamic> json) {
+    return NodeInfo(
+      name: json['name'] as String?,
+      status: json['status'] as String?,
+      version: json['version'] as String?,
+      ip: json['ip'] as String?,
+    );
+  }
+}
+
+class AppLauncherOption {
+  final String key;
+  final String name;
+  final String? icon;
+
+  const AppLauncherOption({
+    required this.key,
+    required this.name,
+    this.icon,
+  });
+
+  factory AppLauncherOption.fromJson(Map<String, dynamic> json) {
+    return AppLauncherOption(
+      key: json['key'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      icon: json['icon'] as String?,
+    );
+  }
+}
+
+class AppLauncherItem {
+  final String key;
+  final String name;
+  final String? icon;
+  final String? url;
+
+  const AppLauncherItem({
+    required this.key,
+    required this.name,
+    this.icon,
+    this.url,
+  });
+
+  factory AppLauncherItem.fromJson(Map<String, dynamic> json) {
+    return AppLauncherItem(
+      key: json['key'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      icon: json['icon'] as String?,
+      url: json['url'] as String?,
+    );
+  }
+}
+
+class QuickJumpOption {
+  final String key;
+  final String name;
+  final String? icon;
+  final bool enabled;
+
+  const QuickJumpOption({
+    required this.key,
+    required this.name,
+    this.icon,
+    this.enabled = true,
+  });
+
+  factory QuickJumpOption.fromJson(Map<String, dynamic> json) {
+    return QuickJumpOption(
+      key: json['key'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      icon: json['icon'] as String?,
+      enabled: json['enabled'] as bool? ?? true,
+    );
+  }
+}
+
 class DashboardData {
   final SystemInfo? systemInfo;
   final DashboardMetrics? metrics;
+  final NodeInfo? nodeInfo;
   final double? cpuPercent;
   final double? memoryPercent;
   final double? diskPercent;
@@ -18,10 +109,14 @@ class DashboardData {
   final DateTime? lastUpdated;
   final List<ProcessInfo> topCpuProcesses;
   final List<ProcessInfo> topMemoryProcesses;
+  final List<AppLauncherItem> appLaunchers;
+  final List<AppLauncherOption> appLauncherOptions;
+  final List<QuickJumpOption> quickOptions;
 
   const DashboardData({
     this.systemInfo,
     this.metrics,
+    this.nodeInfo,
     this.cpuPercent,
     this.memoryPercent,
     this.diskPercent,
@@ -31,11 +126,15 @@ class DashboardData {
     this.lastUpdated,
     this.topCpuProcesses = const [],
     this.topMemoryProcesses = const [],
+    this.appLaunchers = const [],
+    this.appLauncherOptions = const [],
+    this.quickOptions = const [],
   });
 
   DashboardData copyWith({
     SystemInfo? systemInfo,
     DashboardMetrics? metrics,
+    NodeInfo? nodeInfo,
     double? cpuPercent,
     double? memoryPercent,
     double? diskPercent,
@@ -45,10 +144,14 @@ class DashboardData {
     DateTime? lastUpdated,
     List<ProcessInfo>? topCpuProcesses,
     List<ProcessInfo>? topMemoryProcesses,
+    List<AppLauncherItem>? appLaunchers,
+    List<AppLauncherOption>? appLauncherOptions,
+    List<QuickJumpOption>? quickOptions,
   }) {
     return DashboardData(
       systemInfo: systemInfo ?? this.systemInfo,
       metrics: metrics ?? this.metrics,
+      nodeInfo: nodeInfo ?? this.nodeInfo,
       cpuPercent: cpuPercent ?? this.cpuPercent,
       memoryPercent: memoryPercent ?? this.memoryPercent,
       diskPercent: diskPercent ?? this.diskPercent,
@@ -58,6 +161,9 @@ class DashboardData {
       lastUpdated: lastUpdated ?? this.lastUpdated,
       topCpuProcesses: topCpuProcesses ?? this.topCpuProcesses,
       topMemoryProcesses: topMemoryProcesses ?? this.topMemoryProcesses,
+      appLaunchers: appLaunchers ?? this.appLaunchers,
+      appLauncherOptions: appLauncherOptions ?? this.appLauncherOptions,
+      quickOptions: quickOptions ?? this.quickOptions,
     );
   }
 }
@@ -80,18 +186,23 @@ class DashboardActivity {
 
 class DashboardProvider extends ChangeNotifier {
   DashboardV2Api? _api;
+  Timer? _refreshTimer;
 
   DashboardStatus _status = DashboardStatus.initial;
   DashboardData _data = const DashboardData();
   String _errorMessage = '';
   List<DashboardActivity> _activities = [];
   bool _isLoadingTopProcesses = false;
+  bool _isLoadingAppLaunchers = false;
+  bool _isLoadingQuickOptions = false;
 
   DashboardStatus get status => _status;
   DashboardData get data => _data;
   String get errorMessage => _errorMessage;
   List<DashboardActivity> get activities => _activities;
   bool get isLoadingTopProcesses => _isLoadingTopProcesses;
+  bool get isLoadingAppLaunchers => _isLoadingAppLaunchers;
+  bool get isLoadingQuickOptions => _isLoadingQuickOptions;
 
   Future<DashboardV2Api> _getApi() async {
     _api ??= await ApiClientManager.instance.getDashboardApi();
@@ -164,6 +275,135 @@ class DashboardProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> loadAppLaunchers() async {
+    _isLoadingAppLaunchers = true;
+    notifyListeners();
+
+    try {
+      final api = await _getApi();
+      final response = await api.getAppLauncher();
+      final data = response.data;
+
+      if (data != null) {
+        final list = data['list'] as List<dynamic>? ?? 
+                     data['launchers'] as List<dynamic>? ?? 
+                     data['items'] as List<dynamic>? ?? [];
+
+        final launchers = list
+            .map((item) => AppLauncherItem.fromJson(item as Map<String, dynamic>))
+            .toList();
+
+        _data = _data.copyWith(appLaunchers: launchers);
+      }
+    } catch (e) {
+      debugPrint('Failed to load app launchers: $e');
+    }
+
+    _isLoadingAppLaunchers = false;
+    notifyListeners();
+  }
+
+  Future<void> loadAppLauncherOptions() async {
+    try {
+      final api = await _getApi();
+      final response = await api.getAppLauncherOption();
+      final data = response.data;
+
+      if (data != null) {
+        final list = data['list'] as List<dynamic>? ?? 
+                     data['options'] as List<dynamic>? ?? 
+                     data['items'] as List<dynamic>? ?? [];
+
+        final options = list
+            .map((item) => AppLauncherOption.fromJson(item as Map<String, dynamic>))
+            .toList();
+
+        _data = _data.copyWith(appLauncherOptions: options);
+      }
+    } catch (e) {
+      debugPrint('Failed to load app launcher options: $e');
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> loadCurrentNode() async {
+    try {
+      final api = await _getApi();
+      final response = await api.getCurrentNode();
+      final data = response.data;
+
+      if (data != null) {
+        final nodeInfo = NodeInfo.fromJson(data);
+        _data = _data.copyWith(nodeInfo: nodeInfo);
+      }
+    } catch (e) {
+      debugPrint('Failed to load current node: $e');
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> updateAppLauncherShow(String key, bool show) async {
+    try {
+      final api = await _getApi();
+      await api.updateAppLauncherShow(request: {'key': key, 'show': show});
+      await loadAppLaunchers();
+      _addActivity(
+        title: 'App Launcher Updated',
+        description: 'App launcher visibility changed for $key',
+        type: ActivityType.success,
+      );
+    } catch (e) {
+      debugPrint('Failed to update app launcher: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> loadQuickOptions() async {
+    _isLoadingQuickOptions = true;
+    notifyListeners();
+
+    try {
+      final api = await _getApi();
+      final response = await api.getQuickOption();
+      final data = response.data;
+
+      if (data != null) {
+        final list = data['list'] as List<dynamic>? ?? 
+                     data['options'] as List<dynamic>? ?? 
+                     data['items'] as List<dynamic>? ?? [];
+
+        final options = list
+            .map((item) => QuickJumpOption.fromJson(item as Map<String, dynamic>))
+            .toList();
+
+        _data = _data.copyWith(quickOptions: options);
+      }
+    } catch (e) {
+      debugPrint('Failed to load quick options: $e');
+    }
+
+    _isLoadingQuickOptions = false;
+    notifyListeners();
+  }
+
+  Future<void> updateQuickChange(List<String> enabledKeys) async {
+    try {
+      final api = await _getApi();
+      await api.updateQuickChange(request: {'keys': enabledKeys});
+      await loadQuickOptions();
+      _addActivity(
+        title: 'Quick Options Updated',
+        description: 'Quick jump options have been updated',
+        type: ActivityType.success,
+      );
+    } catch (e) {
+      debugPrint('Failed to update quick options: $e');
+      rethrow;
+    }
+  }
+
   List<ProcessInfo> _parseProcessList(Map<String, dynamic>? data) {
     if (data == null) return [];
     
@@ -221,9 +461,19 @@ class DashboardProvider extends ChangeNotifier {
     );
   }
 
-  Future<void> upgradeSystem() async {
+  Future<void> shutdownSystem() async {
     final api = await _getApi();
     await api.systemRestart('shutdown');
+    _addActivity(
+      title: 'System Shutdown',
+      description: 'System shutdown command sent',
+      type: ActivityType.warning,
+    );
+  }
+
+  Future<void> upgradeSystem() async {
+    final api = await _getApi();
+    await api.systemRestart('restart');
     _addActivity(
       title: 'System Upgrade',
       description: 'System upgrade initiated',
@@ -252,11 +502,22 @@ class DashboardProvider extends ChangeNotifier {
   }
 
   void startAutoRefresh({Duration interval = const Duration(seconds: 30)}) {
-    Future.delayed(interval, () async {
+    stopAutoRefresh();
+    _refreshTimer = Timer.periodic(interval, (timer) async {
       if (_status == DashboardStatus.loaded) {
         await refresh();
-        startAutoRefresh(interval: interval);
       }
     });
+  }
+
+  void stopAutoRefresh() {
+    _refreshTimer?.cancel();
+    _refreshTimer = null;
+  }
+
+  @override
+  void dispose() {
+    stopAutoRefresh();
+    super.dispose();
   }
 }
