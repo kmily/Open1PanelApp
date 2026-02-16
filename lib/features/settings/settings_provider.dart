@@ -175,14 +175,9 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   Future<void> loadSnapshots() async {
-    try {
-      final result = await _service.searchSnapshots(api.SnapshotSearch());
-      
-      _data = _data.copyWith(snapshots: result?['items'] as List<dynamic>?);
-      notifyListeners();
-    } catch (e) {
-      debugPrint('[SettingsProvider] loadSnapshots error: $e');
-    }
+    final result = await _service.searchSnapshots(api.SnapshotSearch());
+    _data = _data.copyWith(snapshots: result?['items'] as List<dynamic>?);
+    notifyListeners();
   }
 
   Future<bool> updateSystemSetting(String key, String value) async {
@@ -365,30 +360,20 @@ class SettingsProvider extends ChangeNotifier {
     required String sourceAccountIDs,
     required int downloadAccountID,
   }) async {
-    try {
-      debugPrint('[SettingsProvider] createSnapshot: description=$description, sourceAccountIDs=$sourceAccountIDs, downloadAccountID=$downloadAccountID');
-      await _service.createSnapshot(api.SnapshotCreate(
-        description: description,
-        sourceAccountIDs: sourceAccountIDs,
-        downloadAccountID: downloadAccountID,
-      ));
-      await loadSnapshots();
-      return true;
-    } catch (e) {
-      debugPrint('[SettingsProvider] createSnapshot error: $e');
-      return false;
-    }
+    debugPrint('[SettingsProvider] createSnapshot: description=$description, sourceAccountIDs=$sourceAccountIDs, downloadAccountID=$downloadAccountID');
+    await _service.createSnapshot(api.SnapshotCreate(
+      description: description,
+      sourceAccountIDs: sourceAccountIDs,
+      downloadAccountID: downloadAccountID,
+    ));
+    await loadSnapshots();
+    return true;
   }
 
   Future<List<Map<String, dynamic>>?> loadBackupAccountOptions() async {
-    try {
-      final result = await _service.getBackupAccountOptions();
-      debugPrint('[SettingsProvider] loadBackupAccountOptions result: $result');
-      return result;
-    } catch (e) {
-      debugPrint('[SettingsProvider] loadBackupAccountOptions error: $e');
-      return null;
-    }
+    final result = await _service.getBackupAccountOptions();
+    debugPrint('[SettingsProvider] loadBackupAccountOptions result: $result');
+    return result;
   }
 
   Future<bool> deleteSnapshot(List<int> ids) async {
