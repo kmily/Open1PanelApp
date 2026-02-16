@@ -1171,6 +1171,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get snapshotDelete => '删除';
 
   @override
+  String get snapshotImport => '导入快照';
+
+  @override
+  String get snapshotRollback => '回滚';
+
+  @override
+  String get snapshotEditDesc => '编辑描述';
+
+  @override
   String get snapshotEnterDesc => '请输入快照描述（可选）';
 
   @override
@@ -1186,7 +1195,40 @@ class AppLocalizationsZh extends AppLocalizations {
   String get snapshotCreateFailed => '快照创建失败';
 
   @override
-  String get snapshotDownloadDev => '下载功能开发中';
+  String get snapshotImportTitle => '导入快照';
+
+  @override
+  String get snapshotImportPath => '快照文件路径';
+
+  @override
+  String get snapshotImportPathHint => '请输入快照文件路径';
+
+  @override
+  String get snapshotImportSuccess => '快照导入成功';
+
+  @override
+  String get snapshotImportFailed => '快照导入失败';
+
+  @override
+  String get snapshotRollbackTitle => '回滚快照';
+
+  @override
+  String get snapshotRollbackConfirm => '确定要回滚到此快照吗？回滚后当前配置将被覆盖。';
+
+  @override
+  String get snapshotRollbackSuccess => '快照回滚成功';
+
+  @override
+  String get snapshotRollbackFailed => '快照回滚失败';
+
+  @override
+  String get snapshotEditDescTitle => '编辑快照描述';
+
+  @override
+  String get snapshotEditDescSuccess => '描述更新成功';
+
+  @override
+  String get snapshotEditDescFailed => '描述更新失败';
 
   @override
   String get snapshotRecoverTitle => '恢复快照';
@@ -1211,6 +1253,54 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get snapshotDeleteFailed => '快照删除失败';
+
+  @override
+  String get proxySettingsTitle => '代理设置';
+
+  @override
+  String get proxySettingsEnable => '启用代理';
+
+  @override
+  String get proxySettingsType => '代理类型';
+
+  @override
+  String get proxySettingsHttp => 'HTTP代理';
+
+  @override
+  String get proxySettingsHttps => 'HTTPS代理';
+
+  @override
+  String get proxySettingsHost => '代理地址';
+
+  @override
+  String get proxySettingsPort => '代理端口';
+
+  @override
+  String get proxySettingsUser => '用户名';
+
+  @override
+  String get proxySettingsPassword => '密码';
+
+  @override
+  String get proxySettingsSaved => '代理设置已保存';
+
+  @override
+  String get proxySettingsFailed => '保存失败';
+
+  @override
+  String get bindSettingsTitle => '绑定地址';
+
+  @override
+  String get bindSettingsAddress => '绑定地址';
+
+  @override
+  String get bindSettingsPort => '面板端口';
+
+  @override
+  String get bindSettingsSaved => '绑定设置已保存';
+
+  @override
+  String get bindSettingsFailed => '保存失败';
 
   @override
   String get serverModuleSystemSettings => '系统设置';

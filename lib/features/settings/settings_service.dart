@@ -107,6 +107,32 @@ class SettingsService {
     await apiClient.recoverSnapshot(request);
   }
 
+  Future<void> rollbackSnapshot(api.SnapshotRollback request) async {
+    final apiClient = await _getApi();
+    await apiClient.rollbackSnapshot(request);
+  }
+
+  Future<void> importSnapshot(api.SnapshotImport request) async {
+    final apiClient = await _getApi();
+    await apiClient.importSnapshot(request);
+  }
+
+  Future<void> updateSnapshotDescription(api.SnapshotDescriptionUpdate request) async {
+    final apiClient = await _getApi();
+    await apiClient.updateSnapshotDescription(request);
+  }
+
+  Future<void> updateProxySettings(api.ProxyUpdate request) async {
+    final apiClient = await _getApi();
+    await apiClient.updateProxySettings(request);
+  }
+
+  Future<List<Map<String, dynamic>>?> getBackupAccountOptions() async {
+    final apiClient = await _getApi();
+    final response = await apiClient.getBackupAccountOptions();
+    return response.data;
+  }
+
   Future<void> updateSystemSetting(api.SettingUpdate request) async {
     final apiClient = await _getApi();
     await apiClient.updateSystemSetting(request);

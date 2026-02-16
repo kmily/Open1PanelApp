@@ -503,8 +503,8 @@ class PageContainer extends Equatable {
   final bool? excludeAppStore;
   final String? filters;
   final String? name;
-  final String? order;
-  final String? orderBy;
+  final String order;
+  final String orderBy;
   final int page;
   final int pageSize;
   final String? state;
@@ -513,10 +513,10 @@ class PageContainer extends Equatable {
     this.excludeAppStore,
     this.filters,
     this.name,
-    this.order,
-    this.orderBy,
-    required this.page,
-    required this.pageSize,
+    this.order = 'descending',
+    this.orderBy = 'createdAt',
+    this.page = 1,
+    this.pageSize = 10,
     this.state,
   });
 
@@ -525,24 +525,24 @@ class PageContainer extends Equatable {
       excludeAppStore: json['excludeAppStore'] as bool?,
       filters: json['filters'] as String?,
       name: json['name'] as String?,
-      order: json['order'] as String?,
-      orderBy: json['orderBy'] as String?,
-      page: json['page'] as int,
-      pageSize: json['pageSize'] as int,
+      order: json['order'] as String? ?? 'descending',
+      orderBy: json['orderBy'] as String? ?? 'createdAt',
+      page: json['page'] as int? ?? 1,
+      pageSize: json['pageSize'] as int? ?? 10,
       state: json['state'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'excludeAppStore': excludeAppStore,
-      'filters': filters,
-      'name': name,
+      if (excludeAppStore != null) 'excludeAppStore': excludeAppStore,
+      if (filters != null) 'filters': filters,
+      if (name != null) 'name': name,
       'order': order,
       'orderBy': orderBy,
       'page': page,
       'pageSize': pageSize,
-      'state': state,
+      if (state != null) 'state': state,
     };
   }
 

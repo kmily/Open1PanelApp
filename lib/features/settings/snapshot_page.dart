@@ -12,12 +12,26 @@ class SnapshotPage extends StatefulWidget {
 }
 
 class _SnapshotPageState extends State<SnapshotPage> {
+  List<Map<String, dynamic>>? _backupAccounts;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SettingsProvider>().loadSnapshots();
+      _loadData();
     });
+  }
+
+  Future<void> _loadData() async {
+    final provider = context.read<SettingsProvider>();
+    await provider.loadSnapshots();
+    final accounts = await provider.loadBackupAccountOptions();
+    debugPrint('[SnapshotPage] loadBackupAccountOptions: $accounts');
+    if (mounted) {
+      setState(() {
+        _backupAccounts = accounts;
+      });
+    }
   }
 
   @override
@@ -63,6 +77,11 @@ class _SnapshotPageState extends State<SnapshotPage> {
             icon: const Icon(Icons.add),
             label: Text(l10n.snapshotCreate),
           ),
+          TextButton.icon(
+            onPressed: () => _showImportSnapshotDialog(context, l10n),
+            icon: const Icon(Icons.file_upload_outlined),
+            label: Text(l10n.snapshotImport),
+          ),
         ],
       ),
     );
@@ -97,8 +116,10 @@ class _SnapshotPageState extends State<SnapshotPage> {
           onSelected: (value) => _handleSnapshotAction(context, value, snapshot, l10n),
           itemBuilder: (context) => [
             PopupMenuItem(value: 'recover', child: Text(l10n.snapshotRecover)),
-            PopupMenuItem(value: 'download', child: Text(l10n.snapshotDownload)),
-            PopupMenuItem(value: 'delete', child: Text(l10n.snapshotDelete)),
+            PopupMenuItem(value: 'rollback', child: Text(l10n.snapshotRollback)),
+            PopupMenuItem(value: 'editDesc', child: Text(l10n.snapshotEditDesc)),
+            const PopupMenuDivider(),
+            PopupMenuItem(value: 'delete', child: Text(l10n.snapshotDelete, style: const TextStyle(color: Colors.red))),
           ],
         ),
       ),
@@ -106,25 +127,108 @@ class _SnapshotPageState extends State<SnapshotPage> {
   }
 
   void _showCreateSnapshotDialog(BuildContext context, AppLocalizations l10n) {
+    final descController = TextEditingController();
+    final provider = context.read<SettingsProvider>();
+    int? selectedAccountId;
+
+    if (_backupAccounts != null && _backupAccounts!.isNotEmpty) {
+      selectedAccountId = _backupAccounts!.first['id'] as int;
+    }
+
+    debugPrint('[SnapshotPage] _showCreateSnapshotDialog: _backupAccounts=$_backupAccounts, initial selectedAccountId=$selectedAccountId');
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (statefulContext, setDialogState) {
+          return AlertDialog(
+            title: Text(l10n.snapshotCreate),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_backupAccounts == null || _backupAccounts!.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text('没有可用的备份账户，请先在备份账户管理中添加备份账户'),
+                  )
+                else ...[
+                  Text(l10n.snapshotEnterDesc),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: descController,
+                    decoration: InputDecoration(
+                      labelText: l10n.snapshotDescLabel,
+                      hintText: l10n.snapshotDescHint,
+                    ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<int>(
+                    initialValue: selectedAccountId,
+                    decoration: const InputDecoration(
+                      labelText: '备份账户',
+                      prefixIcon: Icon(Icons.cloud_outlined),
+                    ),
+                    items: _backupAccounts!.map((account) {
+                      return DropdownMenuItem<int>(
+                        value: account['id'] as int,
+                        child: Text('${account['name']} (${account['type']})'),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      debugPrint('[SnapshotPage] Dropdown changed to: $value');
+                      setDialogState(() {
+                        selectedAccountId = value;
+                      });
+                    },
+                  ),
+                ],
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(l10n.commonCancel),
+              ),
+              FilledButton(
+                onPressed: _backupAccounts == null || _backupAccounts!.isEmpty || selectedAccountId == null
+                    ? null
+                    : () async {
+                        Navigator.pop(dialogContext);
+                        debugPrint('[SnapshotPage] Creating snapshot with account: $selectedAccountId');
+                        final success = await provider.createSnapshot(
+                          description: descController.text.isEmpty ? null : descController.text,
+                          sourceAccountIDs: selectedAccountId.toString(),
+                          downloadAccountID: selectedAccountId!,
+                        );
+                        debugPrint('[SnapshotPage] Create snapshot result: $success');
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(success ? l10n.snapshotCreateSuccess : l10n.snapshotCreateFailed)),
+                          );
+                        }
+                      },
+                child: Text(l10n.commonConfirm),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _showImportSnapshotDialog(BuildContext context, AppLocalizations l10n) {
     final controller = TextEditingController();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.snapshotCreate),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(l10n.snapshotEnterDesc),
-            const SizedBox(height: 16),
-            TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                labelText: l10n.snapshotDescLabel,
-                hintText: l10n.snapshotDescHint,
-              ),
-              maxLines: 3,
-            ),
-          ],
+        title: Text(l10n.snapshotImportTitle),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: l10n.snapshotImportPath,
+            hintText: l10n.snapshotImportPathHint,
+          ),
         ),
         actions: [
           TextButton(
@@ -134,12 +238,11 @@ class _SnapshotPageState extends State<SnapshotPage> {
           FilledButton(
             onPressed: () async {
               Navigator.pop(context);
-              final success = await context.read<SettingsProvider>().createSnapshot(
-                description: controller.text.isEmpty ? null : controller.text,
-              );
+              if (controller.text.isEmpty) return;
+              final success = await context.read<SettingsProvider>().importSnapshot(controller.text);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(success ? l10n.snapshotCreateSuccess : l10n.snapshotCreateFailed)),
+                  SnackBar(content: Text(success ? l10n.snapshotImportSuccess : l10n.snapshotImportFailed)),
                 );
               }
             },
@@ -156,10 +259,11 @@ class _SnapshotPageState extends State<SnapshotPage> {
       case 'recover':
         _showRecoverConfirmDialog(context, id, l10n);
         break;
-      case 'download':
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.snapshotDownloadDev)),
-        );
+      case 'rollback':
+        _showRollbackConfirmDialog(context, id, l10n);
+        break;
+      case 'editDesc':
+        _showEditDescDialog(context, id, snapshot['description'] as String?, l10n);
         break;
       case 'delete':
         _showDeleteConfirmDialog(context, [id], l10n);
@@ -195,6 +299,70 @@ class _SnapshotPageState extends State<SnapshotPage> {
     );
   }
 
+  void _showRollbackConfirmDialog(BuildContext context, int id, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.snapshotRollbackTitle),
+        content: Text(l10n.snapshotRollbackConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final success = await context.read<SettingsProvider>().rollbackSnapshot(id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(success ? l10n.snapshotRollbackSuccess : l10n.snapshotRollbackFailed)),
+                );
+              }
+            },
+            child: Text(l10n.commonConfirm),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditDescDialog(BuildContext context, int id, String? currentDesc, AppLocalizations l10n) {
+    final controller = TextEditingController(text: currentDesc ?? '');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.snapshotEditDescTitle),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: l10n.snapshotDescLabel,
+            hintText: l10n.snapshotDescHint,
+          ),
+          maxLines: 3,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final success = await context.read<SettingsProvider>().updateSnapshotDescription(id, controller.text);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(success ? l10n.snapshotEditDescSuccess : l10n.snapshotEditDescFailed)),
+                );
+              }
+            },
+            child: Text(l10n.commonSave),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showDeleteConfirmDialog(BuildContext context, List<int> ids, AppLocalizations l10n) {
     showDialog(
       context: context,
@@ -207,6 +375,7 @@ class _SnapshotPageState extends State<SnapshotPage> {
             child: Text(l10n.commonCancel),
           ),
           FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.pop(context);
               final success = await context.read<SettingsProvider>().deleteSnapshot(ids);

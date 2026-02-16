@@ -50,23 +50,27 @@ class WebsiteV2Api {
   /// 获取网站列表
   ///
   /// 获取所有网站列表
-  /// @param search 搜索关键词（可选）
+  /// @param name 网站名称（可选）
   /// @param type 网站类型（可选）
   /// @param status 网站状态（可选）
   /// @param page 页码（可选，默认为1）
   /// @param pageSize 每页数量（可选，默认为10）
   /// @return 网站列表
   Future<Response<PageResult<WebsiteInfo>>> getWebsites({
-    String? search,
+    String? name,
     String? type,
     String? status,
     int page = 1,
     int pageSize = 10,
+    String order = 'descending',
+    String orderBy = 'createdAt',
   }) async {
     final request = WebsiteSearch(
       page: page,
       pageSize: pageSize,
-      search: search,
+      order: order,
+      orderBy: orderBy,
+      name: name,
       type: type,
       status: status,
     );

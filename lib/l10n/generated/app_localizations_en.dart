@@ -1196,6 +1196,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get snapshotDelete => 'Delete';
 
   @override
+  String get snapshotImport => 'Import Snapshot';
+
+  @override
+  String get snapshotRollback => 'Rollback';
+
+  @override
+  String get snapshotEditDesc => 'Edit Description';
+
+  @override
   String get snapshotEnterDesc => 'Enter snapshot description (optional)';
 
   @override
@@ -1211,7 +1220,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get snapshotCreateFailed => 'Failed to create snapshot';
 
   @override
-  String get snapshotDownloadDev => 'Download feature in development';
+  String get snapshotImportTitle => 'Import Snapshot';
+
+  @override
+  String get snapshotImportPath => 'Snapshot File Path';
+
+  @override
+  String get snapshotImportPathHint => 'Enter snapshot file path';
+
+  @override
+  String get snapshotImportSuccess => 'Snapshot imported successfully';
+
+  @override
+  String get snapshotImportFailed => 'Failed to import snapshot';
+
+  @override
+  String get snapshotRollbackTitle => 'Rollback Snapshot';
+
+  @override
+  String get snapshotRollbackConfirm =>
+      'Are you sure you want to rollback to this snapshot? Current configuration will be overwritten.';
+
+  @override
+  String get snapshotRollbackSuccess => 'Snapshot rolled back successfully';
+
+  @override
+  String get snapshotRollbackFailed => 'Failed to rollback snapshot';
+
+  @override
+  String get snapshotEditDescTitle => 'Edit Snapshot Description';
+
+  @override
+  String get snapshotEditDescSuccess => 'Description updated successfully';
+
+  @override
+  String get snapshotEditDescFailed => 'Failed to update description';
 
   @override
   String get snapshotRecoverTitle => 'Recover Snapshot';
@@ -1238,6 +1281,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get snapshotDeleteFailed => 'Failed to delete snapshot';
+
+  @override
+  String get proxySettingsTitle => 'Proxy Settings';
+
+  @override
+  String get proxySettingsEnable => 'Enable Proxy';
+
+  @override
+  String get proxySettingsType => 'Proxy Type';
+
+  @override
+  String get proxySettingsHttp => 'HTTP Proxy';
+
+  @override
+  String get proxySettingsHttps => 'HTTPS Proxy';
+
+  @override
+  String get proxySettingsHost => 'Proxy Host';
+
+  @override
+  String get proxySettingsPort => 'Proxy Port';
+
+  @override
+  String get proxySettingsUser => 'Username';
+
+  @override
+  String get proxySettingsPassword => 'Password';
+
+  @override
+  String get proxySettingsSaved => 'Proxy settings saved';
+
+  @override
+  String get proxySettingsFailed => 'Failed to save';
+
+  @override
+  String get bindSettingsTitle => 'Bind Address';
+
+  @override
+  String get bindSettingsAddress => 'Bind Address';
+
+  @override
+  String get bindSettingsPort => 'Panel Port';
+
+  @override
+  String get bindSettingsSaved => 'Bind settings saved';
+
+  @override
+  String get bindSettingsFailed => 'Failed to save';
 
   @override
   String get serverModuleSystemSettings => 'System Settings';

@@ -118,27 +118,36 @@ class WebsiteInfo extends Equatable {
 
 /// Website search request model
 class WebsiteSearch extends Equatable {
-  final int? page;
-  final int? pageSize;
-  final String? search;
+  final int page;
+  final int pageSize;
+  final String order;
+  final String orderBy;
+  final String? name;
   final String? type;
   final String? status;
+  final int? websiteGroupId;
 
   const WebsiteSearch({
-    this.page,
-    this.pageSize,
-    this.search,
+    this.page = 1,
+    this.pageSize = 10,
+    this.order = 'descending',
+    this.orderBy = 'createdAt',
+    this.name,
     this.type,
     this.status,
+    this.websiteGroupId,
   });
 
   factory WebsiteSearch.fromJson(Map<String, dynamic> json) {
     return WebsiteSearch(
-      page: json['page'] as int?,
-      pageSize: json['pageSize'] as int?,
-      search: json['search'] as String?,
+      page: json['page'] as int? ?? 1,
+      pageSize: json['pageSize'] as int? ?? 10,
+      order: json['order'] as String? ?? 'descending',
+      orderBy: json['orderBy'] as String? ?? 'createdAt',
+      name: json['name'] as String?,
       type: json['type'] as String?,
       status: json['status'] as String?,
+      websiteGroupId: json['websiteGroupId'] as int?,
     );
   }
 
@@ -146,14 +155,17 @@ class WebsiteSearch extends Equatable {
     return {
       'page': page,
       'pageSize': pageSize,
-      'search': search,
-      'type': type,
-      'status': status,
+      'order': order,
+      'orderBy': orderBy,
+      if (name != null) 'name': name,
+      if (type != null) 'type': type,
+      if (status != null) 'status': status,
+      if (websiteGroupId != null) 'websiteGroupId': websiteGroupId,
     };
   }
 
   @override
-  List<Object?> get props => [page, pageSize, search, type, status];
+  List<Object?> get props => [page, pageSize, order, orderBy, name, type, status, websiteGroupId];
 }
 
 /// Website domain model

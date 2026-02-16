@@ -2330,6 +2330,24 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get snapshotDelete;
 
+  /// No description provided for @snapshotImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Snapshot'**
+  String get snapshotImport;
+
+  /// No description provided for @snapshotRollback.
+  ///
+  /// In en, this message translates to:
+  /// **'Rollback'**
+  String get snapshotRollback;
+
+  /// No description provided for @snapshotEditDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Description'**
+  String get snapshotEditDesc;
+
   /// No description provided for @snapshotEnterDesc.
   ///
   /// In en, this message translates to:
@@ -2360,11 +2378,77 @@ abstract class AppLocalizations {
   /// **'Failed to create snapshot'**
   String get snapshotCreateFailed;
 
-  /// No description provided for @snapshotDownloadDev.
+  /// No description provided for @snapshotImportTitle.
   ///
   /// In en, this message translates to:
-  /// **'Download feature in development'**
-  String get snapshotDownloadDev;
+  /// **'Import Snapshot'**
+  String get snapshotImportTitle;
+
+  /// No description provided for @snapshotImportPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot File Path'**
+  String get snapshotImportPath;
+
+  /// No description provided for @snapshotImportPathHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter snapshot file path'**
+  String get snapshotImportPathHint;
+
+  /// No description provided for @snapshotImportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot imported successfully'**
+  String get snapshotImportSuccess;
+
+  /// No description provided for @snapshotImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to import snapshot'**
+  String get snapshotImportFailed;
+
+  /// No description provided for @snapshotRollbackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rollback Snapshot'**
+  String get snapshotRollbackTitle;
+
+  /// No description provided for @snapshotRollbackConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to rollback to this snapshot? Current configuration will be overwritten.'**
+  String get snapshotRollbackConfirm;
+
+  /// No description provided for @snapshotRollbackSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot rolled back successfully'**
+  String get snapshotRollbackSuccess;
+
+  /// No description provided for @snapshotRollbackFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to rollback snapshot'**
+  String get snapshotRollbackFailed;
+
+  /// No description provided for @snapshotEditDescTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Snapshot Description'**
+  String get snapshotEditDescTitle;
+
+  /// No description provided for @snapshotEditDescSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Description updated successfully'**
+  String get snapshotEditDescSuccess;
+
+  /// No description provided for @snapshotEditDescFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update description'**
+  String get snapshotEditDescFailed;
 
   /// No description provided for @snapshotRecoverTitle.
   ///
@@ -2413,6 +2497,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to delete snapshot'**
   String get snapshotDeleteFailed;
+
+  /// No description provided for @proxySettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy Settings'**
+  String get proxySettingsTitle;
+
+  /// No description provided for @proxySettingsEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Proxy'**
+  String get proxySettingsEnable;
+
+  /// No description provided for @proxySettingsType.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy Type'**
+  String get proxySettingsType;
+
+  /// No description provided for @proxySettingsHttp.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTP Proxy'**
+  String get proxySettingsHttp;
+
+  /// No description provided for @proxySettingsHttps.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTPS Proxy'**
+  String get proxySettingsHttps;
+
+  /// No description provided for @proxySettingsHost.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy Host'**
+  String get proxySettingsHost;
+
+  /// No description provided for @proxySettingsPort.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy Port'**
+  String get proxySettingsPort;
+
+  /// No description provided for @proxySettingsUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get proxySettingsUser;
+
+  /// No description provided for @proxySettingsPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get proxySettingsPassword;
+
+  /// No description provided for @proxySettingsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy settings saved'**
+  String get proxySettingsSaved;
+
+  /// No description provided for @proxySettingsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save'**
+  String get proxySettingsFailed;
+
+  /// No description provided for @bindSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind Address'**
+  String get bindSettingsTitle;
+
+  /// No description provided for @bindSettingsAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind Address'**
+  String get bindSettingsAddress;
+
+  /// No description provided for @bindSettingsPort.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel Port'**
+  String get bindSettingsPort;
+
+  /// No description provided for @bindSettingsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind settings saved'**
+  String get bindSettingsSaved;
+
+  /// No description provided for @bindSettingsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save'**
+  String get bindSettingsFailed;
 
   /// No description provided for @serverModuleSystemSettings.
   ///

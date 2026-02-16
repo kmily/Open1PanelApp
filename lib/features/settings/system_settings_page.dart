@@ -11,6 +11,8 @@ import 'package:onepanelapp_app/features/settings/api_key_settings_page.dart';
 import 'package:onepanelapp_app/features/settings/ssl_settings_page.dart';
 import 'package:onepanelapp_app/features/settings/upgrade_page.dart';
 import 'package:onepanelapp_app/features/settings/monitor_settings_page.dart';
+import 'package:onepanelapp_app/features/settings/proxy_settings_page.dart';
+import 'package:onepanelapp_app/features/settings/backup_account_page.dart';
 import 'package:onepanelapp_app/features/monitoring/monitoring_provider.dart';
 
 class SystemSettingsPage extends StatefulWidget {
@@ -125,6 +127,15 @@ class _SystemSettingsPageState extends State<SystemSettingsPage> {
                 subtitle: l10n.systemSettingsTerminalDesc,
                 onTap: () => _navigateTo(context, const TerminalSettingsPage()),
               ),
+              _buildSettingTile(
+                context,
+                icon: Icons.vpn_lock_outlined,
+                title: l10n.proxySettingsTitle,
+                subtitle: settings?.proxyUrl != null && settings!.proxyUrl!.isNotEmpty
+                    ? l10n.systemSettingsEnabled
+                    : l10n.systemSettingsDisabled,
+                onTap: () => _navigateTo(context, const ProxySettingsPage()),
+              ),
             ],
           ),
         ),
@@ -197,6 +208,13 @@ class _SystemSettingsPageState extends State<SystemSettingsPage> {
                 title: l10n.systemSettingsSnapshot,
                 subtitle: l10n.systemSettingsSnapshotDesc,
                 onTap: () => _navigateTo(context, const SnapshotPage()),
+              ),
+              _buildSettingTile(
+                context,
+                icon: Icons.cloud_outlined,
+                title: '备份账户',
+                subtitle: '管理备份存储账户',
+                onTap: () => _navigateTo(context, const BackupAccountPage()),
               ),
             ],
           ),

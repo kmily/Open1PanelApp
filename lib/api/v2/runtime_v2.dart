@@ -262,23 +262,23 @@ class RuntimeSearch {
   final String? name;
   final String? type;
   final String? status;
-  final int? page;
-  final int? pageSize;
+  final int page;
+  final int pageSize;
 
   const RuntimeSearch({
     this.name,
     this.type,
     this.status,
-    this.page,
-    this.pageSize,
+    this.page = 1,
+    this.pageSize = 10,
   });
 
   Map<String, dynamic> toJson() => {
         if (name != null) 'name': name,
         if (type != null) 'type': type,
         if (status != null) 'status': status,
-        if (page != null) 'page': page,
-        if (pageSize != null) 'pageSize': pageSize,
+        'page': page,
+        'pageSize': pageSize,
       };
 }
 

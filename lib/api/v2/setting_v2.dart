@@ -559,6 +559,36 @@ class SettingV2Api {
     );
   }
 
+  /// 获取备份账户选项
+  ///
+  /// 获取可用的备份账户列表
+  /// @return 备份账户列表
+  Future<Response<List<Map<String, dynamic>>>> getBackupAccountOptions() async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/backups/options'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    final items = data['data'] as List<dynamic>?;
+    return Response(
+      data: items?.cast<Map<String, dynamic>>() ?? [],
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 删除备份账户
+  ///
+  /// 删除指定的备份账户
+  /// @param request 删除请求
+  /// @return 删除结果
+  Future<Response<void>> deleteBackupAccount(BackupAccountDelete request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/backups/del'),
+      data: request.toJson(),
+    );
+  }
+
   // ==================== 快照相关API ====================
 
   /// 创建快照
@@ -939,10 +969,20 @@ class ReleaseNotesRequest {
 
 class SnapshotCreate {
   final String? description;
+  final String sourceAccountIDs;
+  final int downloadAccountID;
 
-  const SnapshotCreate({this.description});
+  const SnapshotCreate({
+    this.description,
+    required this.sourceAccountIDs,
+    required this.downloadAccountID,
+  });
 
-  Map<String, dynamic> toJson() => {if (description != null) 'description': description};
+  Map<String, dynamic> toJson() => {
+        if (description != null) 'description': description,
+        'sourceAccountIDs': sourceAccountIDs,
+        'downloadAccountID': downloadAccountID,
+      };
 }
 
 class SnapshotDelete {
@@ -1013,6 +1053,14 @@ class SnapshotSearch {
         'orderBy': orderBy,
         'order': order,
       };
+}
+
+class BackupAccountDelete {
+  final int id;
+
+  const BackupAccountDelete({required this.id});
+
+  Map<String, dynamic> toJson() => {'id': id};
 }
 
 // ==================== SSH请求模型 ====================

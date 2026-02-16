@@ -229,6 +229,23 @@ class SettingsProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateProxySettings({
+    String? proxyUrl,
+    int? proxyPort,
+  }) async {
+    try {
+      await _service.updateProxySettings(api.ProxyUpdate(
+        proxyUrl: proxyUrl,
+        proxyPort: proxyPort,
+      ));
+      await loadSystemSettings();
+      return true;
+    } catch (e) {
+      debugPrint('[SettingsProvider] updateProxySettings error: $e');
+      return false;
+    }
+  }
+
   Future<bool> bindMfa(MfaBindRequest request) async {
     try {
       await _service.bindMfa(request);
@@ -343,14 +360,34 @@ class SettingsProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> createSnapshot({String? description}) async {
+  Future<bool> createSnapshot({
+    String? description,
+    required String sourceAccountIDs,
+    required int downloadAccountID,
+  }) async {
     try {
-      await _service.createSnapshot(api.SnapshotCreate(description: description));
+      debugPrint('[SettingsProvider] createSnapshot: description=$description, sourceAccountIDs=$sourceAccountIDs, downloadAccountID=$downloadAccountID');
+      await _service.createSnapshot(api.SnapshotCreate(
+        description: description,
+        sourceAccountIDs: sourceAccountIDs,
+        downloadAccountID: downloadAccountID,
+      ));
       await loadSnapshots();
       return true;
     } catch (e) {
       debugPrint('[SettingsProvider] createSnapshot error: $e');
       return false;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>?> loadBackupAccountOptions() async {
+    try {
+      final result = await _service.getBackupAccountOptions();
+      debugPrint('[SettingsProvider] loadBackupAccountOptions result: $result');
+      return result;
+    } catch (e) {
+      debugPrint('[SettingsProvider] loadBackupAccountOptions error: $e');
+      return null;
     }
   }
 
@@ -371,6 +408,38 @@ class SettingsProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       debugPrint('[SettingsProvider] recoverSnapshot error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> rollbackSnapshot(int id) async {
+    try {
+      await _service.rollbackSnapshot(api.SnapshotRollback(id: id));
+      return true;
+    } catch (e) {
+      debugPrint('[SettingsProvider] rollbackSnapshot error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> importSnapshot(String path) async {
+    try {
+      await _service.importSnapshot(api.SnapshotImport(path: path));
+      await loadSnapshots();
+      return true;
+    } catch (e) {
+      debugPrint('[SettingsProvider] importSnapshot error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> updateSnapshotDescription(int id, String description) async {
+    try {
+      await _service.updateSnapshotDescription(api.SnapshotDescriptionUpdate(id: id, description: description));
+      await loadSnapshots();
+      return true;
+    } catch (e) {
+      debugPrint('[SettingsProvider] updateSnapshotDescription error: $e');
       return false;
     }
   }
