@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' show Response, Options, ResponseType;
 import '../../core/network/dio_client.dart';
 import '../../core/config/api_constants.dart';
 import '../../data/models/setting_models.dart';
@@ -8,16 +8,39 @@ class SettingV2Api {
 
   SettingV2Api(this._client);
 
+  /// 从API响应中提取data字段
+  /// API响应结构: { "code": 200, "message": "", "data": {...} }
+  Map<String, dynamic>? _extractData(dynamic responseData) {
+    if (responseData == null) return null;
+    final map = responseData as Map<String, dynamic>;
+    return map['data'] as Map<String, dynamic>?;
+  }
+
+  /// 从API响应中提取data字段（List类型）
+  List<dynamic>? _extractDataList(dynamic responseData) {
+    if (responseData == null) return null;
+    final map = responseData as Map<String, dynamic>;
+    return map['data'] as List<dynamic>?;
+  }
+
+  /// 从API响应中提取data字段（原始类型）
+  dynamic _extractDataRaw(dynamic responseData) {
+    if (responseData == null) return null;
+    final map = responseData as Map<String, dynamic>;
+    return map['data'];
+  }
+
   /// 获取系统设置
   ///
   /// 获取系统设置信息
   /// @return 系统设置
-  Future<Response<SettingInfo>> getSystemSettings() async {
+  Future<Response<SystemSettingInfo>> getSystemSettings() async {
     final response = await _client.post(
       ApiConstants.buildApiPath('/core/settings/search'),
     );
+    final data = _extractData(response.data);
     return Response(
-      data: SettingInfo.fromJson(response.data as Map<String, dynamic>),
+      data: data != null ? SystemSettingInfo.fromJson(data) : null,
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -34,8 +57,9 @@ class SettingV2Api {
       ApiConstants.buildApiPath('/core/settings/by'),
       queryParameters: {'key': key},
     );
+    final data = _extractData(response.data);
     return Response(
-      data: SettingInfo.fromJson(response.data as Map<String, dynamic>),
+      data: data != null ? SettingInfo.fromJson(data) : null,
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -62,8 +86,9 @@ class SettingV2Api {
     final response = await _client.get(
       ApiConstants.buildApiPath('/dashboard/base/os'),
     );
+    final data = _extractData(response.data);
     return Response(
-      data: SystemInfo.fromJson(response.data as Map<String, dynamic>),
+      data: data != null ? SystemInfo.fromJson(data) : null,
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -78,8 +103,9 @@ class SettingV2Api {
     final response = await _client.post(
       ApiConstants.buildApiPath('/core/settings/terminal/search'),
     );
+    final data = _extractData(response.data);
     return Response(
-      data: TerminalInfo.fromJson(response.data as Map<String, dynamic>),
+      data: data != null ? TerminalInfo.fromJson(data) : null,
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -98,16 +124,17 @@ class SettingV2Api {
     );
   }
 
-  /// 获取界面设置
+  /// 获取网络接口列表
   ///
-  /// 获取界面设置信息
-  /// @return 界面设置
-  Future<Response<InterfaceInfo>> getInterfaceSettings() async {
+  /// 获取服务器网络接口IP地址列表
+  /// @return IP地址列表
+  Future<Response<List<String>>> getNetworkInterfaces() async {
     final response = await _client.get(
       ApiConstants.buildApiPath('/core/settings/interface'),
     );
+    final data = _extractDataList(response.data);
     return Response(
-      data: InterfaceInfo.fromJson(response.data as Map<String, dynamic>),
+      data: data != null ? List<String>.from(data) : null,
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -178,12 +205,12 @@ class SettingV2Api {
   ///
   /// 获取默认菜单配置
   /// @return 默认菜单
-  Future<Response<Map<String, dynamic>>> getDefaultMenu() async {
+  Future<Response<dynamic>> getDefaultMenu() async {
     final response = await _client.post(
       ApiConstants.buildApiPath('/core/settings/menu/default'),
     );
     return Response(
-      data: response.data as Map<String, dynamic>,
+      data: _extractDataRaw(response.data),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -206,12 +233,12 @@ class SettingV2Api {
   ///
   /// 生成新的API密钥
   /// @return API密钥生成结果
-  Future<Response<Map<String, dynamic>>> generateApiKey() async {
+  Future<Response<dynamic>> generateApiKey() async {
     final response = await _client.post(
       ApiConstants.buildApiPath('/core/settings/api/config/generate/key'),
     );
     return Response(
-      data: response.data as Map<String, dynamic>,
+      data: _extractDataRaw(response.data),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -234,12 +261,12 @@ class SettingV2Api {
   ///
   /// 获取应用商店配置信息
   /// @return 应用商店配置
-  Future<Response<Map<String, dynamic>>> getAppStoreConfig() async {
+  Future<Response<dynamic>> getAppStoreConfig() async {
     final response = await _client.get(
       ApiConstants.buildApiPath('/core/settings/apps/store/config'),
     );
     return Response(
-      data: response.data as Map<String, dynamic>,
+      data: _extractDataRaw(response.data),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -264,12 +291,12 @@ class SettingV2Api {
   ///
   /// 获取基础目录配置信息
   /// @return 基础目录设置
-  Future<Response<Map<String, dynamic>>> getBaseDir() async {
+  Future<Response<dynamic>> getBaseDir() async {
     final response = await _client.get(
       ApiConstants.buildApiPath('/settings/basedir'),
     );
     return Response(
-      data: response.data as Map<String, dynamic>,
+      data: _extractDataRaw(response.data),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -281,12 +308,12 @@ class SettingV2Api {
   /// 通过key获取设置
   /// @param key 设置key
   /// @return 设置值
-  Future<Response<Map<String, dynamic>>> getSettingByKey(String key) async {
+  Future<Response<dynamic>> getSettingByKey(String key) async {
     final response = await _client.get(
       ApiConstants.buildApiPath('/settings/get/$key'),
     );
     return Response(
-      data: response.data as Map<String, dynamic>,
+      data: _extractDataRaw(response.data),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -297,12 +324,12 @@ class SettingV2Api {
   ///
   /// 搜索系统设置
   /// @return 设置信息
-  Future<Response<Map<String, dynamic>>> searchSettings() async {
+  Future<Response<dynamic>> searchSettings() async {
     final response = await _client.post(
       ApiConstants.buildApiPath('/settings/search'),
     );
     return Response(
-      data: response.data as Map<String, dynamic>,
+      data: _extractDataRaw(response.data),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -313,12 +340,12 @@ class SettingV2Api {
   ///
   /// 检查设置是否可用
   /// @return 可用性结果
-  Future<Response<Map<String, dynamic>>> checkSettingsAvailable() async {
+  Future<Response<dynamic>> checkSettingsAvailable() async {
     final response = await _client.get(
       ApiConstants.buildApiPath('/settings/search/available'),
     );
     return Response(
-      data: response.data as Map<String, dynamic>,
+      data: _extractDataRaw(response.data),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -390,12 +417,12 @@ class SettingV2Api {
   /// 获取当前用户的MFA启用状态
   /// @return MFA状态
   Future<Response<MfaStatus>> getMfaStatus() async {
-    final response = await _client.get<Map<String, dynamic>>(
+    final response = await _client.get(
       ApiConstants.buildApiPath('/core/settings/mfa/status'),
     );
-    final data = response.data!;
+    final data = _extractData(response.data);
     return Response(
-      data: MfaStatus.fromJson(data['data'] as Map<String, dynamic>),
+      data: data != null ? MfaStatus.fromJson(data) : null,
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -414,6 +441,316 @@ class SettingV2Api {
     );
     return Response(
       data: null,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  // ==================== SSL相关API ====================
+
+  /// 获取SSL证书信息
+  ///
+  /// 获取系统SSL证书信息
+  /// @return SSL证书信息
+  Future<Response<dynamic>> getSSLInfo() async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/core/settings/ssl/info'),
+    );
+    final data = _extractDataRaw(response.data);
+    return Response(
+      data: data,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 更新SSL设置
+  ///
+  /// 更新系统SSL设置
+  /// @param request SSL更新请求
+  /// @return 更新结果
+  Future<Response<void>> updateSSL(SSLUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/settings/ssl/update'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 下载SSL证书
+  ///
+  /// 下载系统SSL证书
+  /// @return 证书文件数据
+  Future<Response<List<int>>> downloadSSL() async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/core/settings/ssl/download'),
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return Response(
+      data: response.data as List<int>,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  // ==================== 升级相关API ====================
+
+  /// 获取升级信息
+  ///
+  /// 获取系统升级信息
+  /// @return 升级信息
+  Future<Response<dynamic>> getUpgradeInfo() async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/core/settings/upgrade'),
+    );
+    return Response(
+      data: _extractDataRaw(response.data),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 执行升级
+  ///
+  /// 执行系统升级
+  /// @param request 升级请求
+  /// @return 升级结果
+  Future<Response<void>> upgrade(UpgradeRequest request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/core/settings/upgrade'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 获取版本发布说明
+  ///
+  /// 获取指定版本的发布说明
+  /// @param request 版本请求
+  /// @return 发布说明
+  Future<Response<String>> getReleaseNotes(ReleaseNotesRequest request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/core/settings/upgrade/notes'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: _extractData(response.data)?['notes'] as String?,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 获取升级版本列表
+  ///
+  /// 获取可升级的版本列表
+  /// @return 版本列表
+  Future<Response<List<dynamic>>> getUpgradeReleases() async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/core/settings/upgrade/releases'),
+    );
+    return Response(
+      data: _extractDataList(response.data),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  // ==================== 快照相关API ====================
+
+  /// 创建快照
+  ///
+  /// 创建系统快照
+  /// @param request 快照创建请求
+  /// @return 创建结果
+  Future<Response<void>> createSnapshot(SnapshotCreate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 删除快照
+  ///
+  /// 删除指定快照
+  /// @param request 删除请求
+  /// @return 删除结果
+  Future<Response<void>> deleteSnapshot(SnapshotDelete request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/del'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 更新快照描述
+  ///
+  /// 更新快照描述信息
+  /// @param request 描述更新请求
+  /// @return 更新结果
+  Future<Response<void>> updateSnapshotDescription(SnapshotDescriptionUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/description/update'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 导入快照
+  ///
+  /// 导入系统快照
+  /// @param request 导入请求
+  /// @return 导入结果
+  Future<Response<void>> importSnapshot(SnapshotImport request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/import'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 加载快照数据
+  ///
+  /// 加载系统快照数据
+  /// @return 快照数据
+  Future<Response<dynamic>> loadSnapshot() async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/settings/snapshot/load'),
+    );
+    return Response(
+      data: _extractDataRaw(response.data),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 恢复快照
+  ///
+  /// 从快照恢复系统
+  /// @param request 恢复请求
+  /// @return 恢复结果
+  Future<Response<void>> recoverSnapshot(SnapshotRecover request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/recover'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 重建快照
+  ///
+  /// 重建系统快照
+  /// @param request 重建请求
+  /// @return 重建结果
+  Future<Response<void>> recreateSnapshot(SnapshotRecreate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/recreate'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 回滚快照
+  ///
+  /// 回滚系统快照
+  /// @param request 回滚请求
+  /// @return 回滚结果
+  Future<Response<void>> rollbackSnapshot(SnapshotRollback request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/rollback'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 搜索快照
+  ///
+  /// 分页搜索快照列表
+  /// @param request 搜索请求
+  /// @return 快照列表
+  Future<Response<dynamic>> searchSnapshots(SnapshotSearch request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/settings/snapshot/search'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: _extractDataRaw(response.data),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  // ==================== SSH相关API ====================
+
+  /// 保存SSH连接信息
+  ///
+  /// 保存本地SSH连接信息
+  /// @param request SSH连接请求
+  /// @return 保存结果
+  Future<Response<void>> saveSSHConnection(SSHConnectionSave request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/ssh'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 检查SSH连接信息
+  ///
+  /// 检查本地SSH连接信息
+  /// @param request 检查请求
+  /// @return 检查结果
+  Future<Response<dynamic>> checkSSHConnection(SSHConnectionCheck request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/settings/ssh/check/info'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: _extractDataRaw(response.data),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 获取SSH连接
+  ///
+  /// 获取本地SSH连接信息
+  /// @return SSH连接信息
+  Future<Response<dynamic>> getSSHConnection() async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/settings/ssh/conn'),
+    );
+    return Response(
+      data: _extractDataRaw(response.data),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 更新默认SSH连接
+  ///
+  /// 更新本地默认SSH连接
+  /// @param request 更新请求
+  /// @return 更新结果
+  Future<Response<void>> updateDefaultSSHConnection(SSHDefaultUpdate request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/settings/ssh/conn/default'),
+      data: request.toJson(),
+    );
+  }
+
+  // ==================== 认证相关API ====================
+
+  /// 获取登录设置
+  ///
+  /// 获取登录页面的设置信息
+  /// @return 登录设置
+  Future<Response<dynamic>> getAuthSetting() async {
+    final response = await _client.get(
+      ApiConstants.buildApiPath('/core/auth/setting'),
+    );
+    return Response(
+      data: _extractDataRaw(response.data),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -523,4 +860,157 @@ class DescriptionSave {
   const DescriptionSave({required this.description});
 
   Map<String, dynamic> toJson() => {'description': description};
+}
+
+// ==================== SSL请求模型 ====================
+
+class SSLUpdate {
+  final String? sslType;
+  final String? domain;
+  final int? port;
+
+  const SSLUpdate({this.sslType, this.domain, this.port});
+
+  Map<String, dynamic> toJson() => {
+        if (sslType != null) 'sslType': sslType,
+        if (domain != null) 'domain': domain,
+        if (port != null) 'port': port,
+      };
+}
+
+// ==================== 升级请求模型 ====================
+
+class UpgradeRequest {
+  final String? version;
+
+  const UpgradeRequest({this.version});
+
+  Map<String, dynamic> toJson() => {if (version != null) 'version': version};
+}
+
+class ReleaseNotesRequest {
+  final String version;
+
+  const ReleaseNotesRequest({required this.version});
+
+  Map<String, dynamic> toJson() => {'version': version};
+}
+
+// ==================== 快照请求模型 ====================
+
+class SnapshotCreate {
+  final String? description;
+
+  const SnapshotCreate({this.description});
+
+  Map<String, dynamic> toJson() => {if (description != null) 'description': description};
+}
+
+class SnapshotDelete {
+  final List<int> ids;
+
+  const SnapshotDelete({required this.ids});
+
+  Map<String, dynamic> toJson() => {'ids': ids};
+}
+
+class SnapshotDescriptionUpdate {
+  final int id;
+  final String description;
+
+  const SnapshotDescriptionUpdate({required this.id, required this.description});
+
+  Map<String, dynamic> toJson() => {'id': id, 'description': description};
+}
+
+class SnapshotImport {
+  final String path;
+
+  const SnapshotImport({required this.path});
+
+  Map<String, dynamic> toJson() => {'path': path};
+}
+
+class SnapshotRecover {
+  final int id;
+
+  const SnapshotRecover({required this.id});
+
+  Map<String, dynamic> toJson() => {'id': id};
+}
+
+class SnapshotRecreate {
+  final int id;
+
+  const SnapshotRecreate({required this.id});
+
+  Map<String, dynamic> toJson() => {'id': id};
+}
+
+class SnapshotRollback {
+  final int id;
+
+  const SnapshotRollback({required this.id});
+
+  Map<String, dynamic> toJson() => {'id': id};
+}
+
+class SnapshotSearch {
+  final int? page;
+  final int? pageSize;
+
+  const SnapshotSearch({this.page, this.pageSize});
+
+  Map<String, dynamic> toJson() => {
+        if (page != null) 'page': page,
+        if (pageSize != null) 'pageSize': pageSize,
+      };
+}
+
+// ==================== SSH请求模型 ====================
+
+class SSHConnectionSave {
+  final String? host;
+  final int? port;
+  final String? user;
+  final String? password;
+  final String? privateKey;
+
+  const SSHConnectionSave({this.host, this.port, this.user, this.password, this.privateKey});
+
+  Map<String, dynamic> toJson() => {
+        if (host != null) 'host': host,
+        if (port != null) 'port': port,
+        if (user != null) 'user': user,
+        if (password != null) 'password': password,
+        if (privateKey != null) 'privateKey': privateKey,
+      };
+}
+
+class SSHConnectionCheck {
+  final String? host;
+  final int? port;
+  final String? user;
+  final String? password;
+
+  const SSHConnectionCheck({this.host, this.port, this.user, this.password});
+
+  Map<String, dynamic> toJson() => {
+        if (host != null) 'host': host,
+        if (port != null) 'port': port,
+        if (user != null) 'user': user,
+        if (password != null) 'password': password,
+      };
+}
+
+class SSHDefaultUpdate {
+  final int? id;
+  final bool? isDefault;
+
+  const SSHDefaultUpdate({this.id, this.isDefault});
+
+  Map<String, dynamic> toJson() => {
+        if (id != null) 'id': id,
+        if (isDefault != null) 'isDefault': isDefault,
+      };
 }

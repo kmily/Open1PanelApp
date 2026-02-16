@@ -1,0 +1,137 @@
+import 'package:onepanelapp_app/api/v2/setting_v2.dart' as api;
+import 'package:onepanelapp_app/core/network/api_client_manager.dart';
+import 'package:onepanelapp_app/data/models/setting_models.dart';
+
+class SettingsService {
+  Future<api.SettingV2Api> _getApi() async {
+    return await ApiClientManager.instance.getSettingApi();
+  }
+
+  Future<SystemSettingInfo?> getSystemSettings() async {
+    final apiClient = await _getApi();
+    final response = await apiClient.getSystemSettings();
+    return response.data;
+  }
+
+  Future<TerminalInfo?> getTerminalSettings() async {
+    final apiClient = await _getApi();
+    final response = await apiClient.getTerminalSettings();
+    return response.data;
+  }
+
+  Future<List<String>?> getNetworkInterfaces() async {
+    final apiClient = await _getApi();
+    final response = await apiClient.getNetworkInterfaces();
+    return response.data;
+  }
+
+  Future<MfaOtp?> loadMfaInfo(MfaCredential request) async {
+    final apiClient = await _getApi();
+    final response = await apiClient.loadMfaInfo(request);
+    return response.data;
+  }
+
+  Future<MfaStatus?> getMfaStatus() async {
+    final apiClient = await _getApi();
+    final response = await apiClient.getMfaStatus();
+    return response.data;
+  }
+
+  Future<void> bindMfa(MfaBindRequest request) async {
+    final apiClient = await _getApi();
+    await apiClient.bindMfa(request);
+  }
+
+  Future<void> unbindMfa(Map<String, dynamic> request) async {
+    final apiClient = await _getApi();
+    await apiClient.unbindMfa(request);
+  }
+
+  Future<dynamic> getSSLInfo() async {
+    final apiClient = await _getApi();
+    final response = await apiClient.getSSLInfo();
+    return response.data;
+  }
+
+  Future<void> updateSSL(api.SSLUpdate request) async {
+    final apiClient = await _getApi();
+    await apiClient.updateSSL(request);
+  }
+
+  Future<dynamic> getUpgradeInfo() async {
+    final apiClient = await _getApi();
+    final response = await apiClient.getUpgradeInfo();
+    return response.data;
+  }
+
+  Future<void> upgrade(api.UpgradeRequest request) async {
+    final apiClient = await _getApi();
+    await apiClient.upgrade(request);
+  }
+
+  Future<List<dynamic>?> getUpgradeReleases() async {
+    final apiClient = await _getApi();
+    final response = await apiClient.getUpgradeReleases();
+    return response.data;
+  }
+
+  Future<dynamic> searchSnapshots(api.SnapshotSearch request) async {
+    final apiClient = await _getApi();
+    final response = await apiClient.searchSnapshots(request);
+    return response.data;
+  }
+
+  Future<void> createSnapshot(api.SnapshotCreate request) async {
+    final apiClient = await _getApi();
+    await apiClient.createSnapshot(request);
+  }
+
+  Future<void> deleteSnapshot(api.SnapshotDelete request) async {
+    final apiClient = await _getApi();
+    await apiClient.deleteSnapshot(request);
+  }
+
+  Future<void> recoverSnapshot(api.SnapshotRecover request) async {
+    final apiClient = await _getApi();
+    await apiClient.recoverSnapshot(request);
+  }
+
+  Future<void> updateSystemSetting(api.SettingUpdate request) async {
+    final apiClient = await _getApi();
+    await apiClient.updateSystemSetting(request);
+  }
+
+  Future<void> updateTerminalSettings(api.TerminalUpdate request) async {
+    final apiClient = await _getApi();
+    await apiClient.updateTerminalSettings(request);
+  }
+
+  Future<dynamic> generateApiKey() async {
+    final apiClient = await _getApi();
+    final response = await apiClient.generateApiKey();
+    return response.data;
+  }
+
+  Future<dynamic> getAppStoreConfig() async {
+    final apiClient = await _getApi();
+    final response = await apiClient.getAppStoreConfig();
+    return response.data;
+  }
+
+  Future<dynamic> getAuthSetting() async {
+    final apiClient = await _getApi();
+    final response = await apiClient.getAuthSetting();
+    return response.data;
+  }
+
+  Future<dynamic> getSSHConnection() async {
+    final apiClient = await _getApi();
+    final response = await apiClient.getSSHConnection();
+    return response.data;
+  }
+
+  Future<void> saveSSHConnection(api.SSHConnectionSave request) async {
+    final apiClient = await _getApi();
+    await apiClient.saveSSHConnection(request);
+  }
+}

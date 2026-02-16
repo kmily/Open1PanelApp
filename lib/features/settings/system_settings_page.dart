@@ -1,0 +1,399 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:onepanelapp_app/core/theme/app_design_tokens.dart';
+import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
+import 'package:onepanelapp_app/features/settings/settings_provider.dart';
+import 'package:onepanelapp_app/features/settings/panel_settings_page.dart';
+import 'package:onepanelapp_app/features/settings/security_settings_page.dart';
+import 'package:onepanelapp_app/features/settings/snapshot_page.dart';
+import 'package:onepanelapp_app/features/settings/terminal_settings_page.dart';
+
+class SystemSettingsPage extends StatefulWidget {
+  const SystemSettingsPage({super.key});
+
+  @override
+  State<SystemSettingsPage> createState() => _SystemSettingsPageState();
+}
+
+class _SystemSettingsPageState extends State<SystemSettingsPage> {
+  late SettingsProvider _provider;
+
+  @override
+  void initState() {
+    super.initState();
+    _provider = SettingsProvider();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _provider.load();
+    });
+  }
+
+  @override
+  void dispose() {
+    _provider.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+
+    return ChangeNotifierProvider.value(
+      value: _provider,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.systemSettingsTitle),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh_outlined),
+              onPressed: () => _provider.refresh(),
+              tooltip: l10n.systemSettingsRefresh,
+            ),
+          ],
+        ),
+        body: Consumer<SettingsProvider>(
+          builder: (context, provider, child) {
+            if (provider.data.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (provider.data.error != null) {
+              return _buildErrorView(context, provider, l10n);
+            }
+
+            return _buildSettingsList(context, provider, theme, l10n);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorView(BuildContext context, SettingsProvider provider, AppLocalizations l10n) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+          const SizedBox(height: 16),
+          Text(l10n.systemSettingsLoadFailed),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () => provider.load(),
+            child: Text(l10n.commonRetry),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsList(
+    BuildContext context,
+    SettingsProvider provider,
+    ThemeData theme,
+    AppLocalizations l10n,
+  ) {
+    final settings = provider.data.systemSettings;
+    final lastUpdated = provider.data.lastUpdated;
+
+    return ListView(
+      padding: AppDesignTokens.pagePadding,
+      children: [
+        if (settings != null) ...[
+          _buildInfoCard(context, settings, theme, l10n),
+          const SizedBox(height: AppDesignTokens.spacingMd),
+        ],
+        _buildSectionTitle(context, l10n.systemSettingsPanelSection, theme),
+        Card(
+          child: Column(
+            children: [
+              _buildSettingTile(
+                context,
+                icon: Icons.dns_outlined,
+                title: l10n.systemSettingsPanelConfig,
+                subtitle: l10n.systemSettingsPanelConfigDesc,
+                onTap: () => _navigateTo(context, const PanelSettingsPage()),
+              ),
+              _buildSettingTile(
+                context,
+                icon: Icons.terminal_outlined,
+                title: l10n.systemSettingsTerminal,
+                subtitle: l10n.systemSettingsTerminalDesc,
+                onTap: () => _navigateTo(context, const TerminalSettingsPage()),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppDesignTokens.spacingMd),
+        _buildSectionTitle(context, l10n.systemSettingsSecuritySection, theme),
+        Card(
+          child: Column(
+            children: [
+              _buildSettingTile(
+                context,
+                icon: Icons.security_outlined,
+                title: l10n.systemSettingsSecurityConfig,
+                subtitle: l10n.systemSettingsSecurityConfigDesc,
+                onTap: () => _navigateTo(context, const SecuritySettingsPage()),
+              ),
+              _buildSettingTile(
+                context,
+                icon: Icons.key_outlined,
+                title: l10n.systemSettingsApiKey,
+                subtitle: settings?.apiInterfaceStatus == 'enable'
+                    ? l10n.systemSettingsEnabled
+                    : l10n.systemSettingsDisabled,
+                trailing: _buildStatusChip(
+                  context,
+                  settings?.apiInterfaceStatus == 'enable',
+                  l10n,
+                ),
+                onTap: () => _showApiKeyDialog(context, provider, l10n),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppDesignTokens.spacingMd),
+        _buildSectionTitle(context, l10n.systemSettingsBackupSection, theme),
+        Card(
+          child: Column(
+            children: [
+              _buildSettingTile(
+                context,
+                icon: Icons.backup_outlined,
+                title: l10n.systemSettingsSnapshot,
+                subtitle: l10n.systemSettingsSnapshotDesc,
+                onTap: () => _navigateTo(context, const SnapshotPage()),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppDesignTokens.spacingMd),
+        _buildSectionTitle(context, l10n.systemSettingsSystemSection, theme),
+        Card(
+          child: Column(
+            children: [
+              _buildSettingTile(
+                context,
+                icon: Icons.system_update_outlined,
+                title: l10n.systemSettingsUpgrade,
+                subtitle: settings?.systemVersion ?? 'v1.0.0',
+                onTap: () => _showUpgradeDialog(context, provider, l10n),
+              ),
+              _buildSettingTile(
+                context,
+                icon: Icons.info_outline,
+                title: l10n.systemSettingsAbout,
+                subtitle: l10n.systemSettingsAboutDesc,
+                onTap: () => _showAboutDialog(context, settings),
+              ),
+            ],
+          ),
+        ),
+        if (lastUpdated != null) ...[
+          const SizedBox(height: AppDesignTokens.spacingMd),
+          Text(
+            l10n.systemSettingsLastUpdated(_formatTime(lastUpdated)),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+        const SizedBox(height: AppDesignTokens.spacingLg),
+      ],
+    );
+  }
+
+  Widget _buildInfoCard(
+    BuildContext context,
+    dynamic settings,
+    ThemeData theme,
+    AppLocalizations l10n,
+  ) {
+    return Card(
+      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+      child: Padding(
+        padding: AppDesignTokens.pagePadding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  size: 20,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  settings.panelName ?? l10n.systemSettingsPanelName,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${l10n.systemSettingsSystemVersion}: ${settings.systemVersion ?? "-"}',
+              style: theme.textTheme.bodyMedium,
+            ),
+            if (settings.mfaStatus != null) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Text(
+                    '${l10n.systemSettingsMfaStatus}: ',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                  _buildStatusChip(
+                    context,
+                    settings.mfaStatus == 'enable',
+                    l10n,
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title, ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppDesignTokens.spacingSm),
+      child: Text(
+        title,
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      subtitle: Text(subtitle),
+      trailing: trailing ?? const Icon(Icons.chevron_right),
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildStatusChip(BuildContext context, bool isEnabled, AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: isEnabled
+            ? Colors.green.withValues(alpha: 0.2)
+            : Colors.grey.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        isEnabled ? l10n.systemSettingsEnabled : l10n.systemSettingsDisabled,
+        style: TextStyle(
+          fontSize: 12,
+          color: isEnabled ? Colors.green : Colors.grey,
+        ),
+      ),
+    );
+  }
+
+  void _navigateTo(BuildContext context, Widget page) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider.value(
+          value: _provider,
+          child: page,
+        ),
+      ),
+    );
+  }
+
+  void _showApiKeyDialog(BuildContext context, SettingsProvider provider, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.systemSettingsApiKeyManage),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${l10n.systemSettingsCurrentStatus}: ${provider.data.systemSettings?.apiInterfaceStatus ?? l10n.systemSettingsUnknown}'),
+            const SizedBox(height: 8),
+            Text('${l10n.systemSettingsApiKeyLabel}: ${provider.data.systemSettings?.apiKey ?? l10n.systemSettingsNotSet}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final success = await provider.generateApiKey();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(success ? l10n.systemSettingsApiKeyGenerated : l10n.systemSettingsGenerateFailed),
+                  ),
+                );
+              }
+            },
+            child: Text(l10n.systemSettingsGenerateNewKey),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showUpgradeDialog(BuildContext context, SettingsProvider provider, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.systemSettingsUpgrade),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${l10n.systemSettingsCurrentVersion}: ${provider.data.systemSettings?.systemVersion ?? l10n.systemSettingsUnknown}'),
+            const SizedBox(height: 8),
+            Text(l10n.systemSettingsCheckingUpdate),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.systemSettingsClose),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAboutDialog(BuildContext context, dynamic settings) {
+    showAboutDialog(
+      context: context,
+      applicationName: '1Panel Mobile',
+      applicationVersion: settings?.systemVersion ?? '1.0.0',
+      applicationLegalese: '© 2024 1Panel Team',
+    );
+  }
+
+  String _formatTime(DateTime time) {
+    return '${time.year}-${time.month.toString().padLeft(2, '0')}-${time.day.toString().padLeft(2, '0')} '
+        '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  }
+}

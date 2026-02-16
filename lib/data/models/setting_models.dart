@@ -854,3 +854,108 @@ class InterfaceInfo extends Equatable {
   @override
   List<Object?> get props => [theme, language, menuCollapse, entry];
 }
+
+/// 系统设置信息（实际API响应）
+@JsonSerializable()
+class SystemSettingInfo extends Equatable {
+  final String? userName;
+  final String? systemVersion;
+  final String? developerMode;
+  final String? upgradeBackupCopies;
+  final String? sessionTimeout;
+  final String? port;
+  final String? ipv6;
+  final String? bindAddress;
+  final String? panelName;
+  final String? theme;
+  final String? menuTabs;
+  final String? language;
+  final String? serverPort;
+  final String? ssl;
+  final String? sslType;
+  final String? bindDomain;
+  final String? allowIPs;
+  final String? securityEntrance;
+  final String? dashboardMemoVisible;
+  final String? dashboardSimpleNodeVisible;
+  final String? expirationDays;
+  final String? expirationTime;
+  final String? complexityVerification;
+  final String? mfaStatus;
+  final String? mfaSecret;
+  final String? mfaInterval;
+  final String? appStoreVersion;
+  final String? appStoreLastModified;
+  final String? appStoreSyncStatus;
+  final String? hideMenu;
+  final String? noAuthSetting;
+  final String? proxyUrl;
+  final String? proxyType;
+  final String? proxyPort;
+  final String? proxyUser;
+  final String? proxyPasswd;
+  final String? proxyPasswdKeep;
+  final String? apiInterfaceStatus;
+  final String? apiKey;
+  final String? ipWhiteList;
+  final String? apiKeyValidityTime;
+
+  const SystemSettingInfo({
+    this.userName,
+    this.systemVersion,
+    this.developerMode,
+    this.upgradeBackupCopies,
+    this.sessionTimeout,
+    this.port,
+    this.ipv6,
+    this.bindAddress,
+    this.panelName,
+    this.theme,
+    this.menuTabs,
+    this.language,
+    this.serverPort,
+    this.ssl,
+    this.sslType,
+    this.bindDomain,
+    this.allowIPs,
+    this.securityEntrance,
+    this.dashboardMemoVisible,
+    this.dashboardSimpleNodeVisible,
+    this.expirationDays,
+    this.expirationTime,
+    this.complexityVerification,
+    this.mfaStatus,
+    this.mfaSecret,
+    this.mfaInterval,
+    this.appStoreVersion,
+    this.appStoreLastModified,
+    this.appStoreSyncStatus,
+    this.hideMenu,
+    this.noAuthSetting,
+    this.proxyUrl,
+    this.proxyType,
+    this.proxyPort,
+    this.proxyUser,
+    this.proxyPasswd,
+    this.proxyPasswdKeep,
+    this.apiInterfaceStatus,
+    this.apiKey,
+    this.ipWhiteList,
+    this.apiKeyValidityTime,
+  });
+
+  factory SystemSettingInfo.fromJson(Map<String, dynamic> json) => _$SystemSettingInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$SystemSettingInfoToJson(this);
+
+  @override
+  List<Object?> get props => [
+    userName, systemVersion, developerMode, upgradeBackupCopies, sessionTimeout,
+    port, ipv6, bindAddress, panelName, theme, menuTabs, language, serverPort,
+    ssl, sslType, bindDomain, allowIPs, securityEntrance, dashboardMemoVisible,
+    dashboardSimpleNodeVisible, expirationDays, expirationTime, complexityVerification,
+    mfaStatus, mfaSecret, mfaInterval, appStoreVersion, appStoreLastModified,
+    appStoreSyncStatus, hideMenu, noAuthSetting, proxyUrl, proxyType, proxyPort,
+    proxyUser, proxyPasswd, proxyPasswdKeep, apiInterfaceStatus, apiKey,
+    ipWhiteList, apiKeyValidityTime,
+  ];
+}

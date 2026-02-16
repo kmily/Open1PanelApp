@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/core/theme/app_design_tokens.dart';
 import 'package:onepanelapp_app/features/server/server_models.dart';
+import 'package:onepanelapp_app/config/app_router.dart';
 
 class ServerDetailPage extends StatelessWidget {
   const ServerDetailPage({
@@ -59,6 +60,11 @@ class ServerDetailPage extends StatelessWidget {
         title: l10n.serverModuleFiles,
         icon: Icons.folder_outlined,
         route: '/files',
+      ),
+      _ModuleItem(
+        title: l10n.serverModuleSystemSettings,
+        icon: Icons.settings_applications_outlined,
+        route: '/system-settings',
       ),
     ];
 
@@ -207,8 +213,10 @@ class ServerDetailPage extends StatelessWidget {
       case '/files':
         Navigator.pushNamed(context, '/files');
         break;
+      case '/system-settings':
+        Navigator.pushNamed(context, AppRoutes.systemSettings);
+        break;
       default:
-        // 其他模块显示ComingSoon提示
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${module.title} - ${context.l10n.commonComingSoon}')),
         );

@@ -1375,6 +1375,636 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'To'**
   String get monitorTimeRangeTo;
+
+  /// No description provided for @systemSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'System Settings'**
+  String get systemSettingsTitle;
+
+  /// No description provided for @systemSettingsRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get systemSettingsRefresh;
+
+  /// No description provided for @systemSettingsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load settings'**
+  String get systemSettingsLoadFailed;
+
+  /// No description provided for @systemSettingsPanelSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel Settings'**
+  String get systemSettingsPanelSection;
+
+  /// No description provided for @systemSettingsPanelConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel Config'**
+  String get systemSettingsPanelConfig;
+
+  /// No description provided for @systemSettingsPanelConfigDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel name, port, bind address, etc.'**
+  String get systemSettingsPanelConfigDesc;
+
+  /// No description provided for @systemSettingsTerminal.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal Settings'**
+  String get systemSettingsTerminal;
+
+  /// No description provided for @systemSettingsTerminalDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal style, font, scrolling, etc.'**
+  String get systemSettingsTerminalDesc;
+
+  /// No description provided for @systemSettingsSecuritySection.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Settings'**
+  String get systemSettingsSecuritySection;
+
+  /// No description provided for @systemSettingsSecurityConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Config'**
+  String get systemSettingsSecurityConfig;
+
+  /// No description provided for @systemSettingsSecurityConfigDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'MFA authentication, access control, etc.'**
+  String get systemSettingsSecurityConfigDesc;
+
+  /// No description provided for @systemSettingsApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get systemSettingsApiKey;
+
+  /// No description provided for @systemSettingsBackupSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup & Recovery'**
+  String get systemSettingsBackupSection;
+
+  /// No description provided for @systemSettingsSnapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot Management'**
+  String get systemSettingsSnapshot;
+
+  /// No description provided for @systemSettingsSnapshotDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create, restore, delete system snapshots'**
+  String get systemSettingsSnapshotDesc;
+
+  /// No description provided for @systemSettingsSystemSection.
+  ///
+  /// In en, this message translates to:
+  /// **'System Info'**
+  String get systemSettingsSystemSection;
+
+  /// No description provided for @systemSettingsUpgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'System Upgrade'**
+  String get systemSettingsUpgrade;
+
+  /// No description provided for @systemSettingsAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get systemSettingsAbout;
+
+  /// No description provided for @systemSettingsAboutDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'System info and version'**
+  String get systemSettingsAboutDesc;
+
+  /// No description provided for @systemSettingsLastUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated: {time}'**
+  String systemSettingsLastUpdated(String time);
+
+  /// No description provided for @systemSettingsPanelName.
+  ///
+  /// In en, this message translates to:
+  /// **'1Panel'**
+  String get systemSettingsPanelName;
+
+  /// No description provided for @systemSettingsSystemVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'System Version'**
+  String get systemSettingsSystemVersion;
+
+  /// No description provided for @systemSettingsMfaStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'MFA Status'**
+  String get systemSettingsMfaStatus;
+
+  /// No description provided for @systemSettingsEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get systemSettingsEnabled;
+
+  /// No description provided for @systemSettingsDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get systemSettingsDisabled;
+
+  /// No description provided for @systemSettingsApiKeyManage.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key Management'**
+  String get systemSettingsApiKeyManage;
+
+  /// No description provided for @systemSettingsCurrentStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Status'**
+  String get systemSettingsCurrentStatus;
+
+  /// No description provided for @systemSettingsUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get systemSettingsUnknown;
+
+  /// No description provided for @systemSettingsApiKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get systemSettingsApiKeyLabel;
+
+  /// No description provided for @systemSettingsNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get systemSettingsNotSet;
+
+  /// No description provided for @systemSettingsGenerateNewKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate New Key'**
+  String get systemSettingsGenerateNewKey;
+
+  /// No description provided for @systemSettingsApiKeyGenerated.
+  ///
+  /// In en, this message translates to:
+  /// **'API key generated'**
+  String get systemSettingsApiKeyGenerated;
+
+  /// No description provided for @systemSettingsGenerateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Generation failed'**
+  String get systemSettingsGenerateFailed;
+
+  /// No description provided for @systemSettingsCurrentVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Version'**
+  String get systemSettingsCurrentVersion;
+
+  /// No description provided for @systemSettingsCheckingUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for updates...'**
+  String get systemSettingsCheckingUpdate;
+
+  /// No description provided for @systemSettingsClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get systemSettingsClose;
+
+  /// No description provided for @panelSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel Settings'**
+  String get panelSettingsTitle;
+
+  /// No description provided for @panelSettingsBasicInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Info'**
+  String get panelSettingsBasicInfo;
+
+  /// No description provided for @panelSettingsPanelName.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel Name'**
+  String get panelSettingsPanelName;
+
+  /// No description provided for @panelSettingsVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'System Version'**
+  String get panelSettingsVersion;
+
+  /// No description provided for @panelSettingsPort.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen Port'**
+  String get panelSettingsPort;
+
+  /// No description provided for @panelSettingsBindAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind Address'**
+  String get panelSettingsBindAddress;
+
+  /// No description provided for @panelSettingsInterface.
+  ///
+  /// In en, this message translates to:
+  /// **'Interface Settings'**
+  String get panelSettingsInterface;
+
+  /// No description provided for @panelSettingsTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get panelSettingsTheme;
+
+  /// No description provided for @panelSettingsLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get panelSettingsLanguage;
+
+  /// No description provided for @panelSettingsMenuTabs.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu Tabs'**
+  String get panelSettingsMenuTabs;
+
+  /// No description provided for @panelSettingsAdvanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Settings'**
+  String get panelSettingsAdvanced;
+
+  /// No description provided for @panelSettingsDeveloperMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer Mode'**
+  String get panelSettingsDeveloperMode;
+
+  /// No description provided for @panelSettingsIpv6.
+  ///
+  /// In en, this message translates to:
+  /// **'IPv6'**
+  String get panelSettingsIpv6;
+
+  /// No description provided for @panelSettingsSessionTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Session Timeout'**
+  String get panelSettingsSessionTimeout;
+
+  /// No description provided for @panelSettingsMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} minutes'**
+  String panelSettingsMinutes(String count);
+
+  /// No description provided for @terminalSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal Settings'**
+  String get terminalSettingsTitle;
+
+  /// No description provided for @terminalSettingsDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Display Settings'**
+  String get terminalSettingsDisplay;
+
+  /// No description provided for @terminalSettingsCursorStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cursor Style'**
+  String get terminalSettingsCursorStyle;
+
+  /// No description provided for @terminalSettingsCursorBlink.
+  ///
+  /// In en, this message translates to:
+  /// **'Cursor Blink'**
+  String get terminalSettingsCursorBlink;
+
+  /// No description provided for @terminalSettingsFontSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Font Size'**
+  String get terminalSettingsFontSize;
+
+  /// No description provided for @terminalSettingsScroll.
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll Settings'**
+  String get terminalSettingsScroll;
+
+  /// No description provided for @terminalSettingsScrollSensitivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll Sensitivity'**
+  String get terminalSettingsScrollSensitivity;
+
+  /// No description provided for @terminalSettingsScrollback.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrollback Buffer'**
+  String get terminalSettingsScrollback;
+
+  /// No description provided for @terminalSettingsStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Style Settings'**
+  String get terminalSettingsStyle;
+
+  /// No description provided for @terminalSettingsLineHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Line Height'**
+  String get terminalSettingsLineHeight;
+
+  /// No description provided for @terminalSettingsLetterSpacing.
+  ///
+  /// In en, this message translates to:
+  /// **'Letter Spacing'**
+  String get terminalSettingsLetterSpacing;
+
+  /// No description provided for @securitySettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Settings'**
+  String get securitySettingsTitle;
+
+  /// No description provided for @securitySettingsMfaSection.
+  ///
+  /// In en, this message translates to:
+  /// **'MFA Authentication'**
+  String get securitySettingsMfaSection;
+
+  /// No description provided for @securitySettingsMfaStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'MFA Status'**
+  String get securitySettingsMfaStatus;
+
+  /// No description provided for @securitySettingsUnbindMfa.
+  ///
+  /// In en, this message translates to:
+  /// **'Unbind MFA'**
+  String get securitySettingsUnbindMfa;
+
+  /// No description provided for @securitySettingsAccessControl.
+  ///
+  /// In en, this message translates to:
+  /// **'Access Control'**
+  String get securitySettingsAccessControl;
+
+  /// No description provided for @securitySettingsSecurityEntrance.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Entrance'**
+  String get securitySettingsSecurityEntrance;
+
+  /// No description provided for @securitySettingsBindDomain.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind Domain'**
+  String get securitySettingsBindDomain;
+
+  /// No description provided for @securitySettingsAllowIPs.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed IPs'**
+  String get securitySettingsAllowIPs;
+
+  /// No description provided for @securitySettingsPasswordPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Password Policy'**
+  String get securitySettingsPasswordPolicy;
+
+  /// No description provided for @securitySettingsComplexityVerification.
+  ///
+  /// In en, this message translates to:
+  /// **'Complexity Verification'**
+  String get securitySettingsComplexityVerification;
+
+  /// No description provided for @securitySettingsExpirationDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiration Days'**
+  String get securitySettingsExpirationDays;
+
+  /// No description provided for @securitySettingsEnableMfa.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable MFA'**
+  String get securitySettingsEnableMfa;
+
+  /// No description provided for @securitySettingsDisableMfa.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable MFA'**
+  String get securitySettingsDisableMfa;
+
+  /// No description provided for @securitySettingsEnableMfaConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to enable MFA?'**
+  String get securitySettingsEnableMfaConfirm;
+
+  /// No description provided for @securitySettingsDisableMfaConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to disable MFA?'**
+  String get securitySettingsDisableMfaConfirm;
+
+  /// No description provided for @securitySettingsEnterMfaCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter MFA verification code'**
+  String get securitySettingsEnterMfaCode;
+
+  /// No description provided for @securitySettingsVerifyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Code'**
+  String get securitySettingsVerifyCode;
+
+  /// No description provided for @securitySettingsMfaCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter 6-digit code'**
+  String get securitySettingsMfaCodeHint;
+
+  /// No description provided for @securitySettingsMfaUnbound.
+  ///
+  /// In en, this message translates to:
+  /// **'MFA unbound'**
+  String get securitySettingsMfaUnbound;
+
+  /// No description provided for @securitySettingsUnbindFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unbind failed'**
+  String get securitySettingsUnbindFailed;
+
+  /// No description provided for @snapshotTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot Management'**
+  String get snapshotTitle;
+
+  /// No description provided for @snapshotCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Snapshot'**
+  String get snapshotCreate;
+
+  /// No description provided for @snapshotEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No snapshots'**
+  String get snapshotEmpty;
+
+  /// No description provided for @snapshotCreatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created At'**
+  String get snapshotCreatedAt;
+
+  /// No description provided for @snapshotDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get snapshotDescription;
+
+  /// No description provided for @snapshotRecover.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover'**
+  String get snapshotRecover;
+
+  /// No description provided for @snapshotDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get snapshotDownload;
+
+  /// No description provided for @snapshotDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get snapshotDelete;
+
+  /// No description provided for @snapshotEnterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter snapshot description (optional)'**
+  String get snapshotEnterDesc;
+
+  /// No description provided for @snapshotDescLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get snapshotDescLabel;
+
+  /// No description provided for @snapshotDescHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter snapshot description'**
+  String get snapshotDescHint;
+
+  /// No description provided for @snapshotCreateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot created successfully'**
+  String get snapshotCreateSuccess;
+
+  /// No description provided for @snapshotCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create snapshot'**
+  String get snapshotCreateFailed;
+
+  /// No description provided for @snapshotDownloadDev.
+  ///
+  /// In en, this message translates to:
+  /// **'Download feature in development'**
+  String get snapshotDownloadDev;
+
+  /// No description provided for @snapshotRecoverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover Snapshot'**
+  String get snapshotRecoverTitle;
+
+  /// No description provided for @snapshotRecoverConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to recover this snapshot? Current configuration will be overwritten.'**
+  String get snapshotRecoverConfirm;
+
+  /// No description provided for @snapshotRecoverSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot recovered successfully'**
+  String get snapshotRecoverSuccess;
+
+  /// No description provided for @snapshotRecoverFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to recover snapshot'**
+  String get snapshotRecoverFailed;
+
+  /// No description provided for @snapshotDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Snapshot'**
+  String get snapshotDeleteTitle;
+
+  /// No description provided for @snapshotDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete selected snapshots? This action cannot be undone.'**
+  String get snapshotDeleteConfirm;
+
+  /// No description provided for @snapshotDeleteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot deleted successfully'**
+  String get snapshotDeleteSuccess;
+
+  /// No description provided for @snapshotDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete snapshot'**
+  String get snapshotDeleteFailed;
+
+  /// No description provided for @serverModuleSystemSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'System Settings'**
+  String get serverModuleSystemSettings;
 }
 
 class _AppLocalizationsDelegate

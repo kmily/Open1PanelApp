@@ -692,4 +692,333 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monitorTimeRangeTo => 'To';
+
+  @override
+  String get systemSettingsTitle => 'System Settings';
+
+  @override
+  String get systemSettingsRefresh => 'Refresh';
+
+  @override
+  String get systemSettingsLoadFailed => 'Failed to load settings';
+
+  @override
+  String get systemSettingsPanelSection => 'Panel Settings';
+
+  @override
+  String get systemSettingsPanelConfig => 'Panel Config';
+
+  @override
+  String get systemSettingsPanelConfigDesc =>
+      'Panel name, port, bind address, etc.';
+
+  @override
+  String get systemSettingsTerminal => 'Terminal Settings';
+
+  @override
+  String get systemSettingsTerminalDesc =>
+      'Terminal style, font, scrolling, etc.';
+
+  @override
+  String get systemSettingsSecuritySection => 'Security Settings';
+
+  @override
+  String get systemSettingsSecurityConfig => 'Security Config';
+
+  @override
+  String get systemSettingsSecurityConfigDesc =>
+      'MFA authentication, access control, etc.';
+
+  @override
+  String get systemSettingsApiKey => 'API Key';
+
+  @override
+  String get systemSettingsBackupSection => 'Backup & Recovery';
+
+  @override
+  String get systemSettingsSnapshot => 'Snapshot Management';
+
+  @override
+  String get systemSettingsSnapshotDesc =>
+      'Create, restore, delete system snapshots';
+
+  @override
+  String get systemSettingsSystemSection => 'System Info';
+
+  @override
+  String get systemSettingsUpgrade => 'System Upgrade';
+
+  @override
+  String get systemSettingsAbout => 'About';
+
+  @override
+  String get systemSettingsAboutDesc => 'System info and version';
+
+  @override
+  String systemSettingsLastUpdated(String time) {
+    return 'Last updated: $time';
+  }
+
+  @override
+  String get systemSettingsPanelName => '1Panel';
+
+  @override
+  String get systemSettingsSystemVersion => 'System Version';
+
+  @override
+  String get systemSettingsMfaStatus => 'MFA Status';
+
+  @override
+  String get systemSettingsEnabled => 'Enabled';
+
+  @override
+  String get systemSettingsDisabled => 'Disabled';
+
+  @override
+  String get systemSettingsApiKeyManage => 'API Key Management';
+
+  @override
+  String get systemSettingsCurrentStatus => 'Current Status';
+
+  @override
+  String get systemSettingsUnknown => 'Unknown';
+
+  @override
+  String get systemSettingsApiKeyLabel => 'API Key';
+
+  @override
+  String get systemSettingsNotSet => 'Not set';
+
+  @override
+  String get systemSettingsGenerateNewKey => 'Generate New Key';
+
+  @override
+  String get systemSettingsApiKeyGenerated => 'API key generated';
+
+  @override
+  String get systemSettingsGenerateFailed => 'Generation failed';
+
+  @override
+  String get systemSettingsCurrentVersion => 'Current Version';
+
+  @override
+  String get systemSettingsCheckingUpdate => 'Checking for updates...';
+
+  @override
+  String get systemSettingsClose => 'Close';
+
+  @override
+  String get panelSettingsTitle => 'Panel Settings';
+
+  @override
+  String get panelSettingsBasicInfo => 'Basic Info';
+
+  @override
+  String get panelSettingsPanelName => 'Panel Name';
+
+  @override
+  String get panelSettingsVersion => 'System Version';
+
+  @override
+  String get panelSettingsPort => 'Listen Port';
+
+  @override
+  String get panelSettingsBindAddress => 'Bind Address';
+
+  @override
+  String get panelSettingsInterface => 'Interface Settings';
+
+  @override
+  String get panelSettingsTheme => 'Theme';
+
+  @override
+  String get panelSettingsLanguage => 'Language';
+
+  @override
+  String get panelSettingsMenuTabs => 'Menu Tabs';
+
+  @override
+  String get panelSettingsAdvanced => 'Advanced Settings';
+
+  @override
+  String get panelSettingsDeveloperMode => 'Developer Mode';
+
+  @override
+  String get panelSettingsIpv6 => 'IPv6';
+
+  @override
+  String get panelSettingsSessionTimeout => 'Session Timeout';
+
+  @override
+  String panelSettingsMinutes(String count) {
+    return '$count minutes';
+  }
+
+  @override
+  String get terminalSettingsTitle => 'Terminal Settings';
+
+  @override
+  String get terminalSettingsDisplay => 'Display Settings';
+
+  @override
+  String get terminalSettingsCursorStyle => 'Cursor Style';
+
+  @override
+  String get terminalSettingsCursorBlink => 'Cursor Blink';
+
+  @override
+  String get terminalSettingsFontSize => 'Font Size';
+
+  @override
+  String get terminalSettingsScroll => 'Scroll Settings';
+
+  @override
+  String get terminalSettingsScrollSensitivity => 'Scroll Sensitivity';
+
+  @override
+  String get terminalSettingsScrollback => 'Scrollback Buffer';
+
+  @override
+  String get terminalSettingsStyle => 'Style Settings';
+
+  @override
+  String get terminalSettingsLineHeight => 'Line Height';
+
+  @override
+  String get terminalSettingsLetterSpacing => 'Letter Spacing';
+
+  @override
+  String get securitySettingsTitle => 'Security Settings';
+
+  @override
+  String get securitySettingsMfaSection => 'MFA Authentication';
+
+  @override
+  String get securitySettingsMfaStatus => 'MFA Status';
+
+  @override
+  String get securitySettingsUnbindMfa => 'Unbind MFA';
+
+  @override
+  String get securitySettingsAccessControl => 'Access Control';
+
+  @override
+  String get securitySettingsSecurityEntrance => 'Security Entrance';
+
+  @override
+  String get securitySettingsBindDomain => 'Bind Domain';
+
+  @override
+  String get securitySettingsAllowIPs => 'Allowed IPs';
+
+  @override
+  String get securitySettingsPasswordPolicy => 'Password Policy';
+
+  @override
+  String get securitySettingsComplexityVerification =>
+      'Complexity Verification';
+
+  @override
+  String get securitySettingsExpirationDays => 'Expiration Days';
+
+  @override
+  String get securitySettingsEnableMfa => 'Enable MFA';
+
+  @override
+  String get securitySettingsDisableMfa => 'Disable MFA';
+
+  @override
+  String get securitySettingsEnableMfaConfirm =>
+      'Are you sure you want to enable MFA?';
+
+  @override
+  String get securitySettingsDisableMfaConfirm =>
+      'Are you sure you want to disable MFA?';
+
+  @override
+  String get securitySettingsEnterMfaCode =>
+      'Please enter MFA verification code';
+
+  @override
+  String get securitySettingsVerifyCode => 'Verification Code';
+
+  @override
+  String get securitySettingsMfaCodeHint => 'Enter 6-digit code';
+
+  @override
+  String get securitySettingsMfaUnbound => 'MFA unbound';
+
+  @override
+  String get securitySettingsUnbindFailed => 'Unbind failed';
+
+  @override
+  String get snapshotTitle => 'Snapshot Management';
+
+  @override
+  String get snapshotCreate => 'Create Snapshot';
+
+  @override
+  String get snapshotEmpty => 'No snapshots';
+
+  @override
+  String get snapshotCreatedAt => 'Created At';
+
+  @override
+  String get snapshotDescription => 'Description';
+
+  @override
+  String get snapshotRecover => 'Recover';
+
+  @override
+  String get snapshotDownload => 'Download';
+
+  @override
+  String get snapshotDelete => 'Delete';
+
+  @override
+  String get snapshotEnterDesc => 'Enter snapshot description (optional)';
+
+  @override
+  String get snapshotDescLabel => 'Description';
+
+  @override
+  String get snapshotDescHint => 'Enter snapshot description';
+
+  @override
+  String get snapshotCreateSuccess => 'Snapshot created successfully';
+
+  @override
+  String get snapshotCreateFailed => 'Failed to create snapshot';
+
+  @override
+  String get snapshotDownloadDev => 'Download feature in development';
+
+  @override
+  String get snapshotRecoverTitle => 'Recover Snapshot';
+
+  @override
+  String get snapshotRecoverConfirm =>
+      'Are you sure you want to recover this snapshot? Current configuration will be overwritten.';
+
+  @override
+  String get snapshotRecoverSuccess => 'Snapshot recovered successfully';
+
+  @override
+  String get snapshotRecoverFailed => 'Failed to recover snapshot';
+
+  @override
+  String get snapshotDeleteTitle => 'Delete Snapshot';
+
+  @override
+  String get snapshotDeleteConfirm =>
+      'Are you sure you want to delete selected snapshots? This action cannot be undone.';
+
+  @override
+  String get snapshotDeleteSuccess => 'Snapshot deleted successfully';
+
+  @override
+  String get snapshotDeleteFailed => 'Failed to delete snapshot';
+
+  @override
+  String get serverModuleSystemSettings => 'System Settings';
 }

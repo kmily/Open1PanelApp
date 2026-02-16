@@ -15,6 +15,7 @@ import 'package:onepanelapp_app/features/shell/app_shell_page.dart';
 import 'package:onepanelapp_app/features/terminal/terminal_page.dart';
 import 'package:onepanelapp_app/features/dashboard/dashboard_page.dart';
 import 'package:onepanelapp_app/pages/settings/settings_page.dart';
+import 'package:onepanelapp_app/features/settings/system_settings_page.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -32,6 +33,7 @@ class AppRoutes {
   static const String monitoring = '/monitoring';
   static const String securityVerification = '/security-verification';
   static const String settings = '/settings';
+  static const String systemSettings = '/system-settings';
 }
 
 class AppRouter {
@@ -77,6 +79,8 @@ class AppRouter {
             builder: (_) => const SecurityVerificationPage());
       case AppRoutes.settings:
         return MaterialPageRoute(builder: (_) => const SettingsPage());
+      case AppRoutes.systemSettings:
+        return MaterialPageRoute(builder: (_) => const SystemSettingsPage());
 
       // Legacy routes redirect to the new shell.
       case '/apps':

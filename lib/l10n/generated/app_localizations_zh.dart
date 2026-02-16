@@ -680,4 +680,323 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get monitorTimeRangeTo => '到';
+
+  @override
+  String get systemSettingsTitle => '系统设置';
+
+  @override
+  String get systemSettingsRefresh => '刷新';
+
+  @override
+  String get systemSettingsLoadFailed => '加载设置失败';
+
+  @override
+  String get systemSettingsPanelSection => '面板设置';
+
+  @override
+  String get systemSettingsPanelConfig => '面板配置';
+
+  @override
+  String get systemSettingsPanelConfigDesc => '面板名称、端口、绑定地址等';
+
+  @override
+  String get systemSettingsTerminal => '终端设置';
+
+  @override
+  String get systemSettingsTerminalDesc => '终端样式、字体、滚动等';
+
+  @override
+  String get systemSettingsSecuritySection => '安全设置';
+
+  @override
+  String get systemSettingsSecurityConfig => '安全配置';
+
+  @override
+  String get systemSettingsSecurityConfigDesc => 'MFA认证、访问控制等';
+
+  @override
+  String get systemSettingsApiKey => 'API密钥';
+
+  @override
+  String get systemSettingsBackupSection => '备份恢复';
+
+  @override
+  String get systemSettingsSnapshot => '快照管理';
+
+  @override
+  String get systemSettingsSnapshotDesc => '创建、恢复、删除系统快照';
+
+  @override
+  String get systemSettingsSystemSection => '系统信息';
+
+  @override
+  String get systemSettingsUpgrade => '系统升级';
+
+  @override
+  String get systemSettingsAbout => '关于';
+
+  @override
+  String get systemSettingsAboutDesc => '系统信息与版本';
+
+  @override
+  String systemSettingsLastUpdated(String time) {
+    return '最后更新: $time';
+  }
+
+  @override
+  String get systemSettingsPanelName => '1Panel面板';
+
+  @override
+  String get systemSettingsSystemVersion => '系统版本';
+
+  @override
+  String get systemSettingsMfaStatus => 'MFA状态';
+
+  @override
+  String get systemSettingsEnabled => '启用';
+
+  @override
+  String get systemSettingsDisabled => '禁用';
+
+  @override
+  String get systemSettingsApiKeyManage => 'API密钥管理';
+
+  @override
+  String get systemSettingsCurrentStatus => '当前状态';
+
+  @override
+  String get systemSettingsUnknown => '未知';
+
+  @override
+  String get systemSettingsApiKeyLabel => 'API密钥';
+
+  @override
+  String get systemSettingsNotSet => '未设置';
+
+  @override
+  String get systemSettingsGenerateNewKey => '生成新密钥';
+
+  @override
+  String get systemSettingsApiKeyGenerated => 'API密钥已生成';
+
+  @override
+  String get systemSettingsGenerateFailed => '生成失败';
+
+  @override
+  String get systemSettingsCurrentVersion => '当前版本';
+
+  @override
+  String get systemSettingsCheckingUpdate => '正在检查更新...';
+
+  @override
+  String get systemSettingsClose => '关闭';
+
+  @override
+  String get panelSettingsTitle => '面板设置';
+
+  @override
+  String get panelSettingsBasicInfo => '基本信息';
+
+  @override
+  String get panelSettingsPanelName => '面板名称';
+
+  @override
+  String get panelSettingsVersion => '系统版本';
+
+  @override
+  String get panelSettingsPort => '监听端口';
+
+  @override
+  String get panelSettingsBindAddress => '绑定地址';
+
+  @override
+  String get panelSettingsInterface => '界面设置';
+
+  @override
+  String get panelSettingsTheme => '主题';
+
+  @override
+  String get panelSettingsLanguage => '语言';
+
+  @override
+  String get panelSettingsMenuTabs => '菜单标签';
+
+  @override
+  String get panelSettingsAdvanced => '高级设置';
+
+  @override
+  String get panelSettingsDeveloperMode => '开发者模式';
+
+  @override
+  String get panelSettingsIpv6 => 'IPv6';
+
+  @override
+  String get panelSettingsSessionTimeout => '会话超时';
+
+  @override
+  String panelSettingsMinutes(String count) {
+    return '$count 分钟';
+  }
+
+  @override
+  String get terminalSettingsTitle => '终端设置';
+
+  @override
+  String get terminalSettingsDisplay => '显示设置';
+
+  @override
+  String get terminalSettingsCursorStyle => '光标样式';
+
+  @override
+  String get terminalSettingsCursorBlink => '光标闪烁';
+
+  @override
+  String get terminalSettingsFontSize => '字体大小';
+
+  @override
+  String get terminalSettingsScroll => '滚动设置';
+
+  @override
+  String get terminalSettingsScrollSensitivity => '滚动灵敏度';
+
+  @override
+  String get terminalSettingsScrollback => '滚动缓冲区';
+
+  @override
+  String get terminalSettingsStyle => '样式设置';
+
+  @override
+  String get terminalSettingsLineHeight => '行高';
+
+  @override
+  String get terminalSettingsLetterSpacing => '字母间距';
+
+  @override
+  String get securitySettingsTitle => '安全设置';
+
+  @override
+  String get securitySettingsMfaSection => 'MFA认证';
+
+  @override
+  String get securitySettingsMfaStatus => 'MFA状态';
+
+  @override
+  String get securitySettingsUnbindMfa => '解绑MFA';
+
+  @override
+  String get securitySettingsAccessControl => '访问控制';
+
+  @override
+  String get securitySettingsSecurityEntrance => '安全入口';
+
+  @override
+  String get securitySettingsBindDomain => '绑定域名';
+
+  @override
+  String get securitySettingsAllowIPs => '允许IP列表';
+
+  @override
+  String get securitySettingsPasswordPolicy => '密码策略';
+
+  @override
+  String get securitySettingsComplexityVerification => '复杂度验证';
+
+  @override
+  String get securitySettingsExpirationDays => '过期天数';
+
+  @override
+  String get securitySettingsEnableMfa => '启用MFA';
+
+  @override
+  String get securitySettingsDisableMfa => '禁用MFA';
+
+  @override
+  String get securitySettingsEnableMfaConfirm => '确定要启用MFA认证吗？';
+
+  @override
+  String get securitySettingsDisableMfaConfirm => '确定要禁用MFA认证吗？';
+
+  @override
+  String get securitySettingsEnterMfaCode => '请输入MFA验证码';
+
+  @override
+  String get securitySettingsVerifyCode => '验证码';
+
+  @override
+  String get securitySettingsMfaCodeHint => '请输入6位验证码';
+
+  @override
+  String get securitySettingsMfaUnbound => 'MFA已解绑';
+
+  @override
+  String get securitySettingsUnbindFailed => '解绑失败';
+
+  @override
+  String get snapshotTitle => '快照管理';
+
+  @override
+  String get snapshotCreate => '创建快照';
+
+  @override
+  String get snapshotEmpty => '暂无快照';
+
+  @override
+  String get snapshotCreatedAt => '创建时间';
+
+  @override
+  String get snapshotDescription => '描述';
+
+  @override
+  String get snapshotRecover => '恢复';
+
+  @override
+  String get snapshotDownload => '下载';
+
+  @override
+  String get snapshotDelete => '删除';
+
+  @override
+  String get snapshotEnterDesc => '请输入快照描述（可选）';
+
+  @override
+  String get snapshotDescLabel => '描述';
+
+  @override
+  String get snapshotDescHint => '请输入快照描述';
+
+  @override
+  String get snapshotCreateSuccess => '快照创建成功';
+
+  @override
+  String get snapshotCreateFailed => '快照创建失败';
+
+  @override
+  String get snapshotDownloadDev => '下载功能开发中';
+
+  @override
+  String get snapshotRecoverTitle => '恢复快照';
+
+  @override
+  String get snapshotRecoverConfirm => '确定要恢复此快照吗？恢复后当前配置将被覆盖。';
+
+  @override
+  String get snapshotRecoverSuccess => '快照恢复成功';
+
+  @override
+  String get snapshotRecoverFailed => '快照恢复失败';
+
+  @override
+  String get snapshotDeleteTitle => '删除快照';
+
+  @override
+  String get snapshotDeleteConfirm => '确定要删除选中的快照吗？此操作不可恢复。';
+
+  @override
+  String get snapshotDeleteSuccess => '快照删除成功';
+
+  @override
+  String get snapshotDeleteFailed => '快照删除失败';
+
+  @override
+  String get serverModuleSystemSettings => '系统设置';
 }
