@@ -536,7 +536,7 @@ class SettingV2Api {
       data: request.toJson(),
     );
     return Response(
-      data: _extractData(response.data)?['notes'] as String?,
+      data: _extractDataRaw(response.data) as String?,
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,

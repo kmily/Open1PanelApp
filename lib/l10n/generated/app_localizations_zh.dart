@@ -911,10 +911,38 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get upgradeDowngradeConfirm => '确认降级';
+
+  @override
+  String upgradeDowngradeMessage(Object version) {
+    return '确定要降级到版本 $version 吗？降级可能会导致数据不兼容。';
+  }
+
+  @override
   String get upgradeButton => '升级';
 
   @override
+  String get upgradeDowngradeButton => '降级';
+
+  @override
   String get upgradeStarted => '升级已开始';
+
+  @override
+  String get upgradeViewNotes => '查看更新说明';
+
+  @override
+  String upgradeNotesTitle(Object version) {
+    return '版本 $version 更新说明';
+  }
+
+  @override
+  String get upgradeNotesLoading => '正在加载...';
+
+  @override
+  String get upgradeNotesEmpty => '暂无更新说明';
+
+  @override
+  String get upgradeNotesError => '加载失败';
 
   @override
   String get monitorSettingsTitle => '监控设置';

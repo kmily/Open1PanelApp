@@ -931,10 +931,38 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get upgradeDowngradeConfirm => 'Confirm Downgrade';
+
+  @override
+  String upgradeDowngradeMessage(Object version) {
+    return 'Are you sure you want to downgrade to version $version? Downgrade may cause data incompatibility.';
+  }
+
+  @override
   String get upgradeButton => 'Upgrade';
 
   @override
+  String get upgradeDowngradeButton => 'Downgrade';
+
+  @override
   String get upgradeStarted => 'Upgrade started';
+
+  @override
+  String get upgradeViewNotes => 'View Release Notes';
+
+  @override
+  String upgradeNotesTitle(Object version) {
+    return 'Version $version Release Notes';
+  }
+
+  @override
+  String get upgradeNotesLoading => 'Loading...';
+
+  @override
+  String get upgradeNotesEmpty => 'No release notes available';
+
+  @override
+  String get upgradeNotesError => 'Failed to load';
 
   @override
   String get monitorSettingsTitle => 'Monitor Settings';

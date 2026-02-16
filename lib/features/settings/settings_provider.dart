@@ -394,6 +394,15 @@ class SettingsProvider extends ChangeNotifier {
     }
   }
 
+  Future<String?> getReleaseNotes(String version) async {
+    try {
+      return await _service.getReleaseNotes(version);
+    } catch (e) {
+      debugPrint('[SettingsProvider] getReleaseNotes error: $e');
+      return null;
+    }
+  }
+
   Future<void> load() async {
     _data = _data.copyWith(isLoading: true, error: null);
     notifyListeners();

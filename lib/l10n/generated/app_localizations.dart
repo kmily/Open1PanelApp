@@ -1826,17 +1826,65 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to upgrade to version {version}?'**
   String upgradeConfirmMessage(Object version);
 
+  /// No description provided for @upgradeDowngradeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Downgrade'**
+  String get upgradeDowngradeConfirm;
+
+  /// No description provided for @upgradeDowngradeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to downgrade to version {version}? Downgrade may cause data incompatibility.'**
+  String upgradeDowngradeMessage(Object version);
+
   /// No description provided for @upgradeButton.
   ///
   /// In en, this message translates to:
   /// **'Upgrade'**
   String get upgradeButton;
 
+  /// No description provided for @upgradeDowngradeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Downgrade'**
+  String get upgradeDowngradeButton;
+
   /// No description provided for @upgradeStarted.
   ///
   /// In en, this message translates to:
   /// **'Upgrade started'**
   String get upgradeStarted;
+
+  /// No description provided for @upgradeViewNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'View Release Notes'**
+  String get upgradeViewNotes;
+
+  /// No description provided for @upgradeNotesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} Release Notes'**
+  String upgradeNotesTitle(Object version);
+
+  /// No description provided for @upgradeNotesLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get upgradeNotesLoading;
+
+  /// No description provided for @upgradeNotesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No release notes available'**
+  String get upgradeNotesEmpty;
+
+  /// No description provided for @upgradeNotesError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get upgradeNotesError;
 
   /// No description provided for @monitorSettingsTitle.
   ///

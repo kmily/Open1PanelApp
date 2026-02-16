@@ -80,6 +80,12 @@ class SettingsService {
     return response.data;
   }
 
+  Future<String?> getReleaseNotes(String version) async {
+    final apiClient = await _getApi();
+    final response = await apiClient.getReleaseNotes(api.ReleaseNotesRequest(version: version));
+    return response.data;
+  }
+
   Future<dynamic> searchSnapshots(api.SnapshotSearch request) async {
     final apiClient = await _getApi();
     final response = await apiClient.searchSnapshots(request);
