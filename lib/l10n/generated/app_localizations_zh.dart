@@ -242,10 +242,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get filesRoot => '根目录';
 
   @override
-  String get filesEmptyTitle => '文件页占位已完成';
+  String get filesNavigateUp => '返回上级';
 
   @override
-  String get filesEmptyDesc => '页面结构已就绪，后续接入文件 API 即可。';
+  String get filesEmptyTitle => '此文件夹为空';
+
+  @override
+  String get filesEmptyDesc => '点击下方按钮创建新文件或文件夹。';
 
   @override
   String get filesActionUpload => '上传';
@@ -255,6 +258,119 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get filesActionNewFolder => '新建文件夹';
+
+  @override
+  String get filesActionNew => '新建';
+
+  @override
+  String get filesActionOpen => '打开';
+
+  @override
+  String get filesActionRename => '重命名';
+
+  @override
+  String get filesActionCopy => '复制';
+
+  @override
+  String get filesActionMove => '移动';
+
+  @override
+  String get filesActionExtract => '解压';
+
+  @override
+  String get filesActionCompress => '压缩';
+
+  @override
+  String get filesActionDelete => '删除';
+
+  @override
+  String get filesActionSelectAll => '全选';
+
+  @override
+  String get filesActionDeselect => '取消选择';
+
+  @override
+  String get filesActionSort => '排序';
+
+  @override
+  String get filesActionSearch => '搜索';
+
+  @override
+  String get filesNameLabel => '名称';
+
+  @override
+  String get filesNameHint => '输入名称';
+
+  @override
+  String get filesTargetPath => '目标路径';
+
+  @override
+  String get filesTypeDirectory => '目录';
+
+  @override
+  String get filesSelected => '已选择';
+
+  @override
+  String get filesDeleteTitle => '删除文件';
+
+  @override
+  String filesDeleteConfirm(int count) {
+    return '确定删除选中的 $count 个项目？';
+  }
+
+  @override
+  String get filesSortByName => '按名称排序';
+
+  @override
+  String get filesSortBySize => '按大小排序';
+
+  @override
+  String get filesSortByDate => '按日期排序';
+
+  @override
+  String get filesSearchHint => '搜索文件';
+
+  @override
+  String get filesSearchClear => '清除';
+
+  @override
+  String get filesRecycleBin => '回收站';
+
+  @override
+  String get filesCopyFailed => '复制失败';
+
+  @override
+  String get filesMoveFailed => '移动失败';
+
+  @override
+  String get filesRenameFailed => '重命名失败';
+
+  @override
+  String get filesDeleteFailed => '删除失败';
+
+  @override
+  String get filesCompressFailed => '压缩失败';
+
+  @override
+  String get filesExtractFailed => '解压失败';
+
+  @override
+  String get filesCreateFailed => '创建失败';
+
+  @override
+  String get filesOperationSuccess => '操作成功';
+
+  @override
+  String get filesCompressType => '类型';
+
+  @override
+  String get filesUploadDeveloping => '上传功能需要进一步开发';
+
+  @override
+  String get commonCreate => '创建';
+
+  @override
+  String get commonSearch => '搜索';
 
   @override
   String get securityPageTitle => '动态验证';

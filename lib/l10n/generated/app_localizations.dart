@@ -560,16 +560,22 @@ abstract class AppLocalizations {
   /// **'Root'**
   String get filesRoot;
 
+  /// No description provided for @filesNavigateUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to parent'**
+  String get filesNavigateUp;
+
   /// No description provided for @filesEmptyTitle.
   ///
   /// In en, this message translates to:
-  /// **'File browser placeholder'**
+  /// **'This folder is empty'**
   String get filesEmptyTitle;
 
   /// No description provided for @filesEmptyDesc.
   ///
   /// In en, this message translates to:
-  /// **'UI is ready. Connect file client APIs next.'**
+  /// **'Tap the button below to create a new file or folder.'**
   String get filesEmptyDesc;
 
   /// No description provided for @filesActionUpload.
@@ -589,6 +595,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New folder'**
   String get filesActionNewFolder;
+
+  /// No description provided for @filesActionNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get filesActionNew;
+
+  /// No description provided for @filesActionOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get filesActionOpen;
+
+  /// No description provided for @filesActionRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get filesActionRename;
+
+  /// No description provided for @filesActionCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get filesActionCopy;
+
+  /// No description provided for @filesActionMove.
+  ///
+  /// In en, this message translates to:
+  /// **'Move'**
+  String get filesActionMove;
+
+  /// No description provided for @filesActionExtract.
+  ///
+  /// In en, this message translates to:
+  /// **'Extract'**
+  String get filesActionExtract;
+
+  /// No description provided for @filesActionCompress.
+  ///
+  /// In en, this message translates to:
+  /// **'Compress'**
+  String get filesActionCompress;
+
+  /// No description provided for @filesActionDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get filesActionDelete;
+
+  /// No description provided for @filesActionSelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get filesActionSelectAll;
+
+  /// No description provided for @filesActionDeselect.
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect'**
+  String get filesActionDeselect;
+
+  /// No description provided for @filesActionSort.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get filesActionSort;
+
+  /// No description provided for @filesActionSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get filesActionSearch;
+
+  /// No description provided for @filesNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get filesNameLabel;
+
+  /// No description provided for @filesNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter name'**
+  String get filesNameHint;
+
+  /// No description provided for @filesTargetPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Target path'**
+  String get filesTargetPath;
+
+  /// No description provided for @filesTypeDirectory.
+  ///
+  /// In en, this message translates to:
+  /// **'Directory'**
+  String get filesTypeDirectory;
+
+  /// No description provided for @filesSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'selected'**
+  String get filesSelected;
+
+  /// No description provided for @filesDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete files'**
+  String get filesDeleteTitle;
+
+  /// No description provided for @filesDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} selected items?'**
+  String filesDeleteConfirm(int count);
+
+  /// No description provided for @filesSortByName.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by name'**
+  String get filesSortByName;
+
+  /// No description provided for @filesSortBySize.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by size'**
+  String get filesSortBySize;
+
+  /// No description provided for @filesSortByDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by date'**
+  String get filesSortByDate;
+
+  /// No description provided for @filesSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search files'**
+  String get filesSearchHint;
+
+  /// No description provided for @filesSearchClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get filesSearchClear;
+
+  /// No description provided for @filesRecycleBin.
+  ///
+  /// In en, this message translates to:
+  /// **'Recycle bin'**
+  String get filesRecycleBin;
+
+  /// No description provided for @filesCopyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy failed'**
+  String get filesCopyFailed;
+
+  /// No description provided for @filesMoveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Move failed'**
+  String get filesMoveFailed;
+
+  /// No description provided for @filesRenameFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename failed'**
+  String get filesRenameFailed;
+
+  /// No description provided for @filesDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete failed'**
+  String get filesDeleteFailed;
+
+  /// No description provided for @filesCompressFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Compress failed'**
+  String get filesCompressFailed;
+
+  /// No description provided for @filesExtractFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Extract failed'**
+  String get filesExtractFailed;
+
+  /// No description provided for @filesCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Create failed'**
+  String get filesCreateFailed;
+
+  /// No description provided for @filesOperationSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation successful'**
+  String get filesOperationSuccess;
+
+  /// No description provided for @filesCompressType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get filesCompressType;
+
+  /// No description provided for @filesUploadDeveloping.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload feature is under development'**
+  String get filesUploadDeveloping;
+
+  /// No description provided for @commonCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get commonCreate;
+
+  /// No description provided for @commonSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get commonSearch;
 
   /// No description provided for @securityPageTitle.
   ///

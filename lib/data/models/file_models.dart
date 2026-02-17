@@ -9,6 +9,10 @@ class FileSearch extends Equatable {
   final bool? expand;
   final String? sortBy;
   final String? sortOrder;
+  final bool? containSub;
+  final bool? dir;
+  final bool? showHidden;
+  final bool? isDetail;
 
   const FileSearch({
     required this.path,
@@ -18,6 +22,10 @@ class FileSearch extends Equatable {
     this.expand,
     this.sortBy,
     this.sortOrder,
+    this.containSub,
+    this.dir,
+    this.showHidden,
+    this.isDetail,
   });
 
   factory FileSearch.fromJson(Map<String, dynamic> json) {
@@ -29,18 +37,26 @@ class FileSearch extends Equatable {
       expand: json['expand'] as bool?,
       sortBy: json['sortBy'] as String?,
       sortOrder: json['sortOrder'] as String?,
+      containSub: json['containSub'] as bool?,
+      dir: json['dir'] as bool?,
+      showHidden: json['showHidden'] as bool?,
+      isDetail: json['isDetail'] as bool?,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'path': path,
-      'search': search,
+      if (search != null) 'search': search,
       'page': page,
       'pageSize': pageSize,
-      'expand': expand,
-      'sortBy': sortBy,
-      'sortOrder': sortOrder,
+      if (expand != null) 'expand': expand,
+      if (sortBy != null) 'sortBy': sortBy,
+      if (sortOrder != null) 'sortOrder': sortOrder,
+      if (containSub != null) 'containSub': containSub,
+      if (dir != null) 'dir': dir,
+      if (showHidden != null) 'showHidden': showHidden,
+      if (isDetail != null) 'isDetail': isDetail,
     };
   }
 
@@ -53,6 +69,10 @@ class FileSearch extends Equatable {
         expand,
         sortBy,
         sortOrder,
+        containSub,
+        dir,
+        showHidden,
+        isDetail,
       ];
 }
 
@@ -72,7 +92,7 @@ class FileSearchResponse extends Equatable {
               ?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>))
               .toList() ??
           [];
-      final total = dataField['total'];
+      final total = dataField['itemTotal'] ?? dataField['total'];
       return FileSearchResponse(
         items: items,
         total: total is num ? total.toInt() : items.length,
@@ -86,7 +106,7 @@ class FileSearchResponse extends Equatable {
       final items = (json['items'] as List)
           .map((item) => FileInfo.fromJson(item as Map<String, dynamic>))
           .toList();
-      final total = json['total'];
+      final total = json['itemTotal'] ?? json['total'];
       return FileSearchResponse(
         items: items,
         total: total is num ? total.toInt() : items.length,
@@ -98,7 +118,7 @@ class FileSearchResponse extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       'items': items.map((item) => item.toJson()).toList(),
-      'total': total,
+      'itemTotal': total,
     };
   }
 
@@ -122,6 +142,14 @@ class FileInfo extends Equatable {
   final bool isSymlink;
   final String? linkTarget;
   final List<FileInfo>? children;
+  final String? extension;
+  final bool isHidden;
+  final int? itemTotal;
+  final int? favoriteID;
+  final String? gid;
+  final bool isDetail;
+  final String? content;
+  final String? mode;
 
   const FileInfo({
     required this.name,
@@ -138,30 +166,51 @@ class FileInfo extends Equatable {
     this.isSymlink = false,
     this.linkTarget,
     this.children,
+    this.extension,
+    this.isHidden = false,
+    this.itemTotal,
+    this.favoriteID,
+    this.gid,
+    this.isDetail = false,
+    this.content,
+    this.mode,
   });
 
   factory FileInfo.fromJson(Map<String, dynamic> json) {
     return FileInfo(
-      name: json['name'] as String,
-      path: json['path'] as String,
-      type: json['type'] as String,
+      name: json['name'] as String? ?? '',
+      path: json['path'] as String? ?? '',
+      type: json['type'] as String? ?? 'file',
       size: json['size'] as int? ?? 0,
-      permission: json['permission'] as String?,
+      permission: json['mode'] as String? ?? json['permission'] as String?,
       user: json['user'] as String?,
       group: json['group'] as String?,
-      modifiedAt: json['modifiedAt'] != null
-          ? DateTime.parse(json['modifiedAt'] as String)
-          : null,
+      modifiedAt: json['modTime'] != null
+          ? DateTime.tryParse(json['modTime'] as String)
+          : (json['modifiedAt'] != null
+              ? DateTime.tryParse(json['modifiedAt'] as String)
+              : null),
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
+          ? DateTime.tryParse(json['createdAt'] as String)
           : null,
       mimeType: json['mimeType'] as String?,
       isDir: json['isDir'] as bool? ?? false,
       isSymlink: json['isSymlink'] as bool? ?? false,
-      linkTarget: json['linkTarget'] as String?,
-      children: (json['children'] as List?)
-          ?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>))
-          .toList(),
+      linkTarget: json['linkPath'] as String? ?? json['linkTarget'] as String?,
+      children: (json['items'] as List?)
+              ?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          (json['children'] as List?)
+              ?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>))
+              .toList(),
+      extension: json['extension'] as String?,
+      isHidden: json['isHidden'] as bool? ?? false,
+      itemTotal: json['itemTotal'] as int?,
+      favoriteID: json['favoriteID'] as int?,
+      gid: json['gid'] as String?,
+      isDetail: json['isDetail'] as bool? ?? false,
+      content: json['content'] as String?,
+      mode: json['mode'] as String?,
     );
   }
 
@@ -171,16 +220,23 @@ class FileInfo extends Equatable {
       'path': path,
       'type': type,
       'size': size,
-      'permission': permission,
+      'mode': permission ?? mode,
       'user': user,
       'group': group,
-      'modifiedAt': modifiedAt?.toIso8601String(),
+      'modTime': modifiedAt?.toIso8601String(),
       'createdAt': createdAt?.toIso8601String(),
       'mimeType': mimeType,
       'isDir': isDir,
       'isSymlink': isSymlink,
-      'linkTarget': linkTarget,
-      'children': children?.map((item) => item.toJson()).toList(),
+      'linkPath': linkTarget,
+      'items': children?.map((item) => item.toJson()).toList(),
+      'extension': extension,
+      'isHidden': isHidden,
+      'itemTotal': itemTotal,
+      'favoriteID': favoriteID,
+      'gid': gid,
+      'isDetail': isDetail,
+      'content': content,
     };
   }
 
@@ -200,6 +256,14 @@ class FileInfo extends Equatable {
         isSymlink,
         linkTarget,
         children,
+        extension,
+        isHidden,
+        itemTotal,
+        favoriteID,
+        gid,
+        isDetail,
+        content,
+        mode,
       ];
 }
 
@@ -666,7 +730,7 @@ class FileCheck extends Equatable {
 
 /// 文件检查结果模型
 class FileCheckResult extends Equatable {
-  final String path;
+  final String? path;
   final bool exists;
   final bool readable;
   final bool writable;
@@ -676,7 +740,7 @@ class FileCheckResult extends Equatable {
   final String? lastModified;
 
   const FileCheckResult({
-    required this.path,
+    this.path,
     required this.exists,
     required this.readable,
     required this.writable,
@@ -688,11 +752,11 @@ class FileCheckResult extends Equatable {
 
   factory FileCheckResult.fromJson(Map<String, dynamic> json) {
     return FileCheckResult(
-      path: json['path'] as String,
+      path: json['path'] as String?,
       exists: json['exists'] as bool? ?? false,
       readable: json['readable'] as bool? ?? false,
       writable: json['writable'] as bool? ?? false,
-      isDirectory: json['isDirectory'] as bool? ?? false,
+      isDirectory: json['isDir'] as bool? ?? json['isDirectory'] as bool? ?? false,
       isFile: json['isFile'] as bool? ?? false,
       size: json['size'] as int?,
       lastModified: json['lastModified'] as String?,
@@ -1194,14 +1258,14 @@ class FileSizeRequest extends Equatable {
 
 /// 文件大小信息模型
 class FileSizeInfo extends Equatable {
-  final String path;
+  final String? path;
   final int totalSize;
   final int fileCount;
   final int directoryCount;
   final Map<String, int>? sizeByType;
 
   const FileSizeInfo({
-    required this.path,
+    this.path,
     required this.totalSize,
     required this.fileCount,
     required this.directoryCount,
@@ -1210,10 +1274,10 @@ class FileSizeInfo extends Equatable {
 
   factory FileSizeInfo.fromJson(Map<String, dynamic> json) {
     return FileSizeInfo(
-      path: json['path'] as String,
-      totalSize: json['totalSize'] as int? ?? 0,
+      path: json['path'] as String?,
+      totalSize: json['totalSize'] as int? ?? json['size'] as int? ?? 0,
       fileCount: json['fileCount'] as int? ?? 0,
-      directoryCount: json['directoryCount'] as int? ?? 0,
+      directoryCount: json['directoryCount'] as int? ?? json['dirCount'] as int? ?? 0,
       sizeByType: (json['sizeByType'] as Map<String, dynamic>?)?.map(
         (key, value) => MapEntry(key, value as int),
       ),
@@ -1869,4 +1933,307 @@ class FileSearchMatch extends Equatable {
 
   @override
   List<Object?> get props => [filePath, lineNumber, columnNumber, line, match];
+}
+
+/// 文件转换请求模型
+class FileConvertRequest extends Equatable {
+  final String path;
+  final String fromEncoding;
+  final String toEncoding;
+
+  const FileConvertRequest({
+    required this.path,
+    required this.fromEncoding,
+    required this.toEncoding,
+  });
+
+  factory FileConvertRequest.fromJson(Map<String, dynamic> json) {
+    return FileConvertRequest(
+      path: json['path'] as String,
+      fromEncoding: json['fromEncoding'] as String,
+      toEncoding: json['toEncoding'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'path': path,
+      'fromEncoding': fromEncoding,
+      'toEncoding': toEncoding,
+    };
+  }
+
+  @override
+  List<Object?> get props => [path, fromEncoding, toEncoding];
+}
+
+/// 文件转换日志请求模型
+class FileConvertLogRequest extends Equatable {
+  final String path;
+
+  const FileConvertLogRequest({
+    required this.path,
+  });
+
+  factory FileConvertLogRequest.fromJson(Map<String, dynamic> json) {
+    return FileConvertLogRequest(
+      path: json['path'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'path': path,
+    };
+  }
+
+  @override
+  List<Object?> get props => [path];
+}
+
+/// 多文件大小请求模型
+class FileDepthSizeRequest extends Equatable {
+  final List<String> paths;
+
+  const FileDepthSizeRequest({
+    required this.paths,
+  });
+
+  factory FileDepthSizeRequest.fromJson(Map<String, dynamic> json) {
+    return FileDepthSizeRequest(
+      paths: (json['paths'] as List?)?.cast<String>() ?? [],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'paths': paths,
+    };
+  }
+
+  @override
+  List<Object?> get props => [paths];
+}
+
+/// 多文件大小响应模型
+class FileDepthSizeInfo extends Equatable {
+  final Map<String, int> sizes;
+  final int totalSize;
+
+  const FileDepthSizeInfo({
+    required this.sizes,
+    required this.totalSize,
+  });
+
+  factory FileDepthSizeInfo.fromJson(Map<String, dynamic> json) {
+    final sizesMap = <String, int>{};
+    if (json['sizes'] is Map) {
+      (json['sizes'] as Map).forEach((key, value) {
+        sizesMap[key.toString()] = (value is int) ? value : int.tryParse(value.toString()) ?? 0;
+      });
+    }
+    return FileDepthSizeInfo(
+      sizes: sizesMap,
+      totalSize: json['totalSize'] as int? ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sizes': sizes,
+      'totalSize': totalSize,
+    };
+  }
+
+  @override
+  List<Object?> get props => [sizes, totalSize];
+}
+
+/// 文件预览请求模型
+class FilePreviewRequest extends Equatable {
+  final String path;
+  final int? line;
+  final int? limit;
+
+  const FilePreviewRequest({
+    required this.path,
+    this.line,
+    this.limit,
+  });
+
+  factory FilePreviewRequest.fromJson(Map<String, dynamic> json) {
+    return FilePreviewRequest(
+      path: json['path'] as String,
+      line: json['line'] as int?,
+      limit: json['limit'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'path': path,
+      if (line != null) 'line': line,
+      if (limit != null) 'limit': limit,
+    };
+  }
+
+  @override
+  List<Object?> get props => [path, line, limit];
+}
+
+/// 用户和组信息模型
+class FileUserGroup extends Equatable {
+  final String user;
+  final String group;
+
+  const FileUserGroup({
+    required this.user,
+    required this.group,
+  });
+
+  factory FileUserGroup.fromJson(Map<String, dynamic> json) {
+    return FileUserGroup(
+      user: json['user'] as String? ?? '',
+      group: json['group'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'user': user,
+      'group': group,
+    };
+  }
+
+  @override
+  List<Object?> get props => [user, group];
+}
+
+/// 系统用户和组响应模型
+class FileUserGroupResponse extends Equatable {
+  final List<FileUserGroup> users;
+  final List<String> groups;
+
+  const FileUserGroupResponse({
+    required this.users,
+    required this.groups,
+  });
+
+  factory FileUserGroupResponse.fromJson(Map<String, dynamic> json) {
+    return FileUserGroupResponse(
+      users: (json['users'] as List?)
+              ?.map((item) => FileUserGroup.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [],
+      groups: (json['groups'] as List?)?.cast<String>() ?? [],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'users': users.map((item) => item.toJson()).toList(),
+      'groups': groups,
+    };
+  }
+
+  @override
+  List<Object?> get props => [users, groups];
+}
+
+/// 批量检查文件请求模型
+class FileBatchCheckRequest extends Equatable {
+  final List<String> paths;
+
+  const FileBatchCheckRequest({
+    required this.paths,
+  });
+
+  factory FileBatchCheckRequest.fromJson(Map<String, dynamic> json) {
+    return FileBatchCheckRequest(
+      paths: (json['paths'] as List?)?.cast<String>() ?? [],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'paths': paths,
+    };
+  }
+
+  @override
+  List<Object?> get props => [paths];
+}
+
+/// 批量检查文件结果模型
+class FileBatchCheckResult extends Equatable {
+  final Map<String, FileCheckResult> results;
+
+  const FileBatchCheckResult({
+    required this.results,
+  });
+
+  factory FileBatchCheckResult.fromJson(Map<String, dynamic> json) {
+    final resultsMap = <String, FileCheckResult>{};
+    if (json['results'] is Map) {
+      (json['results'] as Map).forEach((key, value) {
+        if (value is Map<String, dynamic>) {
+          resultsMap[key.toString()] = FileCheckResult.fromJson(value);
+        }
+      });
+    }
+    return FileBatchCheckResult(results: resultsMap);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'results': results.map((key, value) => MapEntry(key, value.toJson())),
+    };
+  }
+
+  @override
+  List<Object?> get props => [results];
+}
+
+/// 系统挂载信息模型
+class FileMountInfo extends Equatable {
+  final String device;
+  final String mountPoint;
+  final String fsType;
+  final int total;
+  final int used;
+  final int available;
+
+  const FileMountInfo({
+    required this.device,
+    required this.mountPoint,
+    required this.fsType,
+    required this.total,
+    required this.used,
+    required this.available,
+  });
+
+  factory FileMountInfo.fromJson(Map<String, dynamic> json) {
+    return FileMountInfo(
+      device: json['device'] as String? ?? '',
+      mountPoint: json['mountPoint'] as String? ?? '',
+      fsType: json['fsType'] as String? ?? '',
+      total: json['total'] as int? ?? 0,
+      used: json['used'] as int? ?? 0,
+      available: json['available'] as int? ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'device': device,
+      'mountPoint': mountPoint,
+      'fsType': fsType,
+      'total': total,
+      'used': used,
+      'available': available,
+    };
+  }
+
+  @override
+  List<Object?> get props => [device, mountPoint, fsType, total, used, available];
 }

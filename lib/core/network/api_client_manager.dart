@@ -5,6 +5,7 @@ import '../../api/v2/auth_v2.dart';
 import '../../api/v2/container_v2.dart';
 import '../../api/v2/dashboard_v2.dart';
 import '../../api/v2/database_v2.dart';
+import '../../api/v2/file_v2.dart';
 import '../../api/v2/firewall_v2.dart';
 import '../../api/v2/host_v2.dart';
 import '../../api/v2/logs_v2.dart';
@@ -123,6 +124,11 @@ class ApiClientManager {
   Future<AuthV2Api> getAuthApi() async {
     final client = await getCurrentClient();
     return AuthV2Api(client);
+  }
+
+  Future<FileV2Api> getFileApi() async {
+    final client = await getCurrentClient();
+    return FileV2Api(client);
   }
 
   /// 移除指定服务器的API客户端

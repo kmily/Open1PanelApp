@@ -45,16 +45,22 @@ class FileV2Api {
     );
   }
 
-  /// 创建目录
+  /// 创建文件或目录
   ///
-  /// 创建一个新的目录
+  /// 创建一个新的文件或目录
   /// @param request 文件创建请求
   /// @return 创建结果
-  Future<Response> createDirectory(FileCreate request) async {
+  Future<Response> createFile(FileCreate request) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/files/directory'),
+      ApiConstants.buildApiPath('/files'),
       data: request.toJson(),
     );
+  }
+
+  /// 创建目录 (兼容旧方法)
+  @Deprecated('Use createFile instead')
+  Future<Response> createDirectory(FileCreate request) async {
+    return createFile(request);
   }
 
   /// 删除文件或目录
@@ -93,18 +99,6 @@ class FileV2Api {
     );
   }
 
-  /// 复制文件或目录
-  ///
-  /// 复制指定的文件或目录
-  /// @param request 文件复制请求
-  /// @return 复制结果
-  Future<Response> copyFiles(FileCopy request) async {
-    return await _client.post(
-      ApiConstants.buildApiPath('/files/copy'),
-      data: request.toJson(),
-    );
-  }
-
   /// 上传文件
   ///
   /// 上传文件到指定目录
@@ -124,10 +118,19 @@ class FileV2Api {
 
   /// 下载文件
   ///
-  /// 下载指定的文件
-  /// @param request 文件下载请求
+  /// 下载指定的文件 (GET 方法)
+  /// @param path 文件路径
   /// @return 文件内容
-  Future<Response> downloadFile(FileDownload request) async {
+  Future<Response> downloadFile(String path) async {
+    return await _client.get(
+      ApiConstants.buildApiPath('/files/download'),
+      queryParameters: {'path': path},
+    );
+  }
+
+  /// 下载文件 (POST 方法，兼容旧版本)
+  @Deprecated('Use downloadFile with path parameter instead')
+  Future<Response> downloadFileWithRequest(FileDownload request) async {
     return await _client.post(
       ApiConstants.buildApiPath('/files/download'),
       data: request.toJson(),
@@ -184,11 +187,17 @@ class FileV2Api {
   /// 解压指定的压缩文件
   /// @param request 文件解压请求
   /// @return 解压结果
-  Future<Response> extractFile(FileExtract request) async {
+  Future<Response> decompressFile(FileExtract request) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/files/extract'),
+      ApiConstants.buildApiPath('/files/decompress'),
       data: request.toJson(),
     );
+  }
+
+  /// 解压文件 (兼容旧方法名)
+  @Deprecated('Use decompressFile instead')
+  Future<Response> extractFile(FileExtract request) async {
+    return decompressFile(request);
   }
 
   /// 获取文件权限
@@ -336,14 +345,15 @@ class FileV2Api {
       ApiConstants.buildApiPath('/files/favorite/search'),
       data: request.toJson(),
     );
-    // 处理API返回可能是Map或List的情况
     final data = response.data;
     List<FileInfo> files = [];
     if (data is List) {
       files = data.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList();
     } else if (data is Map<String, dynamic>) {
-      final items = data['items'] as List? ?? data['data'] as List?;
-      files = items?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList() ?? [];
+      final itemsRaw = data['items'] ?? data['data'] ?? data['files'];
+      if (itemsRaw is List) {
+        files = itemsRaw.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList();
+      }
     }
     return Response(
       data: files,
@@ -433,14 +443,15 @@ class FileV2Api {
       ApiConstants.buildApiPath('/files/recycle/search'),
       data: request.toJson(),
     );
-    // 处理API返回可能是Map或List的情况
     final data = response.data;
     List<FileInfo> files = [];
     if (data is List) {
       files = data.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList();
     } else if (data is Map<String, dynamic>) {
-      final items = data['items'] as List? ?? data['data'] as List?;
-      files = items?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList() ?? [];
+      final itemsRaw = data['items'] ?? data['data'] ?? data['files'];
+      if (itemsRaw is List) {
+        files = itemsRaw.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList();
+      }
     }
     return Response(
       data: files,
@@ -643,6 +654,130 @@ class FileV2Api {
     );
     return Response(
       data: FileSearchResult.fromJson(response.data as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 转换文件
+  ///
+  /// 转换文件编码
+  /// @param request 转换请求
+  /// @return 转换结果
+  Future<Response> convertFile(FileConvertRequest request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/files/convert'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 转换文件日志
+  ///
+  /// 获取文件转换日志
+  /// @param request 转换日志请求
+  /// @return 转换日志
+  Future<Response<String>> convertFileLog(FileConvertLogRequest request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/files/convert/log'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: response.data?.toString() ?? '',
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 获取多文件大小
+  ///
+  /// 获取多个文件或目录的大小
+  /// @param request 多文件大小请求
+  /// @return 多文件大小信息
+  Future<Response<FileDepthSizeInfo>> getDepthSize(FileDepthSizeRequest request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/files/depth/size'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: FileDepthSizeInfo.fromJson(response.data as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 获取系统挂载信息
+  ///
+  /// 获取系统磁盘挂载信息
+  /// @return 挂载信息列表
+  Future<Response<List<FileMountInfo>>> getMountInfo() async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/files/mount'),
+    );
+    final data = response.data;
+    List<FileMountInfo> mounts = [];
+    if (data is List) {
+      mounts = data.map((item) => FileMountInfo.fromJson(item as Map<String, dynamic>)).toList();
+    } else if (data is Map<String, dynamic>) {
+      final items = data['items'] as List? ?? data['data'] as List?;
+      mounts = items?.map((item) => FileMountInfo.fromJson(item as Map<String, dynamic>)).toList() ?? [];
+    }
+    return Response(
+      data: mounts,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 预览文件
+  ///
+  /// 预览文件内容
+  /// @param request 预览请求
+  /// @return 文件预览内容
+  Future<Response<String>> previewFile(FilePreviewRequest request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/files/preview'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: response.data?.toString() ?? '',
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 获取系统用户和组
+  ///
+  /// 获取系统用户和组列表
+  /// @return 用户和组信息
+  Future<Response<FileUserGroupResponse>> getUserGroup() async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/files/user/group'),
+    );
+    return Response(
+      data: FileUserGroupResponse.fromJson(response.data as Map<String, dynamic>),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+      requestOptions: response.requestOptions,
+    );
+  }
+
+  /// 批量检查文件
+  ///
+  /// 批量检查文件是否存在
+  /// @param request 批量检查请求
+  /// @return 批量检查结果
+  Future<Response<FileBatchCheckResult>> batchCheckFiles(FileBatchCheckRequest request) async {
+    final response = await _client.post(
+      ApiConstants.buildApiPath('/files/batch/check'),
+      data: request.toJson(),
+    );
+    return Response(
+      data: FileBatchCheckResult.fromJson(response.data as Map<String, dynamic>),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,

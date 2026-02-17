@@ -244,10 +244,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filesRoot => 'Root';
 
   @override
-  String get filesEmptyTitle => 'File browser placeholder';
+  String get filesNavigateUp => 'Back to parent';
 
   @override
-  String get filesEmptyDesc => 'UI is ready. Connect file client APIs next.';
+  String get filesEmptyTitle => 'This folder is empty';
+
+  @override
+  String get filesEmptyDesc =>
+      'Tap the button below to create a new file or folder.';
 
   @override
   String get filesActionUpload => 'Upload';
@@ -257,6 +261,119 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filesActionNewFolder => 'New folder';
+
+  @override
+  String get filesActionNew => 'New';
+
+  @override
+  String get filesActionOpen => 'Open';
+
+  @override
+  String get filesActionRename => 'Rename';
+
+  @override
+  String get filesActionCopy => 'Copy';
+
+  @override
+  String get filesActionMove => 'Move';
+
+  @override
+  String get filesActionExtract => 'Extract';
+
+  @override
+  String get filesActionCompress => 'Compress';
+
+  @override
+  String get filesActionDelete => 'Delete';
+
+  @override
+  String get filesActionSelectAll => 'Select all';
+
+  @override
+  String get filesActionDeselect => 'Deselect';
+
+  @override
+  String get filesActionSort => 'Sort';
+
+  @override
+  String get filesActionSearch => 'Search';
+
+  @override
+  String get filesNameLabel => 'Name';
+
+  @override
+  String get filesNameHint => 'Enter name';
+
+  @override
+  String get filesTargetPath => 'Target path';
+
+  @override
+  String get filesTypeDirectory => 'Directory';
+
+  @override
+  String get filesSelected => 'selected';
+
+  @override
+  String get filesDeleteTitle => 'Delete files';
+
+  @override
+  String filesDeleteConfirm(int count) {
+    return 'Delete $count selected items?';
+  }
+
+  @override
+  String get filesSortByName => 'Sort by name';
+
+  @override
+  String get filesSortBySize => 'Sort by size';
+
+  @override
+  String get filesSortByDate => 'Sort by date';
+
+  @override
+  String get filesSearchHint => 'Search files';
+
+  @override
+  String get filesSearchClear => 'Clear';
+
+  @override
+  String get filesRecycleBin => 'Recycle bin';
+
+  @override
+  String get filesCopyFailed => 'Copy failed';
+
+  @override
+  String get filesMoveFailed => 'Move failed';
+
+  @override
+  String get filesRenameFailed => 'Rename failed';
+
+  @override
+  String get filesDeleteFailed => 'Delete failed';
+
+  @override
+  String get filesCompressFailed => 'Compress failed';
+
+  @override
+  String get filesExtractFailed => 'Extract failed';
+
+  @override
+  String get filesCreateFailed => 'Create failed';
+
+  @override
+  String get filesOperationSuccess => 'Operation successful';
+
+  @override
+  String get filesCompressType => 'Type';
+
+  @override
+  String get filesUploadDeveloping => 'Upload feature is under development';
+
+  @override
+  String get commonCreate => 'Create';
+
+  @override
+  String get commonSearch => 'Search';
 
   @override
   String get securityPageTitle => 'Dynamic Verification';
