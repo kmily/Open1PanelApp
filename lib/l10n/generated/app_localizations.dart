@@ -698,6 +698,30 @@ abstract class AppLocalizations {
   /// **'selected'**
   String get filesSelected;
 
+  /// No description provided for @filesSelectPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Path'**
+  String get filesSelectPath;
+
+  /// No description provided for @filesCurrentFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Folder'**
+  String get filesCurrentFolder;
+
+  /// No description provided for @filesNoSubfolders.
+  ///
+  /// In en, this message translates to:
+  /// **'No subfolders'**
+  String get filesNoSubfolders;
+
+  /// No description provided for @filesPathSelectorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Target Path'**
+  String get filesPathSelectorTitle;
+
   /// No description provided for @filesDeleteTitle.
   ///
   /// In en, this message translates to:

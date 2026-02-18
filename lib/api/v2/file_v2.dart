@@ -63,12 +63,24 @@ class FileV2Api {
     return createFile(request);
   }
 
-  /// 删除文件或目录
+  /// 删除文件或目录（单个）
   ///
   /// 删除指定的文件或目录
-  /// @param request 文件操作请求
+  /// @param request 文件删除请求
   /// @return 删除结果
-  Future<Response> deleteFiles(FileOperate request) async {
+  Future<Response> deleteFile(FileDelete request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/files/del'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 批量删除文件或目录
+  ///
+  /// 批量删除指定的文件或目录
+  /// @param request 批量删除请求
+  /// @return 删除结果
+  Future<Response> deleteFiles(FileBatchDelete request) async {
     return await _client.post(
       ApiConstants.buildApiPath('/files/del'),
       data: request.toJson(),

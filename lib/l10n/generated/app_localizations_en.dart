@@ -314,6 +314,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filesSelected => 'selected';
 
   @override
+  String get filesSelectPath => 'Select Path';
+
+  @override
+  String get filesCurrentFolder => 'Current Folder';
+
+  @override
+  String get filesNoSubfolders => 'No subfolders';
+
+  @override
+  String get filesPathSelectorTitle => 'Select Target Path';
+
+  @override
   String get filesDeleteTitle => 'Delete files';
 
   @override

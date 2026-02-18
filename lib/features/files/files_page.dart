@@ -4,8 +4,10 @@ import 'package:onepanelapp_app/core/theme/app_design_tokens.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/data/models/file_models.dart';
 import 'package:onepanelapp_app/features/files/files_provider.dart';
+import 'package:onepanelapp_app/features/files/files_service.dart';
 import 'package:onepanelapp_app/core/utils/debug_error_dialog.dart';
 import 'package:onepanelapp_app/core/config/api_config.dart';
+import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
 
 class FilesPage extends StatelessWidget {
   const FilesPage({super.key});
@@ -602,6 +604,7 @@ class _FilesViewState extends State<FilesView> {
   }
 
   void _showCreateDirectoryDialog(BuildContext context) {
+    appLogger.dWithPackage('files_page', '_showCreateDirectoryDialog: 打开创建文件夹对话框');
     final controller = TextEditingController();
     final provider = context.read<FilesProvider>();
     showDialog(
@@ -624,10 +627,13 @@ class _FilesViewState extends State<FilesView> {
           FilledButton(
             onPressed: () async {
               if (controller.text.isEmpty) return;
+              appLogger.dWithPackage('files_page', '_showCreateDirectoryDialog: 用户输入名称=${controller.text}');
               Navigator.pop(dialogContext);
               try {
                 await provider.createDirectory(controller.text);
+                appLogger.iWithPackage('files_page', '_showCreateDirectoryDialog: 创建成功');
               } catch (e, stackTrace) {
+                appLogger.eWithPackage('files_page', '_showCreateDirectoryDialog: 创建失败', error: e, stackTrace: stackTrace);
                 if (context.mounted) {
                   DebugErrorDialog.show(context, context.l10n.filesCreateFailed, e, stackTrace: stackTrace);
                 }
@@ -641,6 +647,7 @@ class _FilesViewState extends State<FilesView> {
   }
 
   void _showCreateFileDialog(BuildContext context) {
+    appLogger.dWithPackage('files_page', '_showCreateFileDialog: 打开创建文件对话框');
     final controller = TextEditingController();
     final provider = context.read<FilesProvider>();
     showDialog(
@@ -663,10 +670,13 @@ class _FilesViewState extends State<FilesView> {
           FilledButton(
             onPressed: () async {
               if (controller.text.isEmpty) return;
+              appLogger.dWithPackage('files_page', '_showCreateFileDialog: 用户输入名称=${controller.text}');
               Navigator.pop(dialogContext);
               try {
                 await provider.createFile(controller.text);
+                appLogger.iWithPackage('files_page', '_showCreateFileDialog: 创建成功');
               } catch (e, stackTrace) {
+                appLogger.eWithPackage('files_page', '_showCreateFileDialog: 创建失败', error: e, stackTrace: stackTrace);
                 if (context.mounted) {
                   DebugErrorDialog.show(context, context.l10n.filesCreateFailed, e, stackTrace: stackTrace);
                 }
@@ -680,6 +690,7 @@ class _FilesViewState extends State<FilesView> {
   }
 
   void _showRenameDialog(BuildContext context, FilesProvider provider, FileInfo file, AppLocalizations l10n) {
+    appLogger.dWithPackage('files_page', '_showRenameDialog: 打开重命名对话框, file=${file.path}');
     final controller = TextEditingController(text: file.name);
     showDialog(
       context: context,
@@ -700,10 +711,13 @@ class _FilesViewState extends State<FilesView> {
           FilledButton(
             onPressed: () async {
               if (controller.text.isEmpty || controller.text == file.name) return;
+              appLogger.dWithPackage('files_page', '_showRenameDialog: 用户输入新名称=${controller.text}');
               Navigator.pop(dialogContext);
               try {
                 await provider.renameFile(file.path, controller.text);
+                appLogger.iWithPackage('files_page', '_showRenameDialog: 重命名成功');
               } catch (e, stackTrace) {
+                appLogger.eWithPackage('files_page', '_showRenameDialog: 重命名失败', error: e, stackTrace: stackTrace);
                 if (context.mounted) {
                   DebugErrorDialog.show(context, l10n.filesRenameFailed, e, stackTrace: stackTrace);
                 }
@@ -717,6 +731,7 @@ class _FilesViewState extends State<FilesView> {
   }
 
   void _showMoveDialog(BuildContext context, FilesProvider provider, FileInfo file, AppLocalizations l10n) {
+    appLogger.dWithPackage('files_page', '_showMoveDialog: 打开移动对话框, file=${file.path}');
     final controller = TextEditingController(text: provider.data.currentPath);
     showDialog(
       context: context,
@@ -736,6 +751,16 @@ class _FilesViewState extends State<FilesView> {
               decoration: InputDecoration(
                 labelText: l10n.filesTargetPath,
                 prefixIcon: const Icon(Icons.folder_outlined),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.folder_open),
+                  onPressed: () async {
+                    final selectedPath = await _showPathSelectorDialog(context, provider, controller.text, l10n);
+                    if (selectedPath != null) {
+                      controller.text = selectedPath;
+                    }
+                  },
+                  tooltip: l10n.filesSelectPath,
+                ),
               ),
             ),
           ],
@@ -747,10 +772,13 @@ class _FilesViewState extends State<FilesView> {
           ),
           FilledButton(
             onPressed: () async {
+              appLogger.dWithPackage('files_page', '_showMoveDialog: 用户选择目标路径=${controller.text}');
               Navigator.pop(dialogContext);
               try {
                 await provider.moveFile(file.path, controller.text);
+                appLogger.iWithPackage('files_page', '_showMoveDialog: 移动成功');
               } catch (e, stackTrace) {
+                appLogger.eWithPackage('files_page', '_showMoveDialog: 移动失败', error: e, stackTrace: stackTrace);
                 if (context.mounted) {
                   DebugErrorDialog.show(context, l10n.filesMoveFailed, e, stackTrace: stackTrace);
                 }
@@ -763,8 +791,104 @@ class _FilesViewState extends State<FilesView> {
     );
   }
 
+  Future<String?> _showPathSelectorDialog(BuildContext context, FilesProvider provider, String currentPath, AppLocalizations l10n) async {
+    String selectedPath = currentPath;
+    
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            title: Text(l10n.filesPathSelectorTitle),
+            content: SizedBox(
+              width: 300,
+              height: 400,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.folder),
+                    title: Text(l10n.filesCurrentFolder),
+                    subtitle: Text(selectedPath, style: Theme.of(context).textTheme.bodySmall),
+                    onTap: () {
+                      Navigator.pop(dialogContext, selectedPath);
+                    },
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: FutureBuilder<List<FileInfo>>(
+                      future: _loadSubfolders(selectedPath),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final folders = snapshot.data ?? [];
+                        if (folders.isEmpty) {
+                          return Center(child: Text(l10n.filesNoSubfolders));
+                        }
+                        return ListView.builder(
+                          itemCount: folders.length,
+                          itemBuilder: (context, index) {
+                            final folder = folders[index];
+                            return ListTile(
+                              leading: const Icon(Icons.folder_outlined),
+                              title: Text(folder.name),
+                              onTap: () {
+                                setDialogState(() {
+                                  selectedPath = folder.path;
+                                });
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(l10n.commonCancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, selectedPath),
+                child: Text(l10n.commonConfirm),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Future<List<FileInfo>> _loadSubfolders(String path) async {
+    try {
+      final service = FilesService();
+      final files = await service.getFiles(path: path);
+      return files.where((f) => f.isDir).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
   void _showExtractDialog(BuildContext context, FilesProvider provider, FileInfo file, AppLocalizations l10n) {
+    appLogger.dWithPackage('files_page', '_showExtractDialog: 打开解压对话框, file=${file.path}');
     final controller = TextEditingController(text: provider.data.currentPath);
+    
+    String getCompressType(String filename) {
+      if (filename.endsWith('.tar.gz')) return 'tar.gz';
+      if (filename.endsWith('.tar')) return 'tar';
+      if (filename.endsWith('.zip')) return 'zip';
+      if (filename.endsWith('.7z')) return '7z';
+      if (filename.endsWith('.gz')) return 'gz';
+      if (filename.endsWith('.bz2')) return 'bz2';
+      if (filename.endsWith('.xz')) return 'xz';
+      return 'zip';
+    }
+    
+    final type = getCompressType(file.name);
+    
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -783,10 +907,13 @@ class _FilesViewState extends State<FilesView> {
           ),
           FilledButton(
             onPressed: () async {
+              appLogger.dWithPackage('files_page', '_showExtractDialog: 用户选择目标路径=${controller.text}, type=$type');
               Navigator.pop(dialogContext);
               try {
-                await provider.extractFile(file.path, controller.text);
+                await provider.extractFile(file.path, controller.text, type);
+                appLogger.iWithPackage('files_page', '_showExtractDialog: 解压成功');
               } catch (e, stackTrace) {
+                appLogger.eWithPackage('files_page', '_showExtractDialog: 解压失败', error: e, stackTrace: stackTrace);
                 if (context.mounted) {
                   DebugErrorDialog.show(context, l10n.filesExtractFailed, e, stackTrace: stackTrace);
                 }
@@ -799,7 +926,8 @@ class _FilesViewState extends State<FilesView> {
     );
   }
 
-  void _showCompressDialog(BuildContext context, FilesProvider provider, List<String> paths, AppLocalizations l10n) {
+  void _showCompressDialog(BuildContext context, FilesProvider provider, List<String> files, AppLocalizations l10n) {
+    appLogger.dWithPackage('files_page', '_showCompressDialog: 打开压缩对话框, files=$files');
     final nameController = TextEditingController();
     String type = 'zip';
     showDialog(
@@ -840,11 +968,14 @@ class _FilesViewState extends State<FilesView> {
             FilledButton(
               onPressed: () async {
                 if (nameController.text.isEmpty) return;
+                final name = nameController.text;
+                appLogger.dWithPackage('files_page', '_showCompressDialog: 用户输入名称=$name, type=$type');
                 Navigator.pop(dialogContext);
-                final targetPath = '${provider.data.currentPath}/${nameController.text}.$type';
                 try {
-                  await provider.compressFiles(paths, targetPath, type);
+                  await provider.compressFiles(files, provider.data.currentPath, name, type);
+                  appLogger.iWithPackage('files_page', '_showCompressDialog: 压缩成功');
                 } catch (e, stackTrace) {
+                  appLogger.eWithPackage('files_page', '_showCompressDialog: 压缩失败', error: e, stackTrace: stackTrace);
                   if (context.mounted) {
                     DebugErrorDialog.show(context, l10n.filesCompressFailed, e, stackTrace: stackTrace);
                   }
@@ -859,6 +990,7 @@ class _FilesViewState extends State<FilesView> {
   }
 
   void _showDeleteConfirmDialog(BuildContext context, FilesProvider provider, AppLocalizations l10n) {
+    appLogger.dWithPackage('files_page', '_showDeleteConfirmDialog: 打开删除确认对话框, 选中${provider.data.selectionCount}个文件');
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -872,10 +1004,13 @@ class _FilesViewState extends State<FilesView> {
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
+              appLogger.dWithPackage('files_page', '_showDeleteConfirmDialog: 用户确认删除');
               Navigator.pop(dialogContext);
               try {
                 await provider.deleteSelected();
+                appLogger.iWithPackage('files_page', '_showDeleteConfirmDialog: 删除成功');
               } catch (e, stackTrace) {
+                appLogger.eWithPackage('files_page', '_showDeleteConfirmDialog: 删除失败', error: e, stackTrace: stackTrace);
                 if (context.mounted) {
                   DebugErrorDialog.show(context, l10n.filesDeleteFailed, e, stackTrace: stackTrace);
                 }

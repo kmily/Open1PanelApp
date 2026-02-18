@@ -1,76 +1,58 @@
-/// 日志级别枚举
-enum LogLevel {
-  trace(0),
-  debug(1),
-  info(2),
-  warning(3),
-  error(4),
-  fatal(5),
-  off(6);
-
-  final int value;
-  const LogLevel(this.value);
-}
-
-/// 构建模式枚举
-enum BuildMode {
-  debug,
-  profile,
-  release;
-
-  static BuildMode fromString(String mode) {
-    switch (mode.toLowerCase()) {
-      case 'debug':
-        return BuildMode.debug;
-      case 'profile':
-        return BuildMode.profile;
-      case 'release':
-        return BuildMode.release;
-      default:
-        return BuildMode.debug;
-    }
-  }
-}
+import 'dart:io' as io;
+import 'package:flutter/foundation.dart';
 
 /// 日志配置常量
 class LoggerConfig {
-  /// 根据构建模式获取日志级别
-  static LogLevel getLogLevelForBuildMode(BuildMode buildMode) {
-    switch (buildMode) {
-      case BuildMode.debug:
-        // Debug模式：输出所有级别的日志
-        return LogLevel.trace;
-      case BuildMode.profile:
-        // Profile模式：输出信息、警告和错误级别
-        return LogLevel.info;
-      case BuildMode.release:
-        // Release模式：只输出错误和警告级别
-        return LogLevel.warning;
-    }
+  LoggerConfig._();
+
+  /// 是否为桌面平台（有终端）
+  static bool get _isDesktopPlatform {
+    return !kIsWeb && (io.Platform.isLinux || io.Platform.isMacOS || io.Platform.isWindows);
   }
 
   /// 日志格式配置
-  static const bool enableColors = true;
+  static bool get enableColors {
+    if (kIsWeb) return false;
+    if (_isDesktopPlatform) {
+      try {
+        return io.stdout.supportsAnsiEscapes;
+      } catch (_) {
+        return false;
+      }
+    }
+    return false;
+  }
+
   static const bool enableEmojis = true;
-  static const bool enableTimeStamps = true;
   static const int maxMethodCount = 3;
   static const int maxErrorMethodCount = 8;
-  static const int lineLength = 120;
+
+  static int get lineLength {
+    if (kIsWeb) return 120;
+    if (_isDesktopPlatform) {
+      try {
+        final columns = io.stdout.terminalColumns;
+        return columns > 0 ? columns : 120;
+      } catch (_) {
+        return 120;
+      }
+    }
+    return 120;
+  }
 
   /// 日志输出配置
   static const bool enableConsoleOutput = true;
   static const bool enableFileOutput = false;
   static const String logFileName = 'app_logs.txt';
-  static const int maxLogFileSize = 10 * 1024 * 1024; // 10MB
+  static const int maxLogFileSize = 10 * 1024 * 1024;
   static const int maxLogFiles = 5;
 
   /// 日志过滤配置
   static const List<String> excludedLogTags = [
-    'MESA', // 过滤MESA图形相关日志
-    'exportSyncFdForQSRILocked', // 过滤特定图形系统日志
+    'MESA',
+    'exportSyncFdForQSRILocked',
   ];
 
-  /// 检查日志标签是否应该被过滤
   static bool shouldFilterLog(String message) {
     for (final tag in excludedLogTags) {
       if (message.contains(tag)) {

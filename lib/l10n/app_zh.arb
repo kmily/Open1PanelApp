@@ -108,6 +108,10 @@
   "filesTargetPath": "目标路径",
   "filesTypeDirectory": "目录",
   "filesSelected": "已选择",
+  "filesSelectPath": "选择路径",
+  "filesCurrentFolder": "当前文件夹",
+  "filesNoSubfolders": "没有子文件夹",
+  "filesPathSelectorTitle": "选择目标路径",
   "filesDeleteTitle": "删除文件",
   "filesDeleteConfirm": "确定删除选中的 {count} 个项目？",
   "@filesDeleteConfirm": {

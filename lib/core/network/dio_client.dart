@@ -6,6 +6,7 @@ import 'network_exceptions.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
 import 'interceptors/retry_interceptor.dart';
+import 'interceptors/business_response_interceptor.dart';
 
 /// 基于Dio的HTTP客户端 - 支持1Panel API认证
 class DioClient {
@@ -38,6 +39,7 @@ class DioClient {
   /// 添加拦截器
   void _addInterceptors() {
     _dio.interceptors.add(_authInterceptor);
+    _dio.interceptors.add(BusinessResponseInterceptor());
     _dio.interceptors.add(LoggingInterceptor(ApiConstants.isDebugMode));
     _dio.interceptors.add(RetryInterceptor());
   }

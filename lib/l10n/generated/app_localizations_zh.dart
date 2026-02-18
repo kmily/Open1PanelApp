@@ -311,6 +311,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get filesSelected => '已选择';
 
   @override
+  String get filesSelectPath => '选择路径';
+
+  @override
+  String get filesCurrentFolder => '当前文件夹';
+
+  @override
+  String get filesNoSubfolders => '没有子文件夹';
+
+  @override
+  String get filesPathSelectorTitle => '选择目标路径';
+
+  @override
   String get filesDeleteTitle => '删除文件';
 
   @override

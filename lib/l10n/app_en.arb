@@ -108,6 +108,10 @@
   "filesTargetPath": "Target path",
   "filesTypeDirectory": "Directory",
   "filesSelected": "selected",
+  "filesSelectPath": "Select Path",
+  "filesCurrentFolder": "Current Folder",
+  "filesNoSubfolders": "No subfolders",
+  "filesPathSelectorTitle": "Select Target Path",
   "filesDeleteTitle": "Delete files",
   "filesDeleteConfirm": "Delete {count} selected items?",
   "@filesDeleteConfirm": {

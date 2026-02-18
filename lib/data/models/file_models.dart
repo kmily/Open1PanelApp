@@ -267,7 +267,65 @@ class FileInfo extends Equatable {
       ];
 }
 
-/// 文件操作模型
+/// 文件删除模型（单个文件）
+class FileDelete extends Equatable {
+  final String path;
+  final bool? isDir;
+  final bool? forceDelete;
+
+  const FileDelete({
+    required this.path,
+    this.isDir,
+    this.forceDelete,
+  });
+
+  factory FileDelete.fromJson(Map<String, dynamic> json) {
+    return FileDelete(
+      path: json['path'] as String? ?? '',
+      isDir: json['isDir'] as bool?,
+      forceDelete: json['forceDelete'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final json = <String, dynamic>{'path': path};
+    if (isDir != null) json['isDir'] = isDir;
+    if (forceDelete != null) json['forceDelete'] = forceDelete;
+    return json;
+  }
+
+  @override
+  List<Object?> get props => [path, isDir, forceDelete];
+}
+
+/// 文件批量删除模型
+class FileBatchDelete extends Equatable {
+  final List<String> paths;
+  final bool? isDir;
+
+  const FileBatchDelete({
+    required this.paths,
+    this.isDir,
+  });
+
+  factory FileBatchDelete.fromJson(Map<String, dynamic> json) {
+    return FileBatchDelete(
+      paths: (json['paths'] as List?)?.cast<String>() ?? [],
+      isDir: json['isDir'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final json = <String, dynamic>{'paths': paths};
+    if (isDir != null) json['isDir'] = isDir;
+    return json;
+  }
+
+  @override
+  List<Object?> get props => [paths, isDir];
+}
+
+/// 文件操作模型（保留兼容性）
 class FileOperate extends Equatable {
   final List<String> paths;
   final bool? force;
@@ -285,10 +343,9 @@ class FileOperate extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'paths': paths,
-      'force': force,
-    };
+    final json = <String, dynamic>{'paths': paths};
+    if (force != null) json['force'] = force;
+    return json;
   }
 
   @override
@@ -307,15 +364,15 @@ class FileRename extends Equatable {
 
   factory FileRename.fromJson(Map<String, dynamic> json) {
     return FileRename(
-      oldPath: json['oldPath'] as String,
-      newPath: json['newPath'] as String,
+      oldPath: json['oldName'] as String? ?? json['oldPath'] as String? ?? '',
+      newPath: json['newName'] as String? ?? json['newPath'] as String? ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'oldPath': oldPath,
-      'newPath': newPath,
+      'oldName': oldPath,
+      'newName': newPath,
     };
   }
 
@@ -327,28 +384,33 @@ class FileRename extends Equatable {
 class FileMove extends Equatable {
   final List<String> paths;
   final String targetPath;
+  final String? type;
 
   const FileMove({
     required this.paths,
     required this.targetPath,
+    this.type,
   });
 
   factory FileMove.fromJson(Map<String, dynamic> json) {
     return FileMove(
-      paths: (json['paths'] as List?)?.cast<String>() ?? [],
-      targetPath: json['targetPath'] as String,
+      paths: (json['oldPaths'] as List?)?.cast<String>() ?? 
+             (json['paths'] as List?)?.cast<String>() ?? [],
+      targetPath: json['newPath'] as String? ?? json['targetPath'] as String? ?? '',
+      type: json['type'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'paths': paths,
-      'targetPath': targetPath,
+      'type': type ?? 'move',
+      'oldPaths': paths,
+      'newPath': targetPath,
     };
   }
 
   @override
-  List<Object?> get props => [paths, targetPath];
+  List<Object?> get props => [paths, targetPath, type];
 }
 
 /// 文件复制模型
@@ -469,70 +531,84 @@ class FileContent extends Equatable {
 
 /// 文件压缩模型
 class FileCompress extends Equatable {
-  final List<String> paths;
-  final String targetPath;
+  final List<String> files;
+  final String dst;
+  final String name;
   final String type;
-  final String? password;
+  final String? secret;
+  final bool? replace;
 
   const FileCompress({
-    required this.paths,
-    required this.targetPath,
+    required this.files,
+    required this.dst,
+    required this.name,
     required this.type,
-    this.password,
+    this.secret,
+    this.replace,
   });
 
   factory FileCompress.fromJson(Map<String, dynamic> json) {
     return FileCompress(
-      paths: (json['paths'] as List?)?.cast<String>() ?? [],
-      targetPath: json['targetPath'] as String,
-      type: json['type'] as String,
-      password: json['password'] as String?,
+      files: (json['files'] as List?)?.cast<String>() ?? [],
+      dst: json['dst'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      type: json['type'] as String? ?? 'zip',
+      secret: json['secret'] as String?,
+      replace: json['replace'] as bool?,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'paths': paths,
-      'targetPath': targetPath,
+    final json = <String, dynamic>{
+      'files': files,
+      'dst': dst,
+      'name': name,
       'type': type,
-      if (password != null) 'password': password,
     };
+    if (secret != null) json['secret'] = secret;
+    if (replace != null) json['replace'] = replace;
+    return json;
   }
 
   @override
-  List<Object?> get props => [paths, targetPath, type, password];
+  List<Object?> get props => [files, dst, name, type, secret, replace];
 }
 
 /// 文件解压模型
 class FileExtract extends Equatable {
   final String path;
-  final String targetPath;
-  final String? password;
+  final String dst;
+  final String type;
+  final String? secret;
 
   const FileExtract({
     required this.path,
-    required this.targetPath,
-    this.password,
+    required this.dst,
+    required this.type,
+    this.secret,
   });
 
   factory FileExtract.fromJson(Map<String, dynamic> json) {
     return FileExtract(
-      path: json['path'] as String,
-      targetPath: json['targetPath'] as String,
-      password: json['password'] as String?,
+      path: json['path'] as String? ?? '',
+      dst: json['dst'] as String? ?? '',
+      type: json['type'] as String? ?? '',
+      secret: json['secret'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    final json = <String, dynamic>{
       'path': path,
-      'targetPath': targetPath,
-      if (password != null) 'password': password,
+      'dst': dst,
+      'type': type,
     };
+    if (secret != null) json['secret'] = secret;
+    return json;
   }
 
   @override
-  List<Object?> get props => [path, targetPath, password];
+  List<Object?> get props => [path, dst, type, secret];
 }
 
 /// 文件权限模型

@@ -3,6 +3,7 @@ import 'files_service.dart';
 import '../../data/models/file_models.dart';
 import '../../core/config/api_config.dart';
 import '../../core/network/api_client_manager.dart';
+import '../../core/services/logger/logger_service.dart';
 
 class FilesData {
   final List<FileInfo> files;
@@ -87,13 +88,16 @@ class FilesProvider extends ChangeNotifier {
   }
 
   Future<void> loadServer() async {
+    appLogger.dWithPackage('files_provider', 'loadServer: 开始加载服务器配置');
     final server = await _service.getCurrentServer();
     _data = _data.copyWith(currentServer: server);
+    appLogger.iWithPackage('files_provider', 'loadServer: 服务器配置加载完成, serverId=${server?.id}');
     notifyListeners();
   }
 
   Future<void> loadFiles({String? path}) async {
     final targetPath = _normalizePath(path ?? _data.currentPath);
+    appLogger.dWithPackage('files_provider', 'loadFiles: 开始加载文件列表, path=$targetPath');
     _data = _data.copyWith(isLoading: true, error: null);
     notifyListeners();
 
@@ -115,7 +119,9 @@ class FilesProvider extends ChangeNotifier {
           pathHistory: [..._data.pathHistory, targetPath],
         );
       }
-    } catch (e) {
+      appLogger.iWithPackage('files_provider', 'loadFiles: 成功加载${files.length}个文件');
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'loadFiles: 加载失败', error: e, stackTrace: stackTrace);
       _data = _data.copyWith(
         isLoading: false,
         error: e.toString(),
@@ -130,7 +136,7 @@ class FilesProvider extends ChangeNotifier {
       _data = _data.copyWith(mountInfo: mounts);
       notifyListeners();
     } catch (e) {
-      debugPrint('Failed to load mount info: $e');
+      appLogger.eWithPackage('files_provider', 'loadMountInfo: 加载挂载信息失败', error: e);
     }
   }
 
@@ -141,11 +147,12 @@ class FilesProvider extends ChangeNotifier {
       _data = _data.copyWith(recycleBinStatus: response.data);
       notifyListeners();
     } catch (e) {
-      debugPrint('Failed to load recycle bin status: $e');
+      appLogger.eWithPackage('files_provider', 'loadRecycleBinStatus: 加载回收站状态失败', error: e);
     }
   }
 
   void onServerChanged() {
+    appLogger.dWithPackage('files_provider', 'onServerChanged: 服务器变更，重置状态');
     _service.clearCache();
     _data = const FilesData();
     notifyListeners();
@@ -170,6 +177,7 @@ class FilesProvider extends ChangeNotifier {
   }
 
   Future<void> refresh() async {
+    appLogger.dWithPackage('files_provider', 'refresh: 刷新文件列表');
     await loadFiles();
   }
 
@@ -210,46 +218,101 @@ class FilesProvider extends ChangeNotifier {
     final newPath = _data.currentPath == '/'
         ? '/$name'
         : '${_data.currentPath}/$name';
-    await _service.createDirectory(newPath);
-    await refresh();
+    appLogger.dWithPackage('files_provider', 'createDirectory: name=$name, fullPath=$newPath');
+    try {
+      await _service.createDirectory(newPath);
+      appLogger.iWithPackage('files_provider', 'createDirectory: 成功');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'createDirectory: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> createFile(String name, {String? content}) async {
     final newPath = _data.currentPath == '/'
         ? '/$name'
         : '${_data.currentPath}/$name';
-    await _service.createFile(newPath, content: content);
-    await refresh();
+    appLogger.dWithPackage('files_provider', 'createFile: name=$name, fullPath=$newPath, hasContent=${content != null}');
+    try {
+      await _service.createFile(newPath, content: content);
+      appLogger.iWithPackage('files_provider', 'createFile: 成功');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'createFile: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> deleteSelected() async {
-    if (_data.selectedFiles.isEmpty) return;
-    await _service.deleteFiles(_data.selectedFiles.toList());
-    await refresh();
+    if (_data.selectedFiles.isEmpty) {
+      appLogger.wWithPackage('files_provider', 'deleteSelected: 没有选中的文件');
+      return;
+    }
+    appLogger.dWithPackage('files_provider', 'deleteSelected: 删除${_data.selectedFiles.length}个文件');
+    try {
+      await _service.deleteFiles(_data.selectedFiles.toList());
+      appLogger.iWithPackage('files_provider', 'deleteSelected: 成功');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'deleteSelected: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> deleteFile(String path) async {
-    await _service.deleteFiles([path]);
-    await refresh();
+    appLogger.dWithPackage('files_provider', 'deleteFile: path=$path');
+    try {
+      await _service.deleteFiles([path]);
+      appLogger.iWithPackage('files_provider', 'deleteFile: 成功');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'deleteFile: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> renameFile(String oldPath, String newName) async {
     final parentPath = oldPath.substring(0, oldPath.lastIndexOf('/'));
     final newPath = parentPath.isEmpty ? '/$newName' : '$parentPath/$newName';
-    await _service.renameFile(oldPath, newPath);
-    await refresh();
+    appLogger.dWithPackage('files_provider', 'renameFile: oldPath=$oldPath, newPath=$newPath');
+    try {
+      await _service.renameFile(oldPath, newPath);
+      appLogger.iWithPackage('files_provider', 'renameFile: 成功');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'renameFile: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> moveSelected(String targetPath) async {
-    if (_data.selectedFiles.isEmpty) return;
-    await _service.moveFiles(_data.selectedFiles.toList(), targetPath);
-    clearSelection();
-    await refresh();
+    if (_data.selectedFiles.isEmpty) {
+      appLogger.wWithPackage('files_provider', 'moveSelected: 没有选中的文件');
+      return;
+    }
+    appLogger.dWithPackage('files_provider', 'moveSelected: 移动${_data.selectedFiles.length}个文件到$targetPath');
+    try {
+      await _service.moveFiles(_data.selectedFiles.toList(), targetPath);
+      appLogger.iWithPackage('files_provider', 'moveSelected: 成功');
+      clearSelection();
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'moveSelected: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> moveFile(String sourcePath, String targetPath) async {
-    await _service.moveFiles([sourcePath], targetPath);
-    await refresh();
+    appLogger.dWithPackage('files_provider', 'moveFile: source=$sourcePath, target=$targetPath');
+    try {
+      await _service.moveFiles([sourcePath], targetPath);
+      appLogger.iWithPackage('files_provider', 'moveFile: 成功');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'moveFile: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   Future<String> getFileContent(String path) async {
@@ -260,31 +323,57 @@ class FilesProvider extends ChangeNotifier {
     await _service.updateFileContent(path, content);
   }
 
-  Future<void> compressSelected(String targetPath, String type, {String? password}) async {
-    if (_data.selectedFiles.isEmpty) return;
-    await _service.compressFiles(
-      paths: _data.selectedFiles.toList(),
-      targetPath: targetPath,
-      type: type,
-      password: password,
-    );
-    clearSelection();
-    await refresh();
+  Future<void> compressSelected(String name, String type, {String? secret}) async {
+    if (_data.selectedFiles.isEmpty) {
+      appLogger.wWithPackage('files_provider', 'compressSelected: 没有选中的文件');
+      return;
+    }
+    appLogger.dWithPackage('files_provider', 'compressSelected: 压缩${_data.selectedFiles.length}个文件, name=$name, type=$type');
+    try {
+      await _service.compressFiles(
+        files: _data.selectedFiles.toList(),
+        dst: _data.currentPath,
+        name: name,
+        type: type,
+        secret: secret,
+      );
+      appLogger.iWithPackage('files_provider', 'compressSelected: 成功');
+      clearSelection();
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'compressSelected: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
-  Future<void> compressFiles(List<String> paths, String targetPath, String type, {String? password}) async {
-    await _service.compressFiles(
-      paths: paths,
-      targetPath: targetPath,
-      type: type,
-      password: password,
-    );
-    await refresh();
+  Future<void> compressFiles(List<String> files, String dst, String name, String type, {String? secret}) async {
+    appLogger.dWithPackage('files_provider', 'compressFiles: 压缩${files.length}个文件到$dst/$name, type=$type');
+    try {
+      await _service.compressFiles(
+        files: files,
+        dst: dst,
+        name: name,
+        type: type,
+        secret: secret,
+      );
+      appLogger.iWithPackage('files_provider', 'compressFiles: 成功');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'compressFiles: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
-  Future<void> extractFile(String path, String targetPath, {String? password}) async {
-    await _service.extractFile(path: path, targetPath: targetPath, password: password);
-    await refresh();
+  Future<void> extractFile(String path, String dst, String type, {String? secret}) async {
+    appLogger.dWithPackage('files_provider', 'extractFile: 解压$path到$dst, type=$type');
+    try {
+      await _service.extractFile(path: path, dst: dst, type: type, secret: secret);
+      appLogger.iWithPackage('files_provider', 'extractFile: 成功');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'extractFile: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   Future<FileSizeInfo> getFileSize(String path) async {
