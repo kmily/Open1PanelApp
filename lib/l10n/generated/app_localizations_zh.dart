@@ -266,6 +266,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get filesActionOpen => '打开';
 
   @override
+  String get filesActionDownload => '下载';
+
+  @override
   String get filesActionRename => '重命名';
 
   @override
@@ -368,6 +371,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get filesCreateFailed => '创建失败';
+
+  @override
+  String get filesDownloadFailed => '下载失败';
+
+  @override
+  String get filesDownloadSuccess => '下载成功';
+
+  @override
+  String filesDownloadProgress(int progress) {
+    return '下载中 $progress%';
+  }
+
+  @override
+  String get filesDownloadCancelled => '下载已取消';
+
+  @override
+  String filesDownloadSaving(String path) {
+    return '正在保存到: $path';
+  }
 
   @override
   String get filesOperationSuccess => '操作成功';
@@ -1432,4 +1454,230 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get serverModuleSystemSettings => '系统设置';
+
+  @override
+  String get filesFavorites => '收藏夹';
+
+  @override
+  String get filesFavoritesEmpty => '暂无收藏';
+
+  @override
+  String get filesFavoritesEmptyDesc => '长按文件或文件夹可添加到收藏夹';
+
+  @override
+  String get filesAddToFavorites => '添加到收藏夹';
+
+  @override
+  String get filesRemoveFromFavorites => '取消收藏';
+
+  @override
+  String get filesFavoritesAdded => '已添加到收藏夹';
+
+  @override
+  String get filesFavoritesRemoved => '已从收藏夹移除';
+
+  @override
+  String get filesNavigateToFolder => '跳转到所在目录';
+
+  @override
+  String get filesFavoritesLoadFailed => '加载收藏夹失败';
+
+  @override
+  String get filesPermissionTitle => '权限管理';
+
+  @override
+  String get filesPermissionMode => '权限模式';
+
+  @override
+  String get filesPermissionOwner => '所有者';
+
+  @override
+  String get filesPermissionGroup => '所属组';
+
+  @override
+  String get filesPermissionRead => '读取';
+
+  @override
+  String get filesPermissionWrite => '写入';
+
+  @override
+  String get filesPermissionExecute => '执行';
+
+  @override
+  String get filesPermissionOwnerLabel => '所有者权限';
+
+  @override
+  String get filesPermissionGroupLabel => '组权限';
+
+  @override
+  String get filesPermissionOtherLabel => '其他权限';
+
+  @override
+  String get filesPermissionRecursive => '递归应用到子目录';
+
+  @override
+  String get filesPermissionUser => '用户';
+
+  @override
+  String get filesPermissionUserHint => '选择用户';
+
+  @override
+  String get filesPermissionGroupHint => '选择组';
+
+  @override
+  String get filesPermissionChangeOwner => '修改所有者';
+
+  @override
+  String get filesPermissionChangeMode => '修改权限';
+
+  @override
+  String get filesPermissionSuccess => '权限修改成功';
+
+  @override
+  String get filesPermissionFailed => '权限修改失败';
+
+  @override
+  String get filesPermissionLoadFailed => '加载权限信息失败';
+
+  @override
+  String get filesPermissionOctal => '八进制表示';
+
+  @override
+  String get filesPreviewTitle => '文件预览';
+
+  @override
+  String get filesEditorTitle => '编辑文件';
+
+  @override
+  String get filesPreviewLoading => '加载中...';
+
+  @override
+  String get filesPreviewError => '加载失败';
+
+  @override
+  String get filesPreviewUnsupported => '不支持预览此文件类型';
+
+  @override
+  String get filesEditorSave => '保存';
+
+  @override
+  String get filesEditorSaved => '已保存';
+
+  @override
+  String get filesEditorUnsaved => '未保存';
+
+  @override
+  String get filesEditorSaving => '保存中...';
+
+  @override
+  String get filesEditorEncoding => '编码';
+
+  @override
+  String get filesEditorLineNumbers => '行号';
+
+  @override
+  String get filesEditorWordWrap => '自动换行';
+
+  @override
+  String get filesPreviewImage => '图片预览';
+
+  @override
+  String get filesPreviewCode => '代码预览';
+
+  @override
+  String get filesPreviewText => '文本预览';
+
+  @override
+  String get filesEditFile => '编辑文件';
+
+  @override
+  String get filesActionWgetDownload => '远程下载';
+
+  @override
+  String get filesWgetUrl => '下载地址';
+
+  @override
+  String get filesWgetUrlHint => '请输入文件URL';
+
+  @override
+  String get filesWgetFilename => '文件名';
+
+  @override
+  String get filesWgetFilenameHint => '留空则使用URL中的文件名';
+
+  @override
+  String get filesWgetOverwrite => '覆盖已存在的文件';
+
+  @override
+  String get filesWgetDownload => '开始下载';
+
+  @override
+  String filesWgetSuccess(String path) {
+    return '下载成功: $path';
+  }
+
+  @override
+  String get filesWgetFailed => '下载失败';
+
+  @override
+  String get recycleBinRestore => '恢复';
+
+  @override
+  String recycleBinRestoreConfirm(int count) {
+    return '确定要恢复选中的 $count 个文件吗？';
+  }
+
+  @override
+  String get recycleBinRestoreSuccess => '文件恢复成功';
+
+  @override
+  String get recycleBinRestoreFailed => '恢复文件失败';
+
+  @override
+  String recycleBinRestoreSingleConfirm(String name) {
+    return '确定要恢复 \"$name\" 吗？';
+  }
+
+  @override
+  String get recycleBinDeletePermanently => '彻底删除';
+
+  @override
+  String recycleBinDeletePermanentlyConfirm(int count) {
+    return '确定要彻底删除选中的 $count 个文件吗？此操作无法撤销。';
+  }
+
+  @override
+  String get recycleBinDeletePermanentlySuccess => '文件已彻底删除';
+
+  @override
+  String get recycleBinDeletePermanentlyFailed => '彻底删除文件失败';
+
+  @override
+  String recycleBinDeletePermanentlySingleConfirm(String name) {
+    return '确定要彻底删除 \"$name\" 吗？此操作无法撤销。';
+  }
+
+  @override
+  String get recycleBinClear => '清空回收站';
+
+  @override
+  String get recycleBinClearConfirm => '确定要清空回收站吗？所有文件将被永久删除。';
+
+  @override
+  String get recycleBinClearSuccess => '回收站已清空';
+
+  @override
+  String get recycleBinClearFailed => '清空回收站失败';
+
+  @override
+  String get recycleBinSearch => '搜索文件';
+
+  @override
+  String get recycleBinEmpty => '回收站为空';
+
+  @override
+  String get recycleBinNoResults => '未找到文件';
+
+  @override
+  String get recycleBinSourcePath => '原路径';
 }

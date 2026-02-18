@@ -60,6 +60,13 @@ dependencies:
   logger: ^2.6.2  # Logging (Updated from 2.0.2+1)
   equatable: ^2.0.8  # Equality checking (Updated from 2.0.5)
   file_picker: ^8.0.0  # File picker for file upload
+  path_provider: ^2.1.0  # Path provider for file download
+  permission_handler: ^11.0.0  # Permission handler for Android storage
+  
+  # Code highlighting & Image preview
+  flutter_highlight: ^0.7.0  # Syntax highlighting for code
+  photo_view: ^0.15.0  # Image zoom viewer
+  flutter_svg: ^2.0.0  # SVG support
   
   # Testing
   mockito: ^5.6.3  # Mock objects for testing (Updated from 5.4.3)

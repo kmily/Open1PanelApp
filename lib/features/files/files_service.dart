@@ -1,7 +1,12 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../api/v2/file_v2.dart';
 import '../../data/models/file_models.dart';
 import '../../core/network/api_client_manager.dart';
 import '../../core/config/api_config.dart';
+import '../../core/config/api_constants.dart';
 import '../../core/services/logger/logger_service.dart';
 
 class FilesService {
@@ -323,19 +328,44 @@ class FilesService {
     await api.clearRecycleBin();
   }
 
+  Future<void> restoreFile(RecycleBinReduceRequest request) async {
+    appLogger.dWithPackage('files', 'restoreFile: rName=${request.rName}, from=${request.from}');
+    final api = await _getApi();
+    await api.restoreRecycleBinFile(request);
+    appLogger.iWithPackage('files', 'restoreFile: 成功恢复文件 ${request.name}');
+  }
+
+  Future<void> restoreFiles(List<RecycleBinReduceRequest> requests) async {
+    appLogger.dWithPackage('files', 'restoreFiles: 恢复${requests.length}个文件');
+    final api = await _getApi();
+    for (final request in requests) {
+      await api.restoreRecycleBinFile(request);
+    }
+    appLogger.iWithPackage('files', 'restoreFiles: 成功恢复${requests.length}个文件');
+  }
+
+  Future<void> deleteRecycleBinFiles(List<RecycleBinItem> files) async {
+    appLogger.dWithPackage('files', 'deleteRecycleBinFiles: 删除${files.length}个回收站文件');
+    final api = await _getApi();
+    for (final file in files) {
+      await api.deleteFile(FileDelete(path: file.rName, forceDelete: true));
+    }
+    appLogger.iWithPackage('files', 'deleteRecycleBinFiles: 成功永久删除${files.length}个文件');
+  }
+
   Future<FileWgetResult> wgetDownload({
     required String url,
     required String path,
-    String? filename,
-    bool? overwrite,
+    required String name,
+    bool? ignoreCertificate,
   }) async {
-    appLogger.dWithPackage('files', 'wgetDownload: url=$url, path=$path');
+    appLogger.dWithPackage('files', 'wgetDownload: url=$url, path=$path, name=$name');
     final api = await _getApi();
     final response = await api.wgetDownload(FileWgetRequest(
       url: url,
       path: path,
-      filename: filename,
-      overwrite: overwrite,
+      name: name,
+      ignoreCertificate: ignoreCertificate,
     ));
     return response.data!;
   }
@@ -448,6 +478,116 @@ class FilesService {
     appLogger.dWithPackage('files', 'downloadFile: path=$path, savePath=$savePath');
     final api = await _getApi();
     await api.downloadFile(path);
+  }
+
+  CancelToken? _downloadCancelToken;
+
+  Future<String> downloadFileToDevice(
+    String filePath,
+    String fileName, {
+    Function(int received, int total)? onProgress,
+    Function()? onCancel,
+  }) async {
+    appLogger.dWithPackage('files', 'downloadFileToDevice: filePath=$filePath, fileName=$fileName');
+
+    final savePath = await _getDownloadPath(fileName);
+    appLogger.iWithPackage('files', 'downloadFileToDevice: savePath=$savePath');
+
+    _downloadCancelToken = CancelToken();
+
+    try {
+      final config = await ApiConfigManager.getCurrentConfig();
+      if (config == null) {
+        throw StateError('No server configured');
+      }
+
+      final downloadUrl = '${config.url}${ApiConstants.buildApiPath('/files/download')}?path=${Uri.encodeComponent(filePath)}';
+
+      final dio = Dio();
+      dio.options.headers['Authorization'] = 'Bearer ${config.apiKey}';
+
+      await dio.download(
+        downloadUrl,
+        savePath,
+        cancelToken: _downloadCancelToken,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            onProgress?.call(received, total);
+          }
+        },
+      );
+
+      appLogger.iWithPackage('files', 'downloadFileToDevice: 下载成功');
+      return savePath;
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.cancel) {
+        appLogger.iWithPackage('files', 'downloadFileToDevice: 用户取消下载');
+        throw Exception('Download cancelled');
+      }
+      appLogger.eWithPackage('files', 'downloadFileToDevice: 下载失败', error: e);
+      rethrow;
+    } finally {
+      _downloadCancelToken = null;
+    }
+  }
+
+  void cancelDownload() {
+    if (_downloadCancelToken != null && !_downloadCancelToken!.isCancelled) {
+      _downloadCancelToken!.cancel('User cancelled');
+      appLogger.iWithPackage('files', 'cancelDownload: 取消下载');
+    }
+  }
+
+  Future<String> _getDownloadPath(String fileName) async {
+    Directory downloadDir;
+
+    if (Platform.isAndroid) {
+      if (await _requestStoragePermission()) {
+        downloadDir = Directory('/storage/emulated/0/Download');
+        if (!await downloadDir.exists()) {
+          downloadDir = await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
+        }
+      } else {
+        downloadDir = await getApplicationDocumentsDirectory();
+      }
+    } else if (Platform.isIOS) {
+      downloadDir = await getApplicationDocumentsDirectory();
+    } else {
+      downloadDir = await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
+    }
+
+    final safeFileName = _sanitizeFileName(fileName);
+    final filePath = '${downloadDir.path}/$safeFileName';
+
+    int counter = 1;
+    String finalPath = filePath;
+    while (await File(finalPath).exists()) {
+      final lastDot = filePath.lastIndexOf('.');
+      if (lastDot > 0) {
+        finalPath = '${filePath.substring(0, lastDot)} ($counter)${filePath.substring(lastDot)}';
+      } else {
+        finalPath = '$filePath ($counter)';
+      }
+      counter++;
+    }
+
+    return finalPath;
+  }
+
+  String _sanitizeFileName(String fileName) {
+    return fileName.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_');
+  }
+
+  Future<bool> _requestStoragePermission() async {
+    if (Platform.isAndroid) {
+      final status = await Permission.storage.status;
+      if (status.isGranted) {
+        return true;
+      }
+      final result = await Permission.storage.request();
+      return result.isGranted;
+    }
+    return true;
   }
 
   Future<void> uploadFile(String path, dynamic file) async {

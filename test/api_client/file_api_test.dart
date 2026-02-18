@@ -6,7 +6,6 @@ import '../api_client_test_base.dart';
 import 'package:onepanelapp_app/core/network/dio_client.dart';
 import 'package:onepanelapp_app/data/models/file_models.dart';
 import 'package:onepanelapp_app/api/v2/file_v2.dart';
-import 'package:dio/dio.dart';
 
 void main() {
   late DioClient client;
@@ -530,7 +529,7 @@ void main() {
         debugPrint('✅ 测试成功!');
         
         try {
-          await api.deleteFiles(FileOperate(paths: [testDir]));
+          await api.deleteFiles(FileBatchDelete(paths: [testDir]));
           debugPrint('🧹 清理测试目录: $testDir');
         } catch (e) {
           debugPrint('⚠️ 清理失败: $e');
@@ -572,7 +571,7 @@ void main() {
         debugPrint('✅ 测试成功!');
         
         try {
-          await api.deleteFiles(FileOperate(paths: [renamedDir]));
+          await api.deleteFiles(FileBatchDelete(paths: [renamedDir]));
           debugPrint('🧹 清理测试目录: $renamedDir');
         } catch (e) {
           debugPrint('⚠️ 清理失败: $e');
@@ -619,7 +618,7 @@ void main() {
         debugPrint('✅ 测试成功!');
         
         try {
-          await api.deleteFiles(FileOperate(paths: [srcDir, dstDir]));
+          await api.deleteFiles(FileBatchDelete(paths: [srcDir, dstDir]));
           debugPrint('🧹 清理测试目录');
         } catch (e) {
           debugPrint('⚠️ 清理失败: $e');
@@ -649,7 +648,7 @@ void main() {
         await api.createFile(FileCreate(path: testDir, isDir: true));
         debugPrint('📤 创建测试目录: $testDir');
         
-        final request = FileOperate(paths: [testDir]);
+        final request = FileBatchDelete(paths: [testDir]);
         final response = await api.deleteFiles(request);
         
         debugPrint('📥 响应状态码: ${response.statusCode}');
@@ -691,8 +690,9 @@ void main() {
         debugPrint('📤 压缩目标: $zipFile');
         
         final request = FileCompress(
-          paths: [testFile],
-          targetPath: zipFile,
+          files: [testFile],
+          dst: '/tmp',
+          name: 'test_compress_$timestamp',
           type: 'zip',
         );
         final response = await api.compressFiles(request);
@@ -704,8 +704,507 @@ void main() {
         debugPrint('✅ 测试成功!');
         
         try {
-          await api.deleteFiles(FileOperate(paths: [testDir, zipFile]));
+          await api.deleteFiles(FileBatchDelete(paths: [testDir, zipFile]));
           debugPrint('🧹 清理测试文件');
+        } catch (e) {
+          debugPrint('⚠️ 清理失败: $e');
+        }
+      } catch (e) {
+        resultCollector.addFailure(testName, e.toString(), Duration.zero);
+        debugPrint('❌ 测试失败: $e');
+      }
+      debugPrint('========================================\n');
+    });
+  });
+
+  group('文件预览 API 测试', () {
+    test('POST /files/preview - 预览文件内容', () async {
+      final testName = 'POST /files/preview - 预览文件内容';
+      final timer = TestPerformanceTimer(testName);
+      timer.start();
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        debugPrint('⚠️  跳过测试: API密钥未配置');
+        return;
+      }
+
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      try {
+        final request = FilePreviewRequest(
+          path: '/etc/hostname',
+          line: 1,
+          limit: 10,
+        );
+        
+        debugPrint('📤 请求参数:');
+        debugPrint('  ${const JsonEncoder.withIndent("  ").convert(request.toJson())}');
+        
+        final response = await api.previewFile(request);
+        
+        debugPrint('\n📥 响应状态码: ${response.statusCode}');
+        debugPrint('📥 文件内容长度: ${response.data?.length ?? 0}');
+        if (response.data != null && response.data!.length < 500) {
+          debugPrint('📥 文件内容:\n${response.data}');
+        } else if (response.data != null) {
+          debugPrint('📥 文件内容(前500字符):\n${response.data!.substring(0, 500)}...');
+        }
+        
+        expect(response.data, isNotNull);
+        timer.stop();
+        resultCollector.addSuccess(testName, timer.duration);
+        debugPrint('\n✅ 测试成功! 耗时: ${timer.duration.inMilliseconds}ms');
+      } catch (e, stackTrace) {
+        timer.stop();
+        resultCollector.addFailure(testName, e.toString(), timer.duration);
+        debugPrint('\n❌ 测试失败: $e');
+        debugPrint('堆栈跟踪:\n$stackTrace');
+      }
+      debugPrint('========================================\n');
+    });
+
+    test('POST /files/preview - 预览指定行范围', () async {
+      final testName = 'POST /files/preview - 预览指定行范围';
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        return;
+      }
+
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      try {
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final testFile = '/tmp/test_preview_$timestamp.txt';
+        
+        final content = List.generate(20, (i) => '这是第 ${i + 1} 行内容').join('\n');
+        await api.saveFile(FileSave(path: testFile, content: content));
+        debugPrint('📤 创建测试文件: $testFile');
+        
+        final request = FilePreviewRequest(
+          path: testFile,
+          line: 5,
+          limit: 5,
+        );
+        
+        debugPrint('📤 请求参数: path=$testFile, line=5, limit=5');
+        
+        final response = await api.previewFile(request);
+        
+        debugPrint('📥 响应状态码: ${response.statusCode}');
+        debugPrint('📥 预览内容:\n${response.data}');
+        
+        resultCollector.addSuccess(testName, Duration.zero);
+        debugPrint('✅ 测试成功!');
+        
+        try {
+          await api.deleteFiles(FileBatchDelete(paths: [testFile]));
+          debugPrint('🧹 清理测试文件: $testFile');
+        } catch (e) {
+          debugPrint('⚠️ 清理失败: $e');
+        }
+      } catch (e) {
+        resultCollector.addFailure(testName, e.toString(), Duration.zero);
+        debugPrint('❌ 测试失败: $e');
+      }
+      debugPrint('========================================\n');
+    });
+  });
+
+  group('权限管理 API 测试', () {
+    test('POST /files/user/group - 获取用户组列表', () async {
+      final testName = 'POST /files/user/group - 获取用户组列表';
+      final timer = TestPerformanceTimer(testName);
+      timer.start();
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        debugPrint('⚠️  跳过测试: API密钥未配置');
+        return;
+      }
+
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      try {
+        debugPrint('📤 请求参数: 无');
+        
+        final response = await api.getUserGroup();
+        
+        debugPrint('\n📥 响应状态码: ${response.statusCode}');
+        debugPrint('📥 用户数量: ${response.data?.users.length ?? 0}');
+        debugPrint('📥 组数量: ${response.data?.groups.length ?? 0}');
+        
+        if (response.data != null) {
+          if (response.data!.users.isNotEmpty) {
+            debugPrint('\n👤 用户列表(前5个):');
+            for (var i = 0; i < (response.data!.users.length > 5 ? 5 : response.data!.users.length); i++) {
+              final user = response.data!.users[i];
+              debugPrint('  [$i] ${user.user} (${user.group})');
+            }
+          }
+          
+          if (response.data!.groups.isNotEmpty) {
+            debugPrint('\n👥 组列表(前5个):');
+            for (var i = 0; i < (response.data!.groups.length > 5 ? 5 : response.data!.groups.length); i++) {
+              debugPrint('  [$i] ${response.data!.groups[i]}');
+            }
+          }
+        }
+        
+        expect(response.data, isNotNull);
+        timer.stop();
+        resultCollector.addSuccess(testName, timer.duration);
+        debugPrint('\n✅ 测试成功! 耗时: ${timer.duration.inMilliseconds}ms');
+      } catch (e, stackTrace) {
+        timer.stop();
+        resultCollector.addFailure(testName, e.toString(), timer.duration);
+        debugPrint('\n❌ 测试失败: $e');
+        debugPrint('堆栈跟踪:\n$stackTrace');
+      }
+      debugPrint('========================================\n');
+    });
+
+    test('POST /files/mode - 修改文件权限(chmod)', () async {
+      final testName = 'POST /files/mode - 修改文件权限(chmod)';
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        return;
+      }
+
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      try {
+        final testDir = '/tmp';
+        
+        final checkResponse = await api.checkFile(FileCheck(path: testDir));
+        if (checkResponse.data?.exists != true) {
+          debugPrint('⚠️ /tmp 目录不存在，跳过测试');
+          resultCollector.addSkipped(testName, '/tmp 目录不存在');
+          return;
+        }
+        
+        final request = FileModeChange(
+          path: testDir,
+          mode: '1777',
+          recursive: false,
+        );
+        
+        debugPrint('📤 请求参数: path=$testDir, mode=1777');
+        
+        final response = await api.changeFileMode(request);
+        
+        debugPrint('📥 响应状态码: ${response.statusCode}');
+        debugPrint('📥 权限修改结果: 成功');
+        
+        resultCollector.addSuccess(testName, Duration.zero);
+        debugPrint('✅ 测试成功!');
+      } catch (e) {
+        resultCollector.addFailure(testName, e.toString(), Duration.zero);
+        debugPrint('❌ 测试失败: $e');
+      }
+      debugPrint('========================================\n');
+    });
+
+    test('POST /files/owner - 修改文件所有者(chown)', () async {
+      final testName = 'POST /files/owner - 修改文件所有者(chown)';
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        return;
+      }
+
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      try {
+        final testFile = '/etc/hostname';
+        
+        final checkResponse = await api.checkFile(FileCheck(path: testFile));
+        if (checkResponse.data?.exists != true) {
+          debugPrint('⚠️ /etc/hostname 文件不存在，跳过测试');
+          resultCollector.addSkipped(testName, '/etc/hostname 文件不存在');
+          return;
+        }
+        
+        final userGroupResponse = await api.getUserGroup();
+        String? testUser;
+        String? testGroup;
+        
+        if (userGroupResponse.data?.users.isNotEmpty == true) {
+          testUser = userGroupResponse.data!.users.first.user;
+        }
+        if (userGroupResponse.data?.groups.isNotEmpty == true) {
+          testGroup = userGroupResponse.data!.groups.first;
+        }
+        
+        if (testUser == null || testGroup == null) {
+          debugPrint('⚠️ 无法获取用户/组信息，跳过测试');
+          resultCollector.addSkipped(testName, '无法获取用户/组信息');
+          return;
+        }
+        
+        final request = FileOwnerChange(
+          path: testFile,
+          user: testUser,
+          group: testGroup,
+          recursive: false,
+        );
+        
+        debugPrint('📤 请求参数: path=$testFile, user=$testUser, group=$testGroup');
+        
+        final response = await api.changeFileOwner(request);
+        
+        debugPrint('📥 响应状态码: ${response.statusCode}');
+        debugPrint('📥 所有者修改结果: 成功');
+        
+        resultCollector.addSuccess(testName, Duration.zero);
+        debugPrint('✅ 测试成功!');
+      } catch (e) {
+        resultCollector.addFailure(testName, e.toString(), Duration.zero);
+        debugPrint('❌ 测试失败: $e');
+      }
+      debugPrint('========================================\n');
+    });
+  });
+
+  group('回收站恢复 API 测试', () {
+    test('POST /files/recycle/reduce - 恢复回收站文件', () async {
+      final testName = 'POST /files/recycle/reduce - 恢复回收站文件';
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        return;
+      }
+
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      try {
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final testFile = '/tmp/test_recycle_$timestamp.txt';
+        final testContent = 'test content for recycle bin restore';
+        
+        await api.saveFile(FileSave(path: testFile, content: testContent));
+        debugPrint('📤 创建测试文件: $testFile');
+        
+        await api.deleteFiles(FileBatchDelete(paths: [testFile]));
+        debugPrint('📤 删除文件到回收站: $testFile');
+        
+        await Future.delayed(const Duration(seconds: 1));
+        
+        final recycleSearch = await api.searchRecycleBin(FileSearch(path: '/tmp', page: 1, pageSize: 50));
+        debugPrint('📥 回收站搜索结果: ${recycleSearch.data?.length ?? 0} 个文件');
+        
+        RecycleBinItem? recycleItem;
+        if (recycleSearch.data != null) {
+          for (final item in recycleSearch.data!) {
+            if (item.name.contains('test_recycle_') && item.path.contains('/tmp')) {
+              recycleItem = RecycleBinItem(
+                sourcePath: item.path,
+                name: item.name,
+                isDir: item.isDir,
+                size: item.size,
+                deleteTime: item.modifiedAt,
+                rName: item.name,
+                from: '/tmp',
+              );
+              break;
+            }
+          }
+        }
+        
+        if (recycleItem == null) {
+          debugPrint('⚠️ 未在回收站找到测试文件，跳过恢复测试');
+          resultCollector.addSkipped(testName, '未在回收站找到测试文件');
+          return;
+        }
+        
+        final restoreRequest = RecycleBinReduceRequest(
+          rName: recycleItem.rName,
+          from: recycleItem.from,
+          name: recycleItem.name,
+        );
+        
+        debugPrint('📤 恢复请求参数:');
+        debugPrint('  rName: ${recycleItem.rName}');
+        debugPrint('  from: ${recycleItem.from}');
+        debugPrint('  name: ${recycleItem.name}');
+        
+        final response = await api.restoreRecycleBinFile(restoreRequest);
+        
+        debugPrint('📥 响应状态码: ${response.statusCode}');
+        debugPrint('📥 恢复结果: 成功');
+        
+        resultCollector.addSuccess(testName, Duration.zero);
+        debugPrint('✅ 测试成功!');
+        
+        try {
+          await api.deleteFiles(FileBatchDelete(paths: [testFile]));
+          debugPrint('🧹 清理测试文件: $testFile');
+        } catch (e) {
+          debugPrint('⚠️ 清理失败: $e');
+        }
+      } catch (e, stackTrace) {
+        resultCollector.addFailure(testName, e.toString(), Duration.zero);
+        debugPrint('❌ 测试失败: $e');
+        debugPrint('堆栈跟踪:\n$stackTrace');
+      }
+      debugPrint('========================================\n');
+    });
+  });
+
+  group('wget 远程下载 API 测试', () {
+    test('POST /files/wget - 下载远程文件', () async {
+      final testName = 'POST /files/wget - 下载远程文件';
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        return;
+      }
+
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      debugPrint('⚠️  跳过测试: 服务器可能无法访问外部网络');
+      resultCollector.addSkipped(testName, '服务器可能无法访问外部网络，跳过 wget 测试');
+      debugPrint('========================================\n');
+    });
+
+    test('POST /files/wget - 下载小文件测试', () async {
+      final testName = 'POST /files/wget - 下载小文件测试';
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        return;
+      }
+
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      debugPrint('⚠️  跳过测试: 服务器可能无法访问外部网络');
+      resultCollector.addSkipped(testName, '服务器可能无法访问外部网络，跳过 wget 测试');
+      debugPrint('========================================\n');
+    });
+  });
+
+  group('文件编码转换 API 测试', () {
+    test('POST /files/convert - 转换文件编码', () async {
+      final testName = 'POST /files/convert - 转换文件编码';
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        return;
+      }
+
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      try {
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final testFile = '/tmp/test_convert_$timestamp.txt';
+        
+        await api.saveFile(FileSave(path: testFile, content: '测试编码转换内容 Test encoding convert'));
+        debugPrint('📤 创建测试文件: $testFile');
+        
+        final request = FileConvertRequest(
+          path: testFile,
+          fromEncoding: 'UTF-8',
+          toEncoding: 'GBK',
+        );
+        
+        debugPrint('📤 请求参数:');
+        debugPrint('  path: ${request.path}');
+        debugPrint('  fromEncoding: ${request.fromEncoding}');
+        debugPrint('  toEncoding: ${request.toEncoding}');
+        
+        final response = await api.convertFile(request);
+        
+        debugPrint('📥 响应状态码: ${response.statusCode}');
+        debugPrint('📥 编码转换结果: 成功');
+        
+        resultCollector.addSuccess(testName, Duration.zero);
+        debugPrint('✅ 测试成功!');
+        
+        try {
+          await api.deleteFiles(FileBatchDelete(paths: [testFile]));
+          debugPrint('🧹 清理测试文件: $testFile');
+        } catch (e) {
+          debugPrint('⚠️ 清理失败: $e');
+        }
+      } catch (e) {
+        resultCollector.addFailure(testName, e.toString(), Duration.zero);
+        debugPrint('❌ 测试失败: $e');
+      }
+      debugPrint('========================================\n');
+    });
+
+    test('POST /files/convert/log - 获取转换日志', () async {
+      final testName = 'POST /files/convert/log - 获取转换日志';
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        return;
+      }
+
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      try {
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final testFile = '/tmp/test_convert_log_$timestamp.txt';
+        
+        await api.saveFile(FileSave(path: testFile, content: '测试转换日志内容'));
+        debugPrint('📤 创建测试文件: $testFile');
+        
+        try {
+          await api.convertFile(FileConvertRequest(
+            path: testFile,
+            fromEncoding: 'UTF-8',
+            toEncoding: 'GBK',
+          ));
+          debugPrint('📤 执行编码转换');
+        } catch (e) {
+          debugPrint('⚠️ 编码转换可能失败: $e');
+        }
+        
+        final request = FileConvertLogRequest(path: testFile);
+        
+        debugPrint('📤 请求参数:');
+        debugPrint('  path: ${request.path}');
+        
+        final response = await api.convertFileLog(request);
+        
+        debugPrint('📥 响应状态码: ${response.statusCode}');
+        debugPrint('📥 日志内容长度: ${response.data?.length ?? 0}');
+        if (response.data != null && response.data!.isNotEmpty) {
+          final logPreview = response.data!.length > 500 
+              ? '${response.data!.substring(0, 500)}...' 
+              : response.data!;
+          debugPrint('📥 日志内容:\n$logPreview');
+        }
+        
+        resultCollector.addSuccess(testName, Duration.zero);
+        debugPrint('✅ 测试成功!');
+        
+        try {
+          await api.deleteFiles(FileBatchDelete(paths: [testFile]));
+          debugPrint('🧹 清理测试文件: $testFile');
         } catch (e) {
           debugPrint('⚠️ 清理失败: $e');
         }

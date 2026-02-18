@@ -6,9 +6,15 @@ import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/data/models/file_models.dart';
 import 'package:onepanelapp_app/features/files/files_provider.dart';
 import 'package:onepanelapp_app/features/files/files_service.dart';
+import 'package:onepanelapp_app/features/files/file_preview_page.dart';
+import 'package:onepanelapp_app/features/files/file_editor_page.dart';
+import 'package:onepanelapp_app/features/files/favorites_page.dart';
+import 'package:onepanelapp_app/features/files/recycle_bin_page.dart';
 import 'package:onepanelapp_app/core/utils/debug_error_dialog.dart';
 import 'package:onepanelapp_app/core/config/api_config.dart';
 import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
+
+export 'files_provider.dart' show WgetDownloadState;
 
 class FilesPage extends StatelessWidget {
   const FilesPage({super.key});
@@ -43,6 +49,7 @@ class _FilesViewState extends State<FilesView> {
         context.read<FilesProvider>().loadServer().then((_) {
           if (mounted) {
             context.read<FilesProvider>().loadFiles();
+            context.read<FilesProvider>().loadFavorites();
           }
         });
       }
@@ -325,6 +332,7 @@ class _FilesViewState extends State<FilesView> {
     final isSelected = provider.data.isSelected(file.path);
     final isDir = file.isDir;
     final colorScheme = theme.colorScheme;
+    final isFavorite = provider.data.isFavorite(file.path);
     final metadata = <String>[
       isDir ? l10n.filesTypeDirectory : _formatFileSize(file.size),
     ];
@@ -343,7 +351,17 @@ class _FilesViewState extends State<FilesView> {
           color: isDir ? colorScheme.primary : _getFileIconColor(file.name, colorScheme),
           size: 32,
         ),
-        title: Text(file.name),
+        title: Row(
+          children: [
+            Expanded(child: Text(file.name)),
+            if (isFavorite)
+              Icon(
+                Icons.star,
+                size: 18,
+                color: colorScheme.primary,
+              ),
+          ],
+        ),
         subtitle: Text(
           metadata.join(' · '),
           style: theme.textTheme.bodySmall?.copyWith(
@@ -355,12 +373,19 @@ class _FilesViewState extends State<FilesView> {
           itemBuilder: (context) => [
             if (isDir)
               PopupMenuItem(value: 'open', child: Text(l10n.filesActionOpen)),
+            if (!isDir)
+              PopupMenuItem(value: 'download', child: Text(l10n.filesActionDownload)),
+            PopupMenuItem(
+              value: 'favorite',
+              child: Text(isFavorite ? l10n.filesRemoveFromFavorites : l10n.filesAddToFavorites),
+            ),
             PopupMenuItem(value: 'rename', child: Text(l10n.filesActionRename)),
             PopupMenuItem(value: 'copy', child: Text(l10n.filesActionCopy)),
             PopupMenuItem(value: 'move', child: Text(l10n.filesActionMove)),
             if (!isDir && _isCompressedFile(file.name))
               PopupMenuItem(value: 'extract', child: Text(l10n.filesActionExtract)),
             PopupMenuItem(value: 'compress', child: Text(l10n.filesActionCompress)),
+            PopupMenuItem(value: 'permission', child: Text(l10n.filesPermissionTitle)),
             const PopupMenuDivider(),
             PopupMenuItem(
               value: 'delete',
@@ -554,6 +579,18 @@ class _FilesViewState extends State<FilesView> {
       case 'open':
         if (file.isDir) provider.navigateTo(file.path);
         break;
+      case 'download':
+        _startDownload(context, provider, file, l10n);
+        break;
+      case 'preview':
+        _openFilePreview(context, file);
+        break;
+      case 'edit':
+        _openFileEditor(context, file);
+        break;
+      case 'favorite':
+        _toggleFavorite(context, provider, file, l10n);
+        break;
       case 'rename':
         _showRenameDialog(context, provider, file, l10n);
         break;
@@ -569,10 +606,125 @@ class _FilesViewState extends State<FilesView> {
       case 'compress':
         _showCompressDialog(context, provider, [file.path], l10n);
         break;
+      case 'permission':
+        _showPermissionDialog(context, provider, file, l10n);
+        break;
       case 'delete':
         provider.toggleSelection(file.path);
         _showDeleteConfirmDialog(context, provider, l10n);
         break;
+    }
+  }
+
+  void _openFilePreview(BuildContext context, FileInfo file) {
+    appLogger.dWithPackage('files_page', '_openFilePreview: 打开预览 ${file.path}');
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => FilePreviewPage(
+          filePath: file.path,
+          fileName: file.name,
+        ),
+      ),
+    );
+  }
+
+  void _openFileEditor(BuildContext context, FileInfo file) {
+    appLogger.dWithPackage('files_page', '_openFileEditor: 打开编辑器 ${file.path}');
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => FileEditorPage(
+          filePath: file.path,
+          fileName: file.name,
+        ),
+      ),
+    );
+  }
+
+  void _startDownload(BuildContext context, FilesProvider provider, FileInfo file, AppLocalizations l10n) {
+    appLogger.dWithPackage('files_page', '_startDownload: 开始下载 ${file.name}');
+    
+    ScaffoldMessenger.of(context).clearSnackBars();
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Consumer<FilesProvider>(
+          builder: (context, provider, _) {
+            if (provider.data.isDownloading) {
+              final progress = (provider.data.downloadProgress * 100).toInt();
+              return Row(
+                children: [
+                  const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(l10n.filesDownloadProgress(progress)),
+                  ),
+                ],
+              );
+            }
+            return Text(l10n.filesDownloadSuccess);
+          },
+        ),
+        duration: const Duration(seconds: 30),
+        action: SnackBarAction(
+          label: l10n.commonCancel,
+          onPressed: () {
+            provider.cancelDownload();
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+
+    provider.downloadFile(file).then((savePath) {
+      if (savePath != null && context.mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.filesDownloadSuccess),
+            action: SnackBarAction(
+              label: l10n.commonConfirm,
+              onPressed: () {},
+            ),
+          ),
+        );
+      }
+    }).catchError((e, stackTrace) {
+      appLogger.eWithPackage('files_page', '_startDownload: 下载失败', error: e, stackTrace: stackTrace);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        final errorMsg = e.toString();
+        if (errorMsg.contains('cancelled')) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.filesDownloadCancelled)),
+          );
+        } else {
+          DebugErrorDialog.show(context, l10n.filesDownloadFailed, e, stackTrace: stackTrace);
+        }
+      }
+    });
+  }
+
+  Future<void> _toggleFavorite(BuildContext context, FilesProvider provider, FileInfo file, AppLocalizations l10n) async {
+    appLogger.dWithPackage('files_page', '_toggleFavorite: path=${file.path}');
+    try {
+      await provider.toggleFavorite(file);
+      if (context.mounted) {
+        final isFavorite = provider.data.isFavorite(file.path);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isFavorite ? l10n.filesFavoritesAdded : l10n.filesFavoritesRemoved),
+          ),
+        );
+      }
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_page', '_toggleFavorite: 失败', error: e, stackTrace: stackTrace);
+      if (context.mounted) {
+        DebugErrorDialog.show(context, l10n.filesFavoritesLoadFailed, e, stackTrace: stackTrace);
+      }
     }
   }
 
@@ -605,6 +757,14 @@ class _FilesViewState extends State<FilesView> {
               onTap: () {
                 Navigator.pop(sheetContext);
                 _showUploadDialog(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.cloud_download_outlined),
+              title: Text(context.l10n.filesActionWgetDownload),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                _showWgetDialog(context);
               },
             ),
           ],
@@ -1248,6 +1408,117 @@ class _FilesViewState extends State<FilesView> {
     );
   }
 
+  void _showWgetDialog(BuildContext context) {
+    appLogger.dWithPackage('files_page', '_showWgetDialog: 打开wget下载对话框');
+    final provider = context.read<FilesProvider>();
+    final l10n = context.l10n;
+    
+    final urlController = TextEditingController();
+    final nameController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.filesActionWgetDownload),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: urlController,
+                decoration: InputDecoration(
+                  labelText: l10n.filesWgetUrl,
+                  hintText: l10n.filesWgetUrlHint,
+                  prefixIcon: const Icon(Icons.link),
+                ),
+                autofocus: true,
+                keyboardType: TextInputType.url,
+                onChanged: (value) {
+                  if (nameController.text.isEmpty && value.isNotEmpty) {
+                    try {
+                      final uri = Uri.parse(value);
+                      final pathSegments = uri.pathSegments;
+                      if (pathSegments.isNotEmpty) {
+                        nameController.text = pathSegments.last;
+                      }
+                    } catch (_) {}
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '${l10n.filesTargetPath}: ${provider.data.currentPath}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: l10n.filesWgetFilename,
+                  hintText: l10n.filesWgetFilenameHint,
+                  prefixIcon: const Icon(Icons.insert_drive_file_outlined),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () async {
+              if (urlController.text.isEmpty || nameController.text.isEmpty) return;
+              
+              final url = urlController.text.trim();
+              final name = nameController.text.trim();
+              
+              appLogger.dWithPackage('files_page', '_showWgetDialog: url=$url, name=$name');
+              Navigator.pop(dialogContext);
+              
+              try {
+                await provider.wgetDownload(
+                  url: url,
+                  name: name,
+                );
+                
+                if (context.mounted) {
+                  final status = provider.data.wgetStatus;
+                  if (status != null && status.state == WgetDownloadState.success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.filesWgetSuccess(status.filePath ?? '')),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    );
+                  } else if (status != null && status.state == WgetDownloadState.error) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(status.message ?? l10n.filesWgetFailed),
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                      ),
+                    );
+                  }
+                }
+                appLogger.iWithPackage('files_page', '_showWgetDialog: wget下载完成');
+              } catch (e, stackTrace) {
+                appLogger.eWithPackage('files_page', '_showWgetDialog: wget下载失败', error: e, stackTrace: stackTrace);
+                if (context.mounted) {
+                  DebugErrorDialog.show(context, l10n.filesWgetFailed, e, stackTrace: stackTrace);
+                }
+              }
+            },
+            child: Text(l10n.filesWgetDownload),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showMoreOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -1255,6 +1526,14 @@ class _FilesViewState extends State<FilesView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ListTile(
+              leading: const Icon(Icons.star_outline),
+              title: Text(context.l10n.filesFavorites),
+              onTap: () {
+                Navigator.pop(context);
+                _openFavorites(context);
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.sort),
               title: Text(context.l10n.filesActionSort),
@@ -1276,10 +1555,34 @@ class _FilesViewState extends State<FilesView> {
               title: Text(context.l10n.filesRecycleBin),
               onTap: () {
                 Navigator.pop(context);
+                _openRecycleBin(context);
               },
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _openFavorites(BuildContext context) async {
+    appLogger.dWithPackage('files_page', '_openFavorites: 打开收藏夹页面');
+    final result = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (context) => const FavoritesPage(),
+      ),
+    );
+
+    if (result != null && mounted) {
+      appLogger.dWithPackage('files_page', '_openFavorites: 导航到路径=$result');
+      context.read<FilesProvider>().navigateTo(result);
+    }
+  }
+
+  void _openRecycleBin(BuildContext context) {
+    appLogger.dWithPackage('files_page', '_openRecycleBin: 打开回收站页面');
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const RecycleBinPage(),
       ),
     );
   }
@@ -1407,6 +1710,474 @@ class _FilesViewState extends State<FilesView> {
           },
         );
       },
+    );
+  }
+
+  void _showPermissionDialog(BuildContext context, FilesProvider provider, FileInfo file, AppLocalizations l10n) {
+    appLogger.dWithPackage('files_page', '_showPermissionDialog: 打开权限管理对话框, file=${file.path}');
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) => _PermissionDialog(
+        file: file,
+        provider: provider,
+        l10n: l10n,
+      ),
+    );
+  }
+}
+
+class _PermissionDialog extends StatefulWidget {
+  final FileInfo file;
+  final FilesProvider provider;
+  final AppLocalizations l10n;
+
+  const _PermissionDialog({
+    required this.file,
+    required this.provider,
+    required this.l10n,
+  });
+
+  @override
+  State<_PermissionDialog> createState() => _PermissionDialogState();
+}
+
+class _PermissionDialogState extends State<_PermissionDialog> {
+  FileUserGroupResponse? _userGroup;
+  bool _isLoading = true;
+  String? _error;
+  
+  late int _ownerRead;
+  late int _ownerWrite;
+  late int _ownerExecute;
+  late int _groupRead;
+  late int _groupWrite;
+  late int _groupExecute;
+  late int _otherRead;
+  late int _otherWrite;
+  late int _otherExecute;
+  
+  String? _selectedUser;
+  String? _selectedGroup;
+  bool _recursive = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPermissionData();
+  }
+
+  Future<void> _loadPermissionData() async {
+    try {
+      final results = await Future.wait([
+        widget.provider.getFilePermission(widget.file.path),
+        widget.provider.getUserGroup(),
+      ]);
+      
+      final permission = results[0] as FilePermission;
+      final userGroup = results[1] as FileUserGroupResponse;
+      
+      final mode = permission.permission ?? widget.file.permission ?? widget.file.mode ?? '755';
+      _parseMode(mode);
+      
+      setState(() {
+        _userGroup = userGroup;
+        _selectedUser = permission.user ?? widget.file.user;
+        _selectedGroup = permission.group ?? widget.file.group;
+        _isLoading = false;
+      });
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_page', '_loadPermissionData: 加载失败', error: e, stackTrace: stackTrace);
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _parseMode(String mode) {
+    String cleanMode = mode;
+    if (cleanMode.length > 3) {
+      cleanMode = cleanMode.substring(cleanMode.length - 3);
+    }
+    
+    int modeValue = int.tryParse(cleanMode, radix: 8) ?? 493;
+    
+    final ownerBits = (modeValue >> 6) & 7;
+    final groupBits = (modeValue >> 3) & 7;
+    final otherBits = modeValue & 7;
+    
+    _ownerRead = (ownerBits >> 2) & 1;
+    _ownerWrite = (ownerBits >> 1) & 1;
+    _ownerExecute = ownerBits & 1;
+    
+    _groupRead = (groupBits >> 2) & 1;
+    _groupWrite = (groupBits >> 1) & 1;
+    _groupExecute = groupBits & 1;
+    
+    _otherRead = (otherBits >> 2) & 1;
+    _otherWrite = (otherBits >> 1) & 1;
+    _otherExecute = otherBits & 1;
+  }
+
+  String _calculateMode() {
+    final owner = (_ownerRead << 2) | (_ownerWrite << 1) | _ownerExecute;
+    final group = (_groupRead << 2) | (_groupWrite << 1) | _groupExecute;
+    final other = (_otherRead << 2) | (_otherWrite << 1) | _otherExecute;
+    return '$owner$group$other';
+  }
+
+  Future<void> _savePermission() async {
+    final mode = _calculateMode();
+    appLogger.dWithPackage('files_page', '_savePermission: mode=$mode, user=$_selectedUser, group=$_selectedGroup, recursive=$_recursive');
+    
+    try {
+      if (_selectedUser != null || _selectedGroup != null) {
+        await widget.provider.changeFileOwner(
+          widget.file.path,
+          user: _selectedUser,
+          group: _selectedGroup,
+          recursive: _recursive,
+        );
+      }
+      
+      await widget.provider.changeFileMode(
+        widget.file.path,
+        mode,
+        recursive: _recursive,
+      );
+      
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(widget.l10n.filesPermissionSuccess)),
+        );
+      }
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_page', '_savePermission: 保存失败', error: e, stackTrace: stackTrace);
+      if (mounted) {
+        DebugErrorDialog.show(context, widget.l10n.filesPermissionFailed, e, stackTrace: stackTrace);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return AlertDialog(
+      title: Row(
+        children: [
+          Icon(Icons.lock_outline, color: colorScheme.primary),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              widget.l10n.filesPermissionTitle,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+      content: _buildContent(theme, colorScheme),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(widget.l10n.commonCancel),
+        ),
+        FilledButton(
+          onPressed: _isLoading ? null : _savePermission,
+          child: Text(widget.l10n.commonSave),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContent(ThemeData theme, ColorScheme colorScheme) {
+    if (_isLoading) {
+      return const SizedBox(
+        width: 400,
+        height: 300,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_error != null) {
+      return SizedBox(
+        width: 400,
+        height: 200,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: colorScheme.error),
+              const SizedBox(height: 16),
+              Text(widget.l10n.filesPermissionLoadFailed),
+              const SizedBox(height: 8),
+              Text(_error!, style: theme.textTheme.bodySmall, textAlign: TextAlign.center),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      child: SizedBox(
+        width: 400,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildFileInfo(theme, colorScheme),
+            const SizedBox(height: 16),
+            _buildModeSection(theme, colorScheme),
+            const SizedBox(height: 16),
+            _buildOwnerSection(theme, colorScheme),
+            const SizedBox(height: 16),
+            _buildRecursiveOption(theme),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFileInfo(ThemeData theme, ColorScheme colorScheme) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.file.name,
+              style: theme.textTheme.titleMedium,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              widget.file.path,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModeSection(ThemeData theme, ColorScheme colorScheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(widget.l10n.filesPermissionMode, style: theme.textTheme.titleSmall),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                _calculateMode(),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildPermissionTable(theme, colorScheme),
+      ],
+    );
+  }
+
+  Widget _buildPermissionTable(ThemeData theme, ColorScheme colorScheme) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            _buildPermissionHeader(theme),
+            const Divider(),
+            _buildPermissionRow(
+              widget.l10n.filesPermissionOwnerLabel,
+              _ownerRead, _ownerWrite, _ownerExecute,
+              (r, w, x) => setState(() {
+                _ownerRead = r;
+                _ownerWrite = w;
+                _ownerExecute = x;
+              }),
+              colorScheme,
+            ),
+            _buildPermissionRow(
+              widget.l10n.filesPermissionGroupLabel,
+              _groupRead, _groupWrite, _groupExecute,
+              (r, w, x) => setState(() {
+                _groupRead = r;
+                _groupWrite = w;
+                _groupExecute = x;
+              }),
+              colorScheme,
+            ),
+            _buildPermissionRow(
+              widget.l10n.filesPermissionOtherLabel,
+              _otherRead, _otherWrite, _otherExecute,
+              (r, w, x) => setState(() {
+                _otherRead = r;
+                _otherWrite = w;
+                _otherExecute = x;
+              }),
+              colorScheme,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPermissionHeader(ThemeData theme) {
+    return Row(
+      children: [
+        const Expanded(child: SizedBox()),
+        SizedBox(
+          width: 60,
+          child: Text(
+            widget.l10n.filesPermissionRead,
+            style: theme.textTheme.labelSmall,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(
+          width: 60,
+          child: Text(
+            widget.l10n.filesPermissionWrite,
+            style: theme.textTheme.labelSmall,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(
+          width: 60,
+          child: Text(
+            widget.l10n.filesPermissionExecute,
+            style: theme.textTheme.labelSmall,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPermissionRow(
+    String label,
+    int read, int write, int execute,
+    void Function(int, int, int) onChanged,
+    ColorScheme colorScheme,
+  ) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+        SizedBox(
+          width: 60,
+          child: Checkbox(
+            value: read == 1,
+            onChanged: (v) => onChanged(v == true ? 1 : 0, write, execute),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+        SizedBox(
+          width: 60,
+          child: Checkbox(
+            value: write == 1,
+            onChanged: (v) => onChanged(read, v == true ? 1 : 0, execute),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+        SizedBox(
+          width: 60,
+          child: Checkbox(
+            value: execute == 1,
+            onChanged: (v) => onChanged(read, write, v == true ? 1 : 0),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOwnerSection(ThemeData theme, ColorScheme colorScheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(widget.l10n.filesPermissionChangeOwner, style: theme.textTheme.titleSmall),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                value: _selectedUser,
+                decoration: InputDecoration(
+                  labelText: widget.l10n.filesPermissionUser,
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+                items: _userGroup?.users.map((u) => DropdownMenuItem(
+                  value: u.user,
+                  child: Text(u.user),
+                )).toList() ?? [],
+                onChanged: (v) => setState(() => _selectedUser = v),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                value: _selectedGroup,
+                decoration: InputDecoration(
+                  labelText: widget.l10n.filesPermissionGroup,
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+                items: _userGroup?.groups.map((g) => DropdownMenuItem(
+                  value: g,
+                  child: Text(g),
+                )).toList() ?? [],
+                onChanged: (v) => setState(() => _selectedGroup = v),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecursiveOption(ThemeData theme) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: SwitchListTile(
+        title: Text(widget.l10n.filesPermissionRecursive),
+        subtitle: Text(
+          widget.file.isDir 
+            ? widget.l10n.filesPermissionRecursive
+            : widget.l10n.filesPermissionRecursive,
+          style: theme.textTheme.bodySmall,
+        ),
+        value: _recursive,
+        onChanged: widget.file.isDir 
+          ? (v) => setState(() => _recursive = v)
+          : null,
+      ),
     );
   }
 }

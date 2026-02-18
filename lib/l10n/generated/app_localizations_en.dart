@@ -269,6 +269,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filesActionOpen => 'Open';
 
   @override
+  String get filesActionDownload => 'Download';
+
+  @override
   String get filesActionRename => 'Rename';
 
   @override
@@ -371,6 +374,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filesCreateFailed => 'Create failed';
+
+  @override
+  String get filesDownloadFailed => 'Download failed';
+
+  @override
+  String get filesDownloadSuccess => 'Download successful';
+
+  @override
+  String filesDownloadProgress(int progress) {
+    return 'Downloading $progress%';
+  }
+
+  @override
+  String get filesDownloadCancelled => 'Download cancelled';
+
+  @override
+  String filesDownloadSaving(String path) {
+    return 'Saving to: $path';
+  }
 
   @override
   String get filesOperationSuccess => 'Operation successful';
@@ -1461,4 +1483,233 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverModuleSystemSettings => 'System Settings';
+
+  @override
+  String get filesFavorites => 'Favorites';
+
+  @override
+  String get filesFavoritesEmpty => 'No favorites';
+
+  @override
+  String get filesFavoritesEmptyDesc =>
+      'Long press a file or folder to add to favorites';
+
+  @override
+  String get filesAddToFavorites => 'Add to Favorites';
+
+  @override
+  String get filesRemoveFromFavorites => 'Remove from Favorites';
+
+  @override
+  String get filesFavoritesAdded => 'Added to favorites';
+
+  @override
+  String get filesFavoritesRemoved => 'Removed from favorites';
+
+  @override
+  String get filesNavigateToFolder => 'Navigate to folder';
+
+  @override
+  String get filesFavoritesLoadFailed => 'Failed to load favorites';
+
+  @override
+  String get filesPermissionTitle => 'Permission Management';
+
+  @override
+  String get filesPermissionMode => 'Permission Mode';
+
+  @override
+  String get filesPermissionOwner => 'Owner';
+
+  @override
+  String get filesPermissionGroup => 'Group';
+
+  @override
+  String get filesPermissionRead => 'Read';
+
+  @override
+  String get filesPermissionWrite => 'Write';
+
+  @override
+  String get filesPermissionExecute => 'Execute';
+
+  @override
+  String get filesPermissionOwnerLabel => 'Owner Permissions';
+
+  @override
+  String get filesPermissionGroupLabel => 'Group Permissions';
+
+  @override
+  String get filesPermissionOtherLabel => 'Other Permissions';
+
+  @override
+  String get filesPermissionRecursive => 'Apply recursively';
+
+  @override
+  String get filesPermissionUser => 'User';
+
+  @override
+  String get filesPermissionUserHint => 'Select user';
+
+  @override
+  String get filesPermissionGroupHint => 'Select group';
+
+  @override
+  String get filesPermissionChangeOwner => 'Change Owner';
+
+  @override
+  String get filesPermissionChangeMode => 'Change Mode';
+
+  @override
+  String get filesPermissionSuccess => 'Permission changed successfully';
+
+  @override
+  String get filesPermissionFailed => 'Failed to change permission';
+
+  @override
+  String get filesPermissionLoadFailed => 'Failed to load permission info';
+
+  @override
+  String get filesPermissionOctal => 'Octal notation';
+
+  @override
+  String get filesPreviewTitle => 'File Preview';
+
+  @override
+  String get filesEditorTitle => 'Edit File';
+
+  @override
+  String get filesPreviewLoading => 'Loading...';
+
+  @override
+  String get filesPreviewError => 'Failed to load';
+
+  @override
+  String get filesPreviewUnsupported => 'Cannot preview this file type';
+
+  @override
+  String get filesEditorSave => 'Save';
+
+  @override
+  String get filesEditorSaved => 'Saved';
+
+  @override
+  String get filesEditorUnsaved => 'Unsaved';
+
+  @override
+  String get filesEditorSaving => 'Saving...';
+
+  @override
+  String get filesEditorEncoding => 'Encoding';
+
+  @override
+  String get filesEditorLineNumbers => 'Line Numbers';
+
+  @override
+  String get filesEditorWordWrap => 'Word Wrap';
+
+  @override
+  String get filesPreviewImage => 'Image Preview';
+
+  @override
+  String get filesPreviewCode => 'Code Preview';
+
+  @override
+  String get filesPreviewText => 'Text Preview';
+
+  @override
+  String get filesEditFile => 'Edit File';
+
+  @override
+  String get filesActionWgetDownload => 'Remote Download';
+
+  @override
+  String get filesWgetUrl => 'Download URL';
+
+  @override
+  String get filesWgetUrlHint => 'Enter file URL';
+
+  @override
+  String get filesWgetFilename => 'Filename';
+
+  @override
+  String get filesWgetFilenameHint => 'Leave empty to use URL filename';
+
+  @override
+  String get filesWgetOverwrite => 'Overwrite existing file';
+
+  @override
+  String get filesWgetDownload => 'Start Download';
+
+  @override
+  String filesWgetSuccess(String path) {
+    return 'Download successful: $path';
+  }
+
+  @override
+  String get filesWgetFailed => 'Download failed';
+
+  @override
+  String get recycleBinRestore => 'Restore';
+
+  @override
+  String recycleBinRestoreConfirm(int count) {
+    return 'Are you sure you want to restore $count selected files?';
+  }
+
+  @override
+  String get recycleBinRestoreSuccess => 'Files restored successfully';
+
+  @override
+  String get recycleBinRestoreFailed => 'Failed to restore files';
+
+  @override
+  String recycleBinRestoreSingleConfirm(String name) {
+    return 'Are you sure you want to restore \"$name\"?';
+  }
+
+  @override
+  String get recycleBinDeletePermanently => 'Delete Permanently';
+
+  @override
+  String recycleBinDeletePermanentlyConfirm(int count) {
+    return 'Are you sure you want to permanently delete $count selected files? This action cannot be undone.';
+  }
+
+  @override
+  String get recycleBinDeletePermanentlySuccess => 'Files permanently deleted';
+
+  @override
+  String get recycleBinDeletePermanentlyFailed =>
+      'Failed to delete files permanently';
+
+  @override
+  String recycleBinDeletePermanentlySingleConfirm(String name) {
+    return 'Are you sure you want to permanently delete \"$name\"? This action cannot be undone.';
+  }
+
+  @override
+  String get recycleBinClear => 'Clear Recycle Bin';
+
+  @override
+  String get recycleBinClearConfirm =>
+      'Are you sure you want to clear the recycle bin? All files will be permanently deleted.';
+
+  @override
+  String get recycleBinClearSuccess => 'Recycle bin cleared';
+
+  @override
+  String get recycleBinClearFailed => 'Failed to clear recycle bin';
+
+  @override
+  String get recycleBinSearch => 'Search files';
+
+  @override
+  String get recycleBinEmpty => 'Recycle bin is empty';
+
+  @override
+  String get recycleBinNoResults => 'No files found';
+
+  @override
+  String get recycleBinSourcePath => 'Original path';
 }

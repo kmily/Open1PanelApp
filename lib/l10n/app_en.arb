@@ -93,6 +93,7 @@
   "filesActionNewFolder": "New folder",
   "filesActionNew": "New",
   "filesActionOpen": "Open",
+  "filesActionDownload": "Download",
   "filesActionRename": "Rename",
   "filesActionCopy": "Copy",
   "filesActionMove": "Move",
@@ -134,6 +135,25 @@
   "filesCompressFailed": "Compress failed",
   "filesExtractFailed": "Extract failed",
   "filesCreateFailed": "Create failed",
+  "filesDownloadFailed": "Download failed",
+  "filesDownloadSuccess": "Download successful",
+  "filesDownloadProgress": "Downloading {progress}%",
+  "@filesDownloadProgress": {
+    "placeholders": {
+      "progress": {
+        "type": "int"
+      }
+    }
+  },
+  "filesDownloadCancelled": "Download cancelled",
+  "filesDownloadSaving": "Saving to: {path}",
+  "@filesDownloadSaving": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
   "filesOperationSuccess": "Operation successful",
   "filesCompressType": "Type",
   "filesUploadDeveloping": "Upload feature is under development",
@@ -605,5 +625,113 @@
   "bindSettingsPort": "Panel Port",
   "bindSettingsSaved": "Bind settings saved",
   "bindSettingsFailed": "Failed to save",
-  "serverModuleSystemSettings": "System Settings"
+  "serverModuleSystemSettings": "System Settings",
+  "filesFavorites": "Favorites",
+  "filesFavoritesEmpty": "No favorites",
+  "filesFavoritesEmptyDesc": "Long press a file or folder to add to favorites",
+  "filesAddToFavorites": "Add to Favorites",
+  "filesRemoveFromFavorites": "Remove from Favorites",
+  "filesFavoritesAdded": "Added to favorites",
+  "filesFavoritesRemoved": "Removed from favorites",
+  "filesNavigateToFolder": "Navigate to folder",
+  "filesFavoritesLoadFailed": "Failed to load favorites",
+  "filesPermissionTitle": "Permission Management",
+  "filesPermissionMode": "Permission Mode",
+  "filesPermissionOwner": "Owner",
+  "filesPermissionGroup": "Group",
+  "filesPermissionRead": "Read",
+  "filesPermissionWrite": "Write",
+  "filesPermissionExecute": "Execute",
+  "filesPermissionOwnerLabel": "Owner Permissions",
+  "filesPermissionGroupLabel": "Group Permissions",
+  "filesPermissionOtherLabel": "Other Permissions",
+  "filesPermissionRecursive": "Apply recursively",
+  "filesPermissionUser": "User",
+  "filesPermissionUserHint": "Select user",
+  "filesPermissionGroupHint": "Select group",
+  "filesPermissionChangeOwner": "Change Owner",
+  "filesPermissionChangeMode": "Change Mode",
+  "filesPermissionSuccess": "Permission changed successfully",
+  "filesPermissionFailed": "Failed to change permission",
+  "filesPermissionLoadFailed": "Failed to load permission info",
+  "filesPermissionOctal": "Octal notation",
+  "filesPreviewTitle": "File Preview",
+  "filesEditorTitle": "Edit File",
+  "filesPreviewLoading": "Loading...",
+  "filesPreviewError": "Failed to load",
+  "filesPreviewUnsupported": "Cannot preview this file type",
+  "filesEditorSave": "Save",
+  "filesEditorSaved": "Saved",
+  "filesEditorUnsaved": "Unsaved",
+  "filesEditorSaving": "Saving...",
+  "filesEditorEncoding": "Encoding",
+  "filesEditorLineNumbers": "Line Numbers",
+  "filesEditorWordWrap": "Word Wrap",
+  "filesPreviewImage": "Image Preview",
+  "filesPreviewCode": "Code Preview",
+  "filesPreviewText": "Text Preview",
+  "filesEditFile": "Edit File",
+  "filesActionWgetDownload": "Remote Download",
+  "filesWgetUrl": "Download URL",
+  "filesWgetUrlHint": "Enter file URL",
+  "filesWgetFilename": "Filename",
+  "filesWgetFilenameHint": "Leave empty to use URL filename",
+  "filesWgetOverwrite": "Overwrite existing file",
+  "filesWgetDownload": "Start Download",
+  "filesWgetSuccess": "Download successful: {path}",
+  "@filesWgetSuccess": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "filesWgetFailed": "Download failed",
+  "filesActionDownload": "Download",
+  "recycleBinRestore": "Restore",
+  "recycleBinRestoreConfirm": "Are you sure you want to restore {count} selected files?",
+  "@recycleBinRestoreConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recycleBinRestoreSuccess": "Files restored successfully",
+  "recycleBinRestoreFailed": "Failed to restore files",
+  "recycleBinRestoreSingleConfirm": "Are you sure you want to restore \"{name}\"?",
+  "@recycleBinRestoreSingleConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "recycleBinDeletePermanently": "Delete Permanently",
+  "recycleBinDeletePermanentlyConfirm": "Are you sure you want to permanently delete {count} selected files? This action cannot be undone.",
+  "@recycleBinDeletePermanentlyConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recycleBinDeletePermanentlySuccess": "Files permanently deleted",
+  "recycleBinDeletePermanentlyFailed": "Failed to delete files permanently",
+  "recycleBinDeletePermanentlySingleConfirm": "Are you sure you want to permanently delete \"{name}\"? This action cannot be undone.",
+  "@recycleBinDeletePermanentlySingleConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "recycleBinClear": "Clear Recycle Bin",
+  "recycleBinClearConfirm": "Are you sure you want to clear the recycle bin? All files will be permanently deleted.",
+  "recycleBinClearSuccess": "Recycle bin cleared",
+  "recycleBinClearFailed": "Failed to clear recycle bin",
+  "recycleBinSearch": "Search files",
+  "recycleBinEmpty": "Recycle bin is empty",
+  "recycleBinNoResults": "No files found",
+  "recycleBinSourcePath": "Original path"
 }

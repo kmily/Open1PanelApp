@@ -93,6 +93,7 @@
   "filesActionNewFolder": "新建文件夹",
   "filesActionNew": "新建",
   "filesActionOpen": "打开",
+  "filesActionDownload": "下载",
   "filesActionRename": "重命名",
   "filesActionCopy": "复制",
   "filesActionMove": "移动",
@@ -134,6 +135,25 @@
   "filesCompressFailed": "压缩失败",
   "filesExtractFailed": "解压失败",
   "filesCreateFailed": "创建失败",
+  "filesDownloadFailed": "下载失败",
+  "filesDownloadSuccess": "下载成功",
+  "filesDownloadProgress": "下载中 {progress}%",
+  "@filesDownloadProgress": {
+    "placeholders": {
+      "progress": {
+        "type": "int"
+      }
+    }
+  },
+  "filesDownloadCancelled": "下载已取消",
+  "filesDownloadSaving": "正在保存到: {path}",
+  "@filesDownloadSaving": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
   "filesOperationSuccess": "操作成功",
   "filesCompressType": "类型",
   "filesUploadDeveloping": "上传功能需要进一步开发",
@@ -553,5 +573,113 @@
   "bindSettingsPort": "面板端口",
   "bindSettingsSaved": "绑定设置已保存",
   "bindSettingsFailed": "保存失败",
-  "serverModuleSystemSettings": "系统设置"
+  "serverModuleSystemSettings": "系统设置",
+  "filesFavorites": "收藏夹",
+  "filesFavoritesEmpty": "暂无收藏",
+  "filesFavoritesEmptyDesc": "长按文件或文件夹可添加到收藏夹",
+  "filesAddToFavorites": "添加到收藏夹",
+  "filesRemoveFromFavorites": "取消收藏",
+  "filesFavoritesAdded": "已添加到收藏夹",
+  "filesFavoritesRemoved": "已从收藏夹移除",
+  "filesNavigateToFolder": "跳转到所在目录",
+  "filesFavoritesLoadFailed": "加载收藏夹失败",
+  "filesPermissionTitle": "权限管理",
+  "filesPermissionMode": "权限模式",
+  "filesPermissionOwner": "所有者",
+  "filesPermissionGroup": "所属组",
+  "filesPermissionRead": "读取",
+  "filesPermissionWrite": "写入",
+  "filesPermissionExecute": "执行",
+  "filesPermissionOwnerLabel": "所有者权限",
+  "filesPermissionGroupLabel": "组权限",
+  "filesPermissionOtherLabel": "其他权限",
+  "filesPermissionRecursive": "递归应用到子目录",
+  "filesPermissionUser": "用户",
+  "filesPermissionUserHint": "选择用户",
+  "filesPermissionGroupHint": "选择组",
+  "filesPermissionChangeOwner": "修改所有者",
+  "filesPermissionChangeMode": "修改权限",
+  "filesPermissionSuccess": "权限修改成功",
+  "filesPermissionFailed": "权限修改失败",
+  "filesPermissionLoadFailed": "加载权限信息失败",
+  "filesPermissionOctal": "八进制表示",
+  "filesPreviewTitle": "文件预览",
+  "filesEditorTitle": "编辑文件",
+  "filesPreviewLoading": "加载中...",
+  "filesPreviewError": "加载失败",
+  "filesPreviewUnsupported": "不支持预览此文件类型",
+  "filesEditorSave": "保存",
+  "filesEditorSaved": "已保存",
+  "filesEditorUnsaved": "未保存",
+  "filesEditorSaving": "保存中...",
+  "filesEditorEncoding": "编码",
+  "filesEditorLineNumbers": "行号",
+  "filesEditorWordWrap": "自动换行",
+  "filesPreviewImage": "图片预览",
+  "filesPreviewCode": "代码预览",
+  "filesPreviewText": "文本预览",
+  "filesEditFile": "编辑文件",
+  "filesActionWgetDownload": "远程下载",
+  "filesWgetUrl": "下载地址",
+  "filesWgetUrlHint": "请输入文件URL",
+  "filesWgetFilename": "文件名",
+  "filesWgetFilenameHint": "留空则使用URL中的文件名",
+  "filesWgetOverwrite": "覆盖已存在的文件",
+  "filesWgetDownload": "开始下载",
+  "filesWgetSuccess": "下载成功: {path}",
+  "@filesWgetSuccess": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "filesWgetFailed": "下载失败",
+  "filesActionDownload": "下载",
+  "recycleBinRestore": "恢复",
+  "recycleBinRestoreConfirm": "确定要恢复选中的 {count} 个文件吗？",
+  "@recycleBinRestoreConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recycleBinRestoreSuccess": "文件恢复成功",
+  "recycleBinRestoreFailed": "恢复文件失败",
+  "recycleBinRestoreSingleConfirm": "确定要恢复 \"{name}\" 吗？",
+  "@recycleBinRestoreSingleConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "recycleBinDeletePermanently": "彻底删除",
+  "recycleBinDeletePermanentlyConfirm": "确定要彻底删除选中的 {count} 个文件吗？此操作无法撤销。",
+  "@recycleBinDeletePermanentlyConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recycleBinDeletePermanentlySuccess": "文件已彻底删除",
+  "recycleBinDeletePermanentlyFailed": "彻底删除文件失败",
+  "recycleBinDeletePermanentlySingleConfirm": "确定要彻底删除 \"{name}\" 吗？此操作无法撤销。",
+  "@recycleBinDeletePermanentlySingleConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "recycleBinClear": "清空回收站",
+  "recycleBinClearConfirm": "确定要清空回收站吗？所有文件将被永久删除。",
+  "recycleBinClearSuccess": "回收站已清空",
+  "recycleBinClearFailed": "清空回收站失败",
+  "recycleBinSearch": "搜索文件",
+  "recycleBinEmpty": "回收站为空",
+  "recycleBinNoResults": "未找到文件",
+  "recycleBinSourcePath": "原路径"
 }

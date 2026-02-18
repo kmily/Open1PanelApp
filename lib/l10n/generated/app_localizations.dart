@@ -608,6 +608,12 @@ abstract class AppLocalizations {
   /// **'Open'**
   String get filesActionOpen;
 
+  /// No description provided for @filesActionDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get filesActionDownload;
+
   /// No description provided for @filesActionRename.
   ///
   /// In en, this message translates to:
@@ -811,6 +817,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create failed'**
   String get filesCreateFailed;
+
+  /// No description provided for @filesDownloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed'**
+  String get filesDownloadFailed;
+
+  /// No description provided for @filesDownloadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Download successful'**
+  String get filesDownloadSuccess;
+
+  /// No description provided for @filesDownloadProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading {progress}%'**
+  String filesDownloadProgress(int progress);
+
+  /// No description provided for @filesDownloadCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Download cancelled'**
+  String get filesDownloadCancelled;
+
+  /// No description provided for @filesDownloadSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving to: {path}'**
+  String filesDownloadSaving(String path);
 
   /// No description provided for @filesOperationSuccess.
   ///
@@ -2851,6 +2887,438 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System Settings'**
   String get serverModuleSystemSettings;
+
+  /// No description provided for @filesFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get filesFavorites;
+
+  /// No description provided for @filesFavoritesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorites'**
+  String get filesFavoritesEmpty;
+
+  /// No description provided for @filesFavoritesEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Long press a file or folder to add to favorites'**
+  String get filesFavoritesEmptyDesc;
+
+  /// No description provided for @filesAddToFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Favorites'**
+  String get filesAddToFavorites;
+
+  /// No description provided for @filesRemoveFromFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from Favorites'**
+  String get filesRemoveFromFavorites;
+
+  /// No description provided for @filesFavoritesAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to favorites'**
+  String get filesFavoritesAdded;
+
+  /// No description provided for @filesFavoritesRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from favorites'**
+  String get filesFavoritesRemoved;
+
+  /// No description provided for @filesNavigateToFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigate to folder'**
+  String get filesNavigateToFolder;
+
+  /// No description provided for @filesFavoritesLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load favorites'**
+  String get filesFavoritesLoadFailed;
+
+  /// No description provided for @filesPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission Management'**
+  String get filesPermissionTitle;
+
+  /// No description provided for @filesPermissionMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission Mode'**
+  String get filesPermissionMode;
+
+  /// No description provided for @filesPermissionOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get filesPermissionOwner;
+
+  /// No description provided for @filesPermissionGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get filesPermissionGroup;
+
+  /// No description provided for @filesPermissionRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get filesPermissionRead;
+
+  /// No description provided for @filesPermissionWrite.
+  ///
+  /// In en, this message translates to:
+  /// **'Write'**
+  String get filesPermissionWrite;
+
+  /// No description provided for @filesPermissionExecute.
+  ///
+  /// In en, this message translates to:
+  /// **'Execute'**
+  String get filesPermissionExecute;
+
+  /// No description provided for @filesPermissionOwnerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner Permissions'**
+  String get filesPermissionOwnerLabel;
+
+  /// No description provided for @filesPermissionGroupLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Group Permissions'**
+  String get filesPermissionGroupLabel;
+
+  /// No description provided for @filesPermissionOtherLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Permissions'**
+  String get filesPermissionOtherLabel;
+
+  /// No description provided for @filesPermissionRecursive.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply recursively'**
+  String get filesPermissionRecursive;
+
+  /// No description provided for @filesPermissionUser.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get filesPermissionUser;
+
+  /// No description provided for @filesPermissionUserHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select user'**
+  String get filesPermissionUserHint;
+
+  /// No description provided for @filesPermissionGroupHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select group'**
+  String get filesPermissionGroupHint;
+
+  /// No description provided for @filesPermissionChangeOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Owner'**
+  String get filesPermissionChangeOwner;
+
+  /// No description provided for @filesPermissionChangeMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Mode'**
+  String get filesPermissionChangeMode;
+
+  /// No description provided for @filesPermissionSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission changed successfully'**
+  String get filesPermissionSuccess;
+
+  /// No description provided for @filesPermissionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to change permission'**
+  String get filesPermissionFailed;
+
+  /// No description provided for @filesPermissionLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load permission info'**
+  String get filesPermissionLoadFailed;
+
+  /// No description provided for @filesPermissionOctal.
+  ///
+  /// In en, this message translates to:
+  /// **'Octal notation'**
+  String get filesPermissionOctal;
+
+  /// No description provided for @filesPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'File Preview'**
+  String get filesPreviewTitle;
+
+  /// No description provided for @filesEditorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit File'**
+  String get filesEditorTitle;
+
+  /// No description provided for @filesPreviewLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get filesPreviewLoading;
+
+  /// No description provided for @filesPreviewError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get filesPreviewError;
+
+  /// No description provided for @filesPreviewUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot preview this file type'**
+  String get filesPreviewUnsupported;
+
+  /// No description provided for @filesEditorSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get filesEditorSave;
+
+  /// No description provided for @filesEditorSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get filesEditorSaved;
+
+  /// No description provided for @filesEditorUnsaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsaved'**
+  String get filesEditorUnsaved;
+
+  /// No description provided for @filesEditorSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get filesEditorSaving;
+
+  /// No description provided for @filesEditorEncoding.
+  ///
+  /// In en, this message translates to:
+  /// **'Encoding'**
+  String get filesEditorEncoding;
+
+  /// No description provided for @filesEditorLineNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Line Numbers'**
+  String get filesEditorLineNumbers;
+
+  /// No description provided for @filesEditorWordWrap.
+  ///
+  /// In en, this message translates to:
+  /// **'Word Wrap'**
+  String get filesEditorWordWrap;
+
+  /// No description provided for @filesPreviewImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image Preview'**
+  String get filesPreviewImage;
+
+  /// No description provided for @filesPreviewCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Code Preview'**
+  String get filesPreviewCode;
+
+  /// No description provided for @filesPreviewText.
+  ///
+  /// In en, this message translates to:
+  /// **'Text Preview'**
+  String get filesPreviewText;
+
+  /// No description provided for @filesEditFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit File'**
+  String get filesEditFile;
+
+  /// No description provided for @filesActionWgetDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote Download'**
+  String get filesActionWgetDownload;
+
+  /// No description provided for @filesWgetUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Download URL'**
+  String get filesWgetUrl;
+
+  /// No description provided for @filesWgetUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter file URL'**
+  String get filesWgetUrlHint;
+
+  /// No description provided for @filesWgetFilename.
+  ///
+  /// In en, this message translates to:
+  /// **'Filename'**
+  String get filesWgetFilename;
+
+  /// No description provided for @filesWgetFilenameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to use URL filename'**
+  String get filesWgetFilenameHint;
+
+  /// No description provided for @filesWgetOverwrite.
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite existing file'**
+  String get filesWgetOverwrite;
+
+  /// No description provided for @filesWgetDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Download'**
+  String get filesWgetDownload;
+
+  /// No description provided for @filesWgetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Download successful: {path}'**
+  String filesWgetSuccess(String path);
+
+  /// No description provided for @filesWgetFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed'**
+  String get filesWgetFailed;
+
+  /// No description provided for @recycleBinRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get recycleBinRestore;
+
+  /// No description provided for @recycleBinRestoreConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to restore {count} selected files?'**
+  String recycleBinRestoreConfirm(int count);
+
+  /// No description provided for @recycleBinRestoreSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Files restored successfully'**
+  String get recycleBinRestoreSuccess;
+
+  /// No description provided for @recycleBinRestoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to restore files'**
+  String get recycleBinRestoreFailed;
+
+  /// No description provided for @recycleBinRestoreSingleConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to restore \"{name}\"?'**
+  String recycleBinRestoreSingleConfirm(String name);
+
+  /// No description provided for @recycleBinDeletePermanently.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Permanently'**
+  String get recycleBinDeletePermanently;
+
+  /// No description provided for @recycleBinDeletePermanentlyConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete {count} selected files? This action cannot be undone.'**
+  String recycleBinDeletePermanentlyConfirm(int count);
+
+  /// No description provided for @recycleBinDeletePermanentlySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Files permanently deleted'**
+  String get recycleBinDeletePermanentlySuccess;
+
+  /// No description provided for @recycleBinDeletePermanentlyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete files permanently'**
+  String get recycleBinDeletePermanentlyFailed;
+
+  /// No description provided for @recycleBinDeletePermanentlySingleConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete \"{name}\"? This action cannot be undone.'**
+  String recycleBinDeletePermanentlySingleConfirm(String name);
+
+  /// No description provided for @recycleBinClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Recycle Bin'**
+  String get recycleBinClear;
+
+  /// No description provided for @recycleBinClearConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear the recycle bin? All files will be permanently deleted.'**
+  String get recycleBinClearConfirm;
+
+  /// No description provided for @recycleBinClearSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Recycle bin cleared'**
+  String get recycleBinClearSuccess;
+
+  /// No description provided for @recycleBinClearFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to clear recycle bin'**
+  String get recycleBinClearFailed;
+
+  /// No description provided for @recycleBinSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search files'**
+  String get recycleBinSearch;
+
+  /// No description provided for @recycleBinEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Recycle bin is empty'**
+  String get recycleBinEmpty;
+
+  /// No description provided for @recycleBinNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No files found'**
+  String get recycleBinNoResults;
+
+  /// No description provided for @recycleBinSourcePath.
+  ///
+  /// In en, this message translates to:
+  /// **'Original path'**
+  String get recycleBinSourcePath;
 }
 
 class _AppLocalizationsDelegate

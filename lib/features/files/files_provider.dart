@@ -6,6 +6,41 @@ import '../../core/config/api_config.dart';
 import '../../core/network/api_client_manager.dart';
 import '../../core/services/logger/logger_service.dart';
 
+enum WgetDownloadState {
+  idle,
+  downloading,
+  success,
+  error,
+}
+
+class WgetDownloadStatus {
+  final WgetDownloadState state;
+  final String? message;
+  final String? filePath;
+  final int? downloadedSize;
+
+  const WgetDownloadStatus({
+    this.state = WgetDownloadState.idle,
+    this.message,
+    this.filePath,
+    this.downloadedSize,
+  });
+
+  WgetDownloadStatus copyWith({
+    WgetDownloadState? state,
+    String? message,
+    String? filePath,
+    int? downloadedSize,
+  }) {
+    return WgetDownloadStatus(
+      state: state ?? this.state,
+      message: message ?? this.message,
+      filePath: filePath ?? this.filePath,
+      downloadedSize: downloadedSize ?? this.downloadedSize,
+    );
+  }
+}
+
 class FilesData {
   final List<FileInfo> files;
   final String currentPath;
@@ -19,6 +54,12 @@ class FilesData {
   final ApiConfig? currentServer;
   final List<FileMountInfo>? mountInfo;
   final FileRecycleStatus? recycleBinStatus;
+  final List<FileInfo> favorites;
+  final Set<String> favoritePaths;
+  final WgetDownloadStatus? wgetStatus;
+  final bool isDownloading;
+  final double downloadProgress;
+  final String? downloadingFileName;
 
   const FilesData({
     this.files = const [],
@@ -33,6 +74,12 @@ class FilesData {
     this.currentServer,
     this.mountInfo,
     this.recycleBinStatus,
+    this.favorites = const [],
+    this.favoritePaths = const {},
+    this.wgetStatus,
+    this.isDownloading = false,
+    this.downloadProgress = 0.0,
+    this.downloadingFileName,
   });
 
   FilesData copyWith({
@@ -48,6 +95,12 @@ class FilesData {
     ApiConfig? currentServer,
     List<FileMountInfo>? mountInfo,
     FileRecycleStatus? recycleBinStatus,
+    List<FileInfo>? favorites,
+    Set<String>? favoritePaths,
+    WgetDownloadStatus? wgetStatus,
+    bool? isDownloading,
+    double? downloadProgress,
+    String? downloadingFileName,
   }) {
     return FilesData(
       files: files ?? this.files,
@@ -62,6 +115,12 @@ class FilesData {
       currentServer: currentServer ?? this.currentServer,
       mountInfo: mountInfo ?? this.mountInfo,
       recycleBinStatus: recycleBinStatus ?? this.recycleBinStatus,
+      favorites: favorites ?? this.favorites,
+      favoritePaths: favoritePaths ?? this.favoritePaths,
+      wgetStatus: wgetStatus,
+      isDownloading: isDownloading ?? this.isDownloading,
+      downloadProgress: downloadProgress ?? this.downloadProgress,
+      downloadingFileName: downloadingFileName ?? this.downloadingFileName,
     );
   }
 
@@ -70,6 +129,7 @@ class FilesData {
   bool isSelected(String path) => selectedFiles.contains(path);
   bool get isSearching => searchQuery != null && searchQuery!.isNotEmpty;
   bool get hasServer => currentServer != null;
+  bool isFavorite(String path) => favoritePaths.contains(path);
 }
 
 class FilesProvider extends ChangeNotifier {
@@ -149,6 +209,96 @@ class FilesProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       appLogger.eWithPackage('files_provider', 'loadRecycleBinStatus: 加载回收站状态失败', error: e);
+    }
+  }
+
+  Future<List<RecycleBinItem>> loadRecycleBinFiles({int page = 1, int pageSize = 100}) async {
+    appLogger.dWithPackage('files_provider', 'loadRecycleBinFiles: 加载回收站文件列表');
+    try {
+      final api = await ApiClientManager.instance.getFileApi();
+      final response = await api.searchRecycleBin(FileSearch(
+        path: '/',
+        page: page,
+        pageSize: pageSize,
+      ));
+      final files = response.data?.map((f) {
+        final json = f.toJson();
+        return RecycleBinItem.fromJson(json);
+      }).toList() ?? [];
+      appLogger.iWithPackage('files_provider', 'loadRecycleBinFiles: 成功加载${files.length}个回收站文件');
+      return files;
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'loadRecycleBinFiles: 加载失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> restoreFile(RecycleBinItem file) async {
+    appLogger.dWithPackage('files_provider', 'restoreFile: 恢复文件 ${file.name}');
+    try {
+      await _service.restoreFile(RecycleBinReduceRequest(
+        rName: file.rName,
+        from: file.from,
+        name: file.name,
+      ));
+      appLogger.iWithPackage('files_provider', 'restoreFile: 成功恢复文件 ${file.name}');
+      await loadRecycleBinStatus();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'restoreFile: 恢复失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> restoreFiles(List<RecycleBinItem> files) async {
+    appLogger.dWithPackage('files_provider', 'restoreFiles: 恢复${files.length}个文件');
+    try {
+      final requests = files.map((f) => RecycleBinReduceRequest(
+        rName: f.rName,
+        from: f.from,
+        name: f.name,
+      )).toList();
+      await _service.restoreFiles(requests);
+      appLogger.iWithPackage('files_provider', 'restoreFiles: 成功恢复${files.length}个文件');
+      await loadRecycleBinStatus();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'restoreFiles: 恢复失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> deletePermanently(RecycleBinItem file) async {
+    appLogger.dWithPackage('files_provider', 'deletePermanently: 永久删除文件 ${file.name}');
+    try {
+      await _service.deleteRecycleBinFiles([file]);
+      appLogger.iWithPackage('files_provider', 'deletePermanently: 成功永久删除文件 ${file.name}');
+      await loadRecycleBinStatus();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'deletePermanently: 删除失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> deletePermanentlyFiles(List<RecycleBinItem> files) async {
+    appLogger.dWithPackage('files_provider', 'deletePermanentlyFiles: 永久删除${files.length}个文件');
+    try {
+      await _service.deleteRecycleBinFiles(files);
+      appLogger.iWithPackage('files_provider', 'deletePermanentlyFiles: 成功永久删除${files.length}个文件');
+      await loadRecycleBinStatus();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'deletePermanentlyFiles: 删除失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> clearRecycleBin() async {
+    appLogger.dWithPackage('files_provider', 'clearRecycleBin: 清空回收站');
+    try {
+      await _service.clearRecycleBin();
+      appLogger.iWithPackage('files_provider', 'clearRecycleBin: 成功清空回收站');
+      await loadRecycleBinStatus();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'clearRecycleBin: 清空失败', error: e, stackTrace: stackTrace);
+      rethrow;
     }
   }
 
@@ -425,13 +575,238 @@ class FilesProvider extends ChangeNotifier {
     return await _service.getFileSize(path, recursive: true);
   }
 
-  Future<void> toggleFavorite(String path) async {
-    final isFavorite = _data.files.firstWhere((f) => f.path == path).isDir;
-    if (isFavorite) {
-      await _service.unfavoriteFile(path);
-    } else {
-      await _service.favoriteFile(path);
+  Future<void> loadFavorites() async {
+    appLogger.dWithPackage('files_provider', 'loadFavorites: 开始加载收藏夹');
+    try {
+      final favorites = await _service.searchFavoriteFiles(path: '/');
+      final favoritePaths = favorites.map((f) => f.path).toSet();
+      _data = _data.copyWith(
+        favorites: favorites,
+        favoritePaths: favoritePaths,
+      );
+      appLogger.iWithPackage('files_provider', 'loadFavorites: 成功加载${favorites.length}个收藏');
+      notifyListeners();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'loadFavorites: 加载失败', error: e, stackTrace: stackTrace);
     }
-    await refresh();
+  }
+
+  Future<void> addToFavorites(FileInfo file) async {
+    appLogger.dWithPackage('files_provider', 'addToFavorites: path=${file.path}');
+    try {
+      await _service.favoriteFile(file.path, name: file.name);
+      final newFavorites = [..._data.favorites, file];
+      final newFavoritePaths = {..._data.favoritePaths, file.path};
+      _data = _data.copyWith(
+        favorites: newFavorites,
+        favoritePaths: newFavoritePaths,
+      );
+      appLogger.iWithPackage('files_provider', 'addToFavorites: 成功');
+      notifyListeners();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'addToFavorites: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> removeFromFavorites(String path) async {
+    appLogger.dWithPackage('files_provider', 'removeFromFavorites: path=$path');
+    try {
+      await _service.unfavoriteFile(path);
+      final newFavorites = _data.favorites.where((f) => f.path != path).toList();
+      final newFavoritePaths = Set<String>.from(_data.favoritePaths)..remove(path);
+      _data = _data.copyWith(
+        favorites: newFavorites,
+        favoritePaths: newFavoritePaths,
+      );
+      appLogger.iWithPackage('files_provider', 'removeFromFavorites: 成功');
+      notifyListeners();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'removeFromFavorites: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> toggleFavorite(FileInfo file) async {
+    if (_data.isFavorite(file.path)) {
+      await removeFromFavorites(file.path);
+    } else {
+      await addToFavorites(file);
+    }
+  }
+
+  Future<void> wgetDownload({
+    required String url,
+    required String name,
+    bool? ignoreCertificate,
+  }) async {
+    appLogger.dWithPackage('files_provider', 'wgetDownload: url=$url, path=${_data.currentPath}, name=$name');
+    
+    _data = _data.copyWith(
+      wgetStatus: const WgetDownloadStatus(
+        state: WgetDownloadState.downloading,
+        message: '正在下载...',
+      ),
+    );
+    notifyListeners();
+
+    try {
+      final result = await _service.wgetDownload(
+        url: url,
+        path: _data.currentPath,
+        name: name,
+        ignoreCertificate: ignoreCertificate,
+      );
+
+      if (result.success) {
+        appLogger.iWithPackage('files_provider', 'wgetDownload: 下载成功, filePath=${result.filePath}');
+        _data = _data.copyWith(
+          wgetStatus: WgetDownloadStatus(
+            state: WgetDownloadState.success,
+            message: '下载成功',
+            filePath: result.filePath,
+            downloadedSize: result.downloadedSize,
+          ),
+        );
+        await refresh();
+      } else {
+        appLogger.eWithPackage('files_provider', 'wgetDownload: 下载失败, error=${result.error}');
+        _data = _data.copyWith(
+          wgetStatus: WgetDownloadStatus(
+            state: WgetDownloadState.error,
+            message: result.error ?? '下载失败',
+          ),
+        );
+      }
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'wgetDownload: 下载异常', error: e, stackTrace: stackTrace);
+      _data = _data.copyWith(
+        wgetStatus: WgetDownloadStatus(
+          state: WgetDownloadState.error,
+          message: e.toString(),
+        ),
+      );
+    }
+    notifyListeners();
+  }
+
+  void clearWgetStatus() {
+    _data = _data.copyWith(wgetStatus: null);
+    notifyListeners();
+  }
+
+  Future<FilePermission> getFilePermission(String path) async {
+    appLogger.dWithPackage('files_provider', 'getFilePermission: path=$path');
+    try {
+      final permission = await _service.getFilePermission(path);
+      appLogger.iWithPackage('files_provider', 'getFilePermission: 成功获取权限信息');
+      return permission;
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'getFilePermission: 获取权限失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> updateFilePermission(FilePermission permission) async {
+    appLogger.dWithPackage('files_provider', 'updateFilePermission: path=${permission.path}');
+    try {
+      await _service.updateFilePermission(permission);
+      appLogger.iWithPackage('files_provider', 'updateFilePermission: 成功更新权限');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'updateFilePermission: 更新权限失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> changeFileMode(String path, String mode, {bool? recursive}) async {
+    appLogger.dWithPackage('files_provider', 'changeFileMode: path=$path, mode=$mode, recursive=$recursive');
+    try {
+      await _service.changeFileMode(path, mode, recursive: recursive);
+      appLogger.iWithPackage('files_provider', 'changeFileMode: 成功修改权限模式');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'changeFileMode: 修改权限模式失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> changeFileOwner(String path, {String? user, String? group, bool? recursive}) async {
+    appLogger.dWithPackage('files_provider', 'changeFileOwner: path=$path, user=$user, group=$group, recursive=$recursive');
+    try {
+      await _service.changeFileOwner(path, user: user, group: group, recursive: recursive);
+      appLogger.iWithPackage('files_provider', 'changeFileOwner: 成功修改所有者');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'changeFileOwner: 修改所有者失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<FileUserGroupResponse> getUserGroup() async {
+    appLogger.dWithPackage('files_provider', 'getUserGroup: 获取用户和组列表');
+    try {
+      final result = await _service.getUserGroup();
+      appLogger.iWithPackage('files_provider', 'getUserGroup: 成功获取用户和组列表');
+      return result;
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'getUserGroup: 获取用户和组列表失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<String?> downloadFile(FileInfo file) async {
+    if (file.isDir) {
+      appLogger.wWithPackage('files_provider', 'downloadFile: 不能下载文件夹');
+      return null;
+    }
+
+    appLogger.dWithPackage('files_provider', 'downloadFile: 开始下载 ${file.name}');
+    _data = _data.copyWith(
+      isDownloading: true,
+      downloadProgress: 0.0,
+      downloadingFileName: file.name,
+    );
+    notifyListeners();
+
+    try {
+      final savePath = await _service.downloadFileToDevice(
+        file.path,
+        file.name,
+        onProgress: (received, total) {
+          final progress = received / total;
+          _data = _data.copyWith(downloadProgress: progress);
+          notifyListeners();
+        },
+      );
+      
+      appLogger.iWithPackage('files_provider', 'downloadFile: 下载成功, savePath=$savePath');
+      _data = _data.copyWith(
+        isDownloading: false,
+        downloadProgress: 1.0,
+        downloadingFileName: null,
+      );
+      notifyListeners();
+      return savePath;
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'downloadFile: 下载失败', error: e, stackTrace: stackTrace);
+      _data = _data.copyWith(
+        isDownloading: false,
+        downloadProgress: 0.0,
+        downloadingFileName: null,
+      );
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  void cancelDownload() {
+    _service.cancelDownload();
+    _data = _data.copyWith(
+      isDownloading: false,
+      downloadProgress: 0.0,
+      downloadingFileName: null,
+    );
+    notifyListeners();
   }
 }

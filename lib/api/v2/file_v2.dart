@@ -445,6 +445,18 @@ class FileV2Api {
     );
   }
 
+  /// 恢复回收站文件
+  ///
+  /// 从回收站恢复文件到原路径
+  /// @param request 恢复请求
+  /// @return 恢复结果
+  Future<Response> restoreRecycleBinFile(RecycleBinReduceRequest request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/files/recycle/reduce'),
+      data: request.toJson(),
+    );
+  }
+
   /// 搜索回收站
   ///
   /// 搜索回收站中的文件

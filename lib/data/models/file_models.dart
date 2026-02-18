@@ -1516,27 +1516,22 @@ class FileTree extends Equatable {
 class FileWgetRequest extends Equatable {
   final String url;
   final String path;
-  final String? filename;
-  final bool? overwrite;
-  final Map<String, String>? headers;
+  final String name;
+  final bool? ignoreCertificate;
 
   const FileWgetRequest({
     required this.url,
     required this.path,
-    this.filename,
-    this.overwrite,
-    this.headers,
+    required this.name,
+    this.ignoreCertificate,
   });
 
   factory FileWgetRequest.fromJson(Map<String, dynamic> json) {
     return FileWgetRequest(
       url: json['url'] as String,
       path: json['path'] as String,
-      filename: json['filename'] as String?,
-      overwrite: json['overwrite'] as bool?,
-      headers: (json['headers'] as Map<String, dynamic>?)?.map(
-        (key, value) => MapEntry(key, value as String),
-      ),
+      name: json['name'] as String,
+      ignoreCertificate: json['ignoreCertificate'] as bool?,
     );
   }
 
@@ -1544,14 +1539,13 @@ class FileWgetRequest extends Equatable {
     return {
       'url': url,
       'path': path,
-      'filename': filename,
-      'overwrite': overwrite,
-      'headers': headers,
+      'name': name,
+      if (ignoreCertificate != null) 'ignoreCertificate': ignoreCertificate,
     };
   }
 
   @override
-  List<Object?> get props => [url, path, filename, overwrite, headers];
+  List<Object?> get props => [url, path, name, ignoreCertificate];
 }
 
 /// 文件Wget结果模型
@@ -2321,4 +2315,84 @@ class FileMountInfo extends Equatable {
 
   @override
   List<Object?> get props => [device, mountPoint, fsType, total, used, available];
+}
+
+class RecycleBinItem extends Equatable {
+  final String sourcePath;
+  final String name;
+  final bool isDir;
+  final int size;
+  final DateTime? deleteTime;
+  final String rName;
+  final String from;
+
+  const RecycleBinItem({
+    required this.sourcePath,
+    required this.name,
+    required this.isDir,
+    required this.size,
+    this.deleteTime,
+    required this.rName,
+    required this.from,
+  });
+
+  factory RecycleBinItem.fromJson(Map<String, dynamic> json) {
+    return RecycleBinItem(
+      sourcePath: json['sourcePath'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      isDir: json['isDir'] as bool? ?? false,
+      size: json['size'] as int? ?? 0,
+      deleteTime: json['deleteTime'] != null
+          ? DateTime.tryParse(json['deleteTime'] as String)
+          : null,
+      rName: json['rName'] as String? ?? '',
+      from: json['from'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sourcePath': sourcePath,
+      'name': name,
+      'isDir': isDir,
+      'size': size,
+      'deleteTime': deleteTime?.toIso8601String(),
+      'rName': rName,
+      'from': from,
+    };
+  }
+
+  @override
+  List<Object?> get props => [sourcePath, name, isDir, size, deleteTime, rName, from];
+}
+
+class RecycleBinReduceRequest extends Equatable {
+  final String rName;
+  final String from;
+  final String name;
+
+  const RecycleBinReduceRequest({
+    required this.rName,
+    required this.from,
+    required this.name,
+  });
+
+  factory RecycleBinReduceRequest.fromJson(Map<String, dynamic> json) {
+    return RecycleBinReduceRequest(
+      rName: json['rName'] as String? ?? '',
+      from: json['from'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'rName': rName,
+      'from': from,
+      'name': name,
+    };
+  }
+
+  @override
+  List<Object?> get props => [rName, from, name];
 }
