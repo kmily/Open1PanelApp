@@ -314,7 +314,10 @@ class FilesProvider extends ChangeNotifier {
     _service.clearCache();
     _data = const FilesData();
     notifyListeners();
-    loadServer().then((_) => loadFiles());
+    loadServer().then((_) {
+      loadFiles();
+      loadFavorites();
+    });
   }
 
   Future<void> navigateTo(String path) async {
