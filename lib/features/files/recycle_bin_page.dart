@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:onepanelapp_app/core/theme/app_design_tokens.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/data/models/file_models.dart';
-import 'package:onepanelapp_app/features/files/files_provider.dart';
+import 'package:onepanelapp_app/features/files/files_service.dart';
 import 'package:onepanelapp_app/core/utils/debug_error_dialog.dart';
+import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
 
 class RecycleBinPage extends StatelessWidget {
   const RecycleBinPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) {
-        final provider = FilesProvider();
-        provider.loadServer();
-        return provider;
-      },
-      child: const RecycleBinView(),
-    );
+    return const RecycleBinView();
   }
 }
 
@@ -37,11 +30,20 @@ class _RecycleBinViewState extends State<RecycleBinView> {
   String? _error;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  FilesService? _service;
 
   @override
   void initState() {
     super.initState();
-    _loadFiles();
+    _initService();
+  }
+
+  Future<void> _initService() async {
+    _service = FilesService();
+    await _service!.getCurrentServer();
+    if (mounted) {
+      _loadFiles();
+    }
   }
 
   @override
@@ -51,23 +53,39 @@ class _RecycleBinViewState extends State<RecycleBinView> {
   }
 
   Future<void> _loadFiles() async {
+    appLogger.dWithPackage('recycle_bin', '_loadFiles: 开始加载回收站文件');
     setState(() {
       _isLoading = true;
       _error = null;
     });
 
     try {
-      final provider = context.read<FilesProvider>();
-      final files = await provider.loadRecycleBinFiles();
+      if (_service == null) {
+        _service = FilesService();
+        await _service!.getCurrentServer();
+      }
+      final files = await _service!.searchRecycleBin(path: '/');
+      appLogger.iWithPackage('recycle_bin', '_loadFiles: 成功加载 ${files.length} 个文件');
       if (mounted) {
         setState(() {
-          _files = files;
-          _filteredFiles = files;
+          _files = files.map((f) {
+            return RecycleBinItem(
+              sourcePath: f.path,
+              name: f.name,
+              isDir: f.isDir,
+              size: f.size,
+              deleteTime: f.modifiedAt,
+              rName: f.gid ?? f.path.split('/').last,
+              from: f.path.substring(0, f.path.lastIndexOf('/')),
+            );
+          }).toList();
+          _filteredFiles = _files;
           _isLoading = false;
           _selectedIds.clear();
         });
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('recycle_bin', '_loadFiles: 加载失败', error: e, stackTrace: stackTrace);
       if (mounted) {
         setState(() {
           _error = e.toString();
@@ -141,8 +159,12 @@ class _RecycleBinViewState extends State<RecycleBinView> {
 
     if (confirmed == true && mounted) {
       try {
-        final provider = context.read<FilesProvider>();
-        await provider.restoreFiles(_selectedFiles);
+        final requests = _selectedFiles.map((f) => RecycleBinReduceRequest(
+          rName: f.rName,
+          from: f.from,
+          name: f.name,
+        )).toList();
+        await _service!.restoreFiles(requests);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.recycleBinRestoreSuccess)),
@@ -184,8 +206,7 @@ class _RecycleBinViewState extends State<RecycleBinView> {
 
     if (confirmed == true && mounted) {
       try {
-        final provider = context.read<FilesProvider>();
-        await provider.deletePermanentlyFiles(_selectedFiles);
+        await _service!.deleteRecycleBinFiles(_selectedFiles);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.recycleBinDeletePermanentlySuccess)),
@@ -225,8 +246,7 @@ class _RecycleBinViewState extends State<RecycleBinView> {
 
     if (confirmed == true && mounted) {
       try {
-        final provider = context.read<FilesProvider>();
-        await provider.clearRecycleBin();
+        await _service!.clearRecycleBin();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.recycleBinClearSuccess)),
@@ -263,8 +283,11 @@ class _RecycleBinViewState extends State<RecycleBinView> {
 
     if (confirmed == true && mounted) {
       try {
-        final provider = context.read<FilesProvider>();
-        await provider.restoreFile(file);
+        await _service!.restoreFile(RecycleBinReduceRequest(
+          rName: file.rName,
+          from: file.from,
+          name: file.name,
+        ));
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.recycleBinRestoreSuccess)),
@@ -304,8 +327,7 @@ class _RecycleBinViewState extends State<RecycleBinView> {
 
     if (confirmed == true && mounted) {
       try {
-        final provider = context.read<FilesProvider>();
-        await provider.deletePermanently(file);
+        await _service!.deleteRecycleBinFiles([file]);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.recycleBinDeletePermanentlySuccess)),

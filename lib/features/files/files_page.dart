@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:dio/dio.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:onepanelapp_app/core/theme/app_design_tokens.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/data/models/file_models.dart';
@@ -173,6 +175,7 @@ class _FilesViewState extends State<FilesView> {
   }
 
   Widget _buildEmptyState(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+    final provider = context.read<FilesProvider>();
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -191,13 +194,13 @@ class _FilesViewState extends State<FilesView> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FilledButton.icon(
-                onPressed: () => _showCreateDirectoryDialog(context),
+                onPressed: () => _showCreateDirectoryDialog(context, provider),
                 icon: const Icon(Icons.create_new_folder_outlined),
                 label: Text(l10n.filesActionNewFolder),
               ),
               const SizedBox(width: 8),
               OutlinedButton.icon(
-                onPressed: () => _showCreateFileDialog(context),
+                onPressed: () => _showCreateFileDialog(context, provider),
                 icon: const Icon(Icons.note_add_outlined),
                 label: Text(l10n.filesActionNewFile),
               ),
@@ -647,8 +650,9 @@ class _FilesViewState extends State<FilesView> {
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Consumer<FilesProvider>(
-          builder: (context, provider, _) {
+        content: ListenableBuilder(
+          listenable: provider,
+          builder: (context, _) {
             if (provider.data.isDownloading) {
               final progress = (provider.data.downloadProgress * 100).toInt();
               return Row(
@@ -692,7 +696,7 @@ class _FilesViewState extends State<FilesView> {
           ),
         );
       }
-    }).catchError((e, stackTrace) {
+    }).catchError((e, stackTrace) async {
       appLogger.eWithPackage('files_page', '_startDownload: 下载失败', error: e, stackTrace: stackTrace);
       if (context.mounted) {
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -701,6 +705,21 @@ class _FilesViewState extends State<FilesView> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.filesDownloadCancelled)),
           );
+        } else if (errorMsg.contains('storage_permission_denied')) {
+          final isPermanentlyDenied = await provider.isStoragePermissionPermanentlyDenied();
+          if (isPermanentlyDenied && context.mounted) {
+            _showPermissionSettingsDialog(context, l10n);
+          } else if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('存储权限被拒绝，无法下载文件'),
+                action: SnackBarAction(
+                  label: '设置',
+                  onPressed: () => _showPermissionSettingsDialog(context, l10n),
+                ),
+              ),
+            );
+          }
         } else {
           DebugErrorDialog.show(context, l10n.filesDownloadFailed, e, stackTrace: stackTrace);
         }
@@ -708,27 +727,81 @@ class _FilesViewState extends State<FilesView> {
     });
   }
 
+  void _showPermissionSettingsDialog(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('存储权限'),
+        content: const Text('请在设置中授予存储权限以保存下载文件'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Permission.storage.request().then((_) {
+                Permission.manageExternalStorage.request();
+              });
+            },
+            child: const Text('打开设置'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _toggleFavorite(BuildContext context, FilesProvider provider, FileInfo file, AppLocalizations l10n) async {
     appLogger.dWithPackage('files_page', '_toggleFavorite: path=${file.path}');
-    try {
-      await provider.toggleFavorite(file);
+    
+    final isFavorite = provider.data.isFavorite(file.path);
+    
+    if (isFavorite) {
       if (context.mounted) {
-        final isFavorite = provider.data.isFavorite(file.path);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(isFavorite ? l10n.filesFavoritesAdded : l10n.filesFavoritesRemoved),
-          ),
+          SnackBar(content: Text(l10n.filesFavoritesAdded)),
         );
+      }
+      return;
+    }
+    
+    try {
+      await provider.addToFavorites(file);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.filesFavoritesAdded)),
+        );
+      }
+    } on DioException catch (e) {
+      appLogger.eWithPackage('files_page', '_toggleFavorite: 失败', error: e);
+      if (context.mounted) {
+        final errorMsg = e.response?.data?.toString() ?? e.message ?? '';
+        if (errorMsg.contains('已收藏') || errorMsg.contains('already')) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.filesFavoritesAdded)),
+          );
+        } else {
+          DebugErrorDialog.show(context, l10n.filesFavoritesLoadFailed, e);
+        }
       }
     } catch (e, stackTrace) {
       appLogger.eWithPackage('files_page', '_toggleFavorite: 失败', error: e, stackTrace: stackTrace);
       if (context.mounted) {
-        DebugErrorDialog.show(context, l10n.filesFavoritesLoadFailed, e, stackTrace: stackTrace);
+        final errorMsg = e.toString();
+        if (errorMsg.contains('已收藏') || errorMsg.contains('already')) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.filesFavoritesAdded)),
+          );
+        } else {
+          DebugErrorDialog.show(context, l10n.filesFavoritesLoadFailed, e, stackTrace: stackTrace);
+        }
       }
     }
   }
 
   void _showCreateOptions(BuildContext context) {
+    final provider = context.read<FilesProvider>();
     showModalBottomSheet(
       context: context,
       builder: (sheetContext) => SafeArea(
@@ -740,7 +813,7 @@ class _FilesViewState extends State<FilesView> {
               title: Text(context.l10n.filesActionNewFolder),
               onTap: () {
                 Navigator.pop(sheetContext);
-                _showCreateDirectoryDialog(context);
+                _showCreateDirectoryDialog(context, provider);
               },
             ),
             ListTile(
@@ -748,7 +821,7 @@ class _FilesViewState extends State<FilesView> {
               title: Text(context.l10n.filesActionNewFile),
               onTap: () {
                 Navigator.pop(sheetContext);
-                _showCreateFileDialog(context);
+                _showCreateFileDialog(context, provider);
               },
             ),
             ListTile(
@@ -756,7 +829,7 @@ class _FilesViewState extends State<FilesView> {
               title: Text(context.l10n.filesActionUpload),
               onTap: () {
                 Navigator.pop(sheetContext);
-                _showUploadDialog(context);
+                _showUploadDialog(context, provider);
               },
             ),
             ListTile(
@@ -764,7 +837,7 @@ class _FilesViewState extends State<FilesView> {
               title: Text(context.l10n.filesActionWgetDownload),
               onTap: () {
                 Navigator.pop(sheetContext);
-                _showWgetDialog(context);
+                _showWgetDialog(context, provider);
               },
             ),
           ],
@@ -773,10 +846,9 @@ class _FilesViewState extends State<FilesView> {
     );
   }
 
-  void _showCreateDirectoryDialog(BuildContext context) {
+  void _showCreateDirectoryDialog(BuildContext context, FilesProvider provider) {
     appLogger.dWithPackage('files_page', '_showCreateDirectoryDialog: 打开创建文件夹对话框');
     final controller = TextEditingController();
-    final provider = context.read<FilesProvider>();
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -816,10 +888,9 @@ class _FilesViewState extends State<FilesView> {
     );
   }
 
-  void _showCreateFileDialog(BuildContext context) {
+  void _showCreateFileDialog(BuildContext context, FilesProvider provider) {
     appLogger.dWithPackage('files_page', '_showCreateFileDialog: 打开创建文件对话框');
     final controller = TextEditingController();
-    final provider = context.read<FilesProvider>();
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -1348,9 +1419,8 @@ class _FilesViewState extends State<FilesView> {
     );
   }
 
-  void _showUploadDialog(BuildContext context) {
+  void _showUploadDialog(BuildContext context, FilesProvider provider) {
     appLogger.dWithPackage('files_page', '_showUploadDialog: 打开上传对话框');
-    final provider = context.read<FilesProvider>();
     final l10n = context.l10n;
     
     showDialog(
@@ -1408,9 +1478,8 @@ class _FilesViewState extends State<FilesView> {
     );
   }
 
-  void _showWgetDialog(BuildContext context) {
+  void _showWgetDialog(BuildContext context, FilesProvider provider) {
     appLogger.dWithPackage('files_page', '_showWgetDialog: 打开wget下载对话框');
-    final provider = context.read<FilesProvider>();
     final l10n = context.l10n;
     
     final urlController = TextEditingController();
@@ -1520,41 +1589,42 @@ class _FilesViewState extends State<FilesView> {
   }
 
   void _showMoreOptions(BuildContext context) {
+    final provider = context.read<FilesProvider>();
     showModalBottomSheet(
       context: context,
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.star_outline),
-              title: Text(context.l10n.filesFavorites),
+              title: Text(sheetContext.l10n.filesFavorites),
               onTap: () {
-                Navigator.pop(context);
-                _openFavorites(context);
+                Navigator.pop(sheetContext);
+                _openFavorites(context, provider);
               },
             ),
             ListTile(
               leading: const Icon(Icons.sort),
-              title: Text(context.l10n.filesActionSort),
+              title: Text(sheetContext.l10n.filesActionSort),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(sheetContext);
                 _showSortOptions(context);
               },
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: Text(context.l10n.filesActionSearch),
+              title: Text(sheetContext.l10n.filesActionSearch),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(sheetContext);
                 _showSearchDialog(context);
               },
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline),
-              title: Text(context.l10n.filesRecycleBin),
+              title: Text(sheetContext.l10n.filesRecycleBin),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(sheetContext);
                 _openRecycleBin(context);
               },
             ),
@@ -1564,7 +1634,7 @@ class _FilesViewState extends State<FilesView> {
     );
   }
 
-  void _openFavorites(BuildContext context) async {
+  void _openFavorites(BuildContext context, FilesProvider provider) async {
     appLogger.dWithPackage('files_page', '_openFavorites: 打开收藏夹页面');
     final result = await Navigator.of(context).push<String>(
       MaterialPageRoute(
@@ -1574,7 +1644,7 @@ class _FilesViewState extends State<FilesView> {
 
     if (result != null && mounted) {
       appLogger.dWithPackage('files_page', '_openFavorites: 导航到路径=$result');
-      context.read<FilesProvider>().navigateTo(result);
+      provider.navigateTo(result);
     }
   }
 
@@ -1747,15 +1817,15 @@ class _PermissionDialogState extends State<_PermissionDialog> {
   bool _isLoading = true;
   String? _error;
   
-  late int _ownerRead;
-  late int _ownerWrite;
-  late int _ownerExecute;
-  late int _groupRead;
-  late int _groupWrite;
-  late int _groupExecute;
-  late int _otherRead;
-  late int _otherWrite;
-  late int _otherExecute;
+  int _ownerRead = 0;
+  int _ownerWrite = 0;
+  int _ownerExecute = 0;
+  int _groupRead = 0;
+  int _groupWrite = 0;
+  int _groupExecute = 0;
+  int _otherRead = 0;
+  int _otherWrite = 0;
+  int _otherExecute = 0;
   
   String? _selectedUser;
   String? _selectedGroup;
@@ -2127,7 +2197,8 @@ class _PermissionDialogState extends State<_PermissionDialog> {
           children: [
             Expanded(
               child: DropdownButtonFormField<String>(
-                value: _selectedUser,
+                key: ValueKey('user-$_selectedUser'),
+                initialValue: _selectedUser,
                 decoration: InputDecoration(
                   labelText: widget.l10n.filesPermissionUser,
                   border: const OutlineInputBorder(),
@@ -2143,7 +2214,8 @@ class _PermissionDialogState extends State<_PermissionDialog> {
             const SizedBox(width: 12),
             Expanded(
               child: DropdownButtonFormField<String>(
-                value: _selectedGroup,
+                key: ValueKey('group-$_selectedGroup'),
+                initialValue: _selectedGroup,
                 decoration: InputDecoration(
                   labelText: widget.l10n.filesPermissionGroup,
                   border: const OutlineInputBorder(),

@@ -1555,6 +1555,7 @@ class FileWgetResult extends Equatable {
   final String? error;
   final int? downloadedSize;
   final String? checksum;
+  final String? key;
 
   const FileWgetResult({
     required this.success,
@@ -1562,15 +1563,19 @@ class FileWgetResult extends Equatable {
     this.error,
     this.downloadedSize,
     this.checksum,
+    this.key,
   });
 
   factory FileWgetResult.fromJson(Map<String, dynamic> json) {
+    final data = json['data'] as Map<String, dynamic>? ?? json;
+    final hasKey = data['key'] != null;
     return FileWgetResult(
-      success: json['success'] as bool? ?? false,
-      filePath: json['filePath'] as String?,
-      error: json['error'] as String?,
-      downloadedSize: json['downloadedSize'] as int?,
-      checksum: json['checksum'] as String?,
+      success: data['success'] as bool? ?? hasKey,
+      filePath: data['filePath'] as String? ?? data['path'] as String?,
+      error: data['error'] as String? ?? data['message'] as String?,
+      downloadedSize: data['downloadedSize'] as int? ?? data['size'] as int?,
+      checksum: data['checksum'] as String?,
+      key: data['key'] as String?,
     );
   }
 
@@ -1581,11 +1586,12 @@ class FileWgetResult extends Equatable {
       'error': error,
       'downloadedSize': downloadedSize,
       'checksum': checksum,
+      'key': key,
     };
   }
 
   @override
-  List<Object?> get props => [success, filePath, error, downloadedSize, checksum];
+  List<Object?> get props => [success, filePath, error, downloadedSize, checksum, key];
 }
 
 /// 文件批量结果模型

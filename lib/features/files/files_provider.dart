@@ -222,8 +222,15 @@ class FilesProvider extends ChangeNotifier {
         pageSize: pageSize,
       ));
       final files = response.data?.map((f) {
-        final json = f.toJson();
-        return RecycleBinItem.fromJson(json);
+        return RecycleBinItem(
+          sourcePath: f.path,
+          name: f.name,
+          isDir: f.isDir,
+          size: f.size,
+          deleteTime: f.modifiedAt,
+          rName: f.gid ?? f.path.split('/').last,
+          from: f.path.substring(0, f.path.lastIndexOf('/')),
+        );
       }).toList() ?? [];
       appLogger.iWithPackage('files_provider', 'loadRecycleBinFiles: 成功加载${files.length}个回收站文件');
       return files;
@@ -645,7 +652,7 @@ class FilesProvider extends ChangeNotifier {
     _data = _data.copyWith(
       wgetStatus: const WgetDownloadStatus(
         state: WgetDownloadState.downloading,
-        message: '正在下载...',
+        message: '正在创建下载任务...',
       ),
     );
     notifyListeners();
@@ -658,32 +665,41 @@ class FilesProvider extends ChangeNotifier {
         ignoreCertificate: ignoreCertificate,
       );
 
+      appLogger.iWithPackage('files_provider', 'wgetDownload: result.success=${result.success}, filePath=${result.filePath}, key=${result.key}, error=${result.error}');
+      
       if (result.success) {
-        appLogger.iWithPackage('files_provider', 'wgetDownload: 下载成功, filePath=${result.filePath}');
+        final message = result.key != null 
+            ? '下载任务已创建' 
+            : '下载成功';
+        appLogger.iWithPackage('files_provider', 'wgetDownload: $message, filePath=${result.filePath}');
         _data = _data.copyWith(
           wgetStatus: WgetDownloadStatus(
             state: WgetDownloadState.success,
-            message: '下载成功',
+            message: message,
             filePath: result.filePath,
             downloadedSize: result.downloadedSize,
           ),
         );
         await refresh();
       } else {
-        appLogger.eWithPackage('files_provider', 'wgetDownload: 下载失败, error=${result.error}');
+        final errorMsg = result.error ?? '下载失败';
+        appLogger.eWithPackage('files_provider', 'wgetDownload: 下载失败, error=$errorMsg');
         _data = _data.copyWith(
           wgetStatus: WgetDownloadStatus(
             state: WgetDownloadState.error,
-            message: result.error ?? '下载失败',
+            message: errorMsg,
           ),
         );
       }
     } catch (e, stackTrace) {
-      appLogger.eWithPackage('files_provider', 'wgetDownload: 下载异常', error: e, stackTrace: stackTrace);
+      final errorMsg = e.toString();
+      appLogger.eWithPackage('files_provider', 'wgetDownload: 下载异常, error=$errorMsg', error: e, stackTrace: stackTrace);
       _data = _data.copyWith(
         wgetStatus: WgetDownloadStatus(
           state: WgetDownloadState.error,
-          message: e.toString(),
+          message: errorMsg.contains('Exception:') 
+              ? errorMsg.split('Exception:').last.trim() 
+              : errorMsg,
         ),
       );
     }
@@ -703,18 +719,6 @@ class FilesProvider extends ChangeNotifier {
       return permission;
     } catch (e, stackTrace) {
       appLogger.eWithPackage('files_provider', 'getFilePermission: 获取权限失败', error: e, stackTrace: stackTrace);
-      rethrow;
-    }
-  }
-
-  Future<void> updateFilePermission(FilePermission permission) async {
-    appLogger.dWithPackage('files_provider', 'updateFilePermission: path=${permission.path}');
-    try {
-      await _service.updateFilePermission(permission);
-      appLogger.iWithPackage('files_provider', 'updateFilePermission: 成功更新权限');
-      await refresh();
-    } catch (e, stackTrace) {
-      appLogger.eWithPackage('files_provider', 'updateFilePermission: 更新权限失败', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
@@ -761,6 +765,12 @@ class FilesProvider extends ChangeNotifier {
       return null;
     }
 
+    final hasPermission = await _service.checkAndRequestStoragePermission();
+    if (!hasPermission) {
+      appLogger.wWithPackage('files_provider', 'downloadFile: 存储权限被拒绝');
+      throw Exception('storage_permission_denied');
+    }
+
     appLogger.dWithPackage('files_provider', 'downloadFile: 开始下载 ${file.name}');
     _data = _data.copyWith(
       isDownloading: true,
@@ -798,6 +808,10 @@ class FilesProvider extends ChangeNotifier {
       notifyListeners();
       rethrow;
     }
+  }
+
+  Future<bool> isStoragePermissionPermanentlyDenied() async {
+    return await _service.isStoragePermissionPermanentlyDenied();
   }
 
   void cancelDownload() {

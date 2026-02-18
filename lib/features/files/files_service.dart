@@ -12,6 +12,7 @@ import '../../core/services/logger/logger_service.dart';
 class FilesService {
   FileV2Api? _api;
   String? _currentServerId;
+  String? _currentApiKey;
 
   Future<FileV2Api> _getApi() async {
     appLogger.dWithPackage('files', '_getApi: 开始获取API客户端');
@@ -21,11 +22,12 @@ class FilesService {
       throw StateError('No server configured');
     }
     
-    if (_api == null || _currentServerId != config.id) {
+    if (_api == null || _currentServerId != config.id || _currentApiKey != config.apiKey) {
       appLogger.dWithPackage('files', '_getApi: 创建新的API客户端, serverId=${config.id}');
       final client = await ApiClientManager.instance.getCurrentClient();
       _api = FileV2Api(client);
       _currentServerId = config.id;
+      _currentApiKey = config.apiKey;
     }
     return _api!;
   }
@@ -34,6 +36,7 @@ class FilesService {
     appLogger.dWithPackage('files', 'clearCache: 清除API缓存');
     _api = null;
     _currentServerId = null;
+    _currentApiKey = null;
   }
 
   Future<ApiConfig?> getCurrentServer() async {
@@ -233,10 +236,25 @@ class FilesService {
     return response.data!;
   }
 
-  Future<void> updateFilePermission(FilePermission permission) async {
-    appLogger.dWithPackage('files', 'updateFilePermission: path=${permission.path}');
+  Future<void> changeFileMode(String path, String mode, {bool? recursive}) async {
+    appLogger.dWithPackage('files', 'changeFileMode: path=$path, mode=$mode');
     final api = await _getApi();
-    await api.updateFilePermission(permission);
+    await api.changeFileMode(FileModeChange(
+      path: path,
+      mode: mode,
+      recursive: recursive,
+    ));
+  }
+
+  Future<void> changeFileOwner(String path, {String? user, String? group, bool? recursive}) async {
+    appLogger.dWithPackage('files', 'changeFileOwner: path=$path, user=$user, group=$group');
+    final api = await _getApi();
+    await api.changeFileOwner(FileOwnerChange(
+      path: path,
+      user: user,
+      group: group,
+      recursive: recursive,
+    ));
   }
 
   Future<FileCheckResult> checkFile(String path) async {
@@ -430,27 +448,6 @@ class FilesService {
     return response.data!;
   }
 
-  Future<void> changeFileMode(String path, String mode, {bool? recursive}) async {
-    appLogger.dWithPackage('files', 'changeFileMode: path=$path, mode=$mode');
-    final api = await _getApi();
-    await api.changeFileMode(FileModeChange(
-      path: path,
-      mode: mode,
-      recursive: recursive,
-    ));
-  }
-
-  Future<void> changeFileOwner(String path, {String? user, String? group, bool? recursive}) async {
-    appLogger.dWithPackage('files', 'changeFileOwner: path=$path, user=$user, group=$group');
-    final api = await _getApi();
-    await api.changeFileOwner(FileOwnerChange(
-      path: path,
-      user: user,
-      group: group,
-      recursive: recursive,
-    ));
-  }
-
   Future<void> saveFile(String path, String content, {String? encoding, bool? createDir}) async {
     appLogger.dWithPackage('files', 'saveFile: path=$path, contentLength=${content.length}');
     final api = await _getApi();
@@ -542,7 +539,8 @@ class FilesService {
     Directory downloadDir;
 
     if (Platform.isAndroid) {
-      if (await _requestStoragePermission()) {
+      final permissionGranted = await _requestStoragePermission();
+      if (permissionGranted) {
         downloadDir = Directory('/storage/emulated/0/Download');
         if (!await downloadDir.exists()) {
           downloadDir = await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
@@ -580,14 +578,83 @@ class FilesService {
 
   Future<bool> _requestStoragePermission() async {
     if (Platform.isAndroid) {
-      final status = await Permission.storage.status;
-      if (status.isGranted) {
+      try {
+        if (await Permission.manageExternalStorage.isGranted) {
+          return true;
+        }
+        
+        final status = await Permission.storage.status;
+        if (status.isGranted) {
+          return true;
+        }
+        
+        if (status.isDenied) {
+          final result = await Permission.storage.request();
+          if (result.isGranted) {
+            return true;
+          }
+        }
+        
+        if (status.isPermanentlyDenied) {
+          await openAppSettings();
+          return false;
+        }
+        
+        final manageResult = await Permission.manageExternalStorage.request();
+        return manageResult.isGranted;
+      } catch (e) {
+        appLogger.wWithPackage('files', '_requestStoragePermission: 权限检查失败，降级处理: $e');
         return true;
       }
-      final result = await Permission.storage.request();
-      return result.isGranted;
     }
     return true;
+  }
+
+  Future<bool> checkAndRequestStoragePermission() async {
+    if (Platform.isIOS) {
+      return true;
+    }
+    
+    if (Platform.isAndroid) {
+      try {
+        if (await Permission.manageExternalStorage.isGranted) {
+          return true;
+        }
+        
+        final status = await Permission.storage.status;
+        if (status.isGranted) {
+          return true;
+        }
+        
+        if (status.isDenied) {
+          final result = await Permission.storage.request();
+          return result.isGranted;
+        }
+        
+        if (status.isPermanentlyDenied) {
+          return false;
+        }
+        
+        return false;
+      } catch (e) {
+        appLogger.wWithPackage('files', 'checkAndRequestStoragePermission: 权限检查失败: $e');
+        return true;
+      }
+    }
+    
+    return true;
+  }
+
+  Future<bool> isStoragePermissionPermanentlyDenied() async {
+    if (Platform.isAndroid) {
+      try {
+        final status = await Permission.storage.status;
+        return status.isPermanentlyDenied;
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
   }
 
   Future<void> uploadFile(String path, dynamic file) async {

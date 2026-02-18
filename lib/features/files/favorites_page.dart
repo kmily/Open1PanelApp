@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:onepanelapp_app/core/theme/app_design_tokens.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/data/models/file_models.dart';
-import 'package:onepanelapp_app/features/files/files_provider.dart';
+import 'package:onepanelapp_app/features/files/files_service.dart';
 import 'package:onepanelapp_app/core/utils/debug_error_dialog.dart';
 import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
 
@@ -12,10 +11,7 @@ class FavoritesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: context.read<FilesProvider>(),
-      child: const FavoritesView(),
-    );
+    return const FavoritesView();
   }
 }
 
@@ -27,14 +23,78 @@ class FavoritesView extends StatefulWidget {
 }
 
 class _FavoritesViewState extends State<FavoritesView> {
+  List<FileInfo> _favorites = [];
+  Set<String> _favoritePaths = {};
+  bool _isLoading = true;
+  String? _error;
+  FilesService? _service;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.read<FilesProvider>().loadFavorites();
-      }
+    _initService();
+  }
+
+  Future<void> _initService() async {
+    _service = FilesService();
+    await _service!.getCurrentServer();
+    if (mounted) {
+      _loadFavorites();
+    }
+  }
+
+  Future<void> _loadFavorites() async {
+    appLogger.dWithPackage('favorites_page', '_loadFavorites: 开始加载收藏夹');
+    setState(() {
+      _isLoading = true;
+      _error = null;
     });
+
+    try {
+      if (_service == null) {
+        _service = FilesService();
+        await _service!.getCurrentServer();
+      }
+      final favorites = await _service!.searchFavoriteFiles(path: '/');
+      final favoritePaths = favorites.map((f) => f.path).toSet();
+      appLogger.iWithPackage('favorites_page', '_loadFavorites: 成功加载 ${favorites.length} 个收藏');
+      if (mounted) {
+        setState(() {
+          _favorites = favorites;
+          _favoritePaths = favoritePaths;
+          _isLoading = false;
+        });
+      }
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('favorites_page', '_loadFavorites: 加载失败', error: e, stackTrace: stackTrace);
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _removeFavorite(String path, AppLocalizations l10n) async {
+    appLogger.dWithPackage('favorites_page', '_removeFavorite: path=$path');
+    try {
+      await _service!.unfavoriteFile(path);
+      if (mounted) {
+        setState(() {
+          _favorites.removeWhere((f) => f.path == path);
+          _favoritePaths.remove(path);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.filesFavoritesRemoved)),
+        );
+      }
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('favorites_page', '_removeFavorite: 失败', error: e, stackTrace: stackTrace);
+      if (mounted) {
+        DebugErrorDialog.show(context, l10n.filesFavoritesLoadFailed, e, stackTrace: stackTrace);
+      }
+    }
   }
 
   @override
@@ -45,24 +105,53 @@ class _FavoritesViewState extends State<FavoritesView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.filesFavorites),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh_outlined),
+            onPressed: _loadFavorites,
+            tooltip: l10n.systemSettingsRefresh,
+          ),
+        ],
       ),
-      body: Consumer<FilesProvider>(
-        builder: (context, provider, _) {
-          if (provider.data.favorites.isEmpty) {
-            return _buildEmptyState(context, l10n, theme);
-          }
+      body: _buildBody(context, l10n, theme),
+    );
+  }
 
-          return RefreshIndicator(
-            onRefresh: () => provider.loadFavorites(),
-            child: ListView.builder(
-              padding: AppDesignTokens.pagePadding,
-              itemCount: provider.data.favorites.length,
-              itemBuilder: (context, index) {
-                final file = provider.data.favorites[index];
-                return _buildFavoriteItem(context, provider, file, theme, l10n);
-              },
+  Widget _buildBody(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
+            const SizedBox(height: 16),
+            Text(_error!, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: _loadFavorites,
+              child: Text(l10n.commonRetry),
             ),
-          );
+          ],
+        ),
+      );
+    }
+
+    if (_favorites.isEmpty) {
+      return _buildEmptyState(context, l10n, theme);
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadFavorites,
+      child: ListView.builder(
+        padding: AppDesignTokens.pagePadding,
+        itemCount: _favorites.length,
+        itemBuilder: (context, index) {
+          final file = _favorites[index];
+          return _buildFavoriteItem(context, file, theme, l10n);
         },
       ),
     );
@@ -98,7 +187,6 @@ class _FavoritesViewState extends State<FavoritesView> {
 
   Widget _buildFavoriteItem(
     BuildContext context,
-    FilesProvider provider,
     FileInfo file,
     ThemeData theme,
     AppLocalizations l10n,
@@ -115,7 +203,16 @@ class _FavoritesViewState extends State<FavoritesView> {
           color: isDir ? colorScheme.primary : _getFileIconColor(file.name, colorScheme),
           size: 32,
         ),
-        title: Text(file.name),
+        title: Row(
+          children: [
+            Expanded(child: Text(file.name)),
+            Icon(
+              Icons.star,
+              size: 18,
+              color: colorScheme.primary,
+            ),
+          ],
+        ),
         subtitle: Text(
           file.path,
           style: theme.textTheme.bodySmall?.copyWith(
@@ -125,7 +222,7 @@ class _FavoritesViewState extends State<FavoritesView> {
           overflow: TextOverflow.ellipsis,
         ),
         trailing: PopupMenuButton<String>(
-          onSelected: (value) => _handleAction(context, provider, file, value, l10n),
+          onSelected: (value) => _handleAction(context, file, value, l10n),
           itemBuilder: (context) => [
             PopupMenuItem(
               value: 'navigate',
@@ -244,7 +341,6 @@ class _FavoritesViewState extends State<FavoritesView> {
 
   void _handleAction(
     BuildContext context,
-    FilesProvider provider,
     FileInfo file,
     String action,
     AppLocalizations l10n,
@@ -254,7 +350,7 @@ class _FavoritesViewState extends State<FavoritesView> {
         _navigateToFolder(context, file);
         break;
       case 'remove':
-        _removeFavorite(context, provider, file, l10n);
+        _removeFavorite(file.path, l10n);
         break;
     }
   }
@@ -265,27 +361,5 @@ class _FavoritesViewState extends State<FavoritesView> {
     final targetPath = parentPath.isEmpty ? '/' : parentPath;
 
     Navigator.of(context).pop(targetPath);
-  }
-
-  Future<void> _removeFavorite(
-    BuildContext context,
-    FilesProvider provider,
-    FileInfo file,
-    AppLocalizations l10n,
-  ) async {
-    appLogger.dWithPackage('favorites_page', '_removeFavorite: path=${file.path}');
-    try {
-      await provider.removeFromFavorites(file.path);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.filesFavoritesRemoved)),
-        );
-      }
-    } catch (e, stackTrace) {
-      appLogger.eWithPackage('favorites_page', '_removeFavorite: 失败', error: e, stackTrace: stackTrace);
-      if (context.mounted) {
-        DebugErrorDialog.show(context, l10n.filesFavoritesLoadFailed, e, stackTrace: stackTrace);
-      }
-    }
   }
 }

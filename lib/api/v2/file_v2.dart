@@ -222,7 +222,7 @@ class FileV2Api {
       'path': path,
     };
     final response = await _client.post(
-      ApiConstants.buildApiPath('/files/permission'),
+      ApiConstants.buildApiPath('/files/mode'),
       data: data,
     );
     return Response(
@@ -233,14 +233,26 @@ class FileV2Api {
     );
   }
 
-  /// 更新文件权限
+  /// 更新文件权限模式
   ///
-  /// 更新指定文件的权限
-  /// @param request 文件权限更新请求
+  /// 更新指定文件的权限模式
+  /// @param request 权限模式更新请求
   /// @return 更新结果
-  Future<Response> updateFilePermission(FilePermission request) async {
+  Future<Response> updateFileMode(FileModeChange request) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/files/permission/update'),
+      ApiConstants.buildApiPath('/files/mode'),
+      data: request.toJson(),
+    );
+  }
+
+  /// 更新文件所有者
+  ///
+  /// 更新指定文件的所有者
+  /// @param request 所有者更新请求
+  /// @return 更新结果
+  Future<Response> updateFileOwner(FileOwnerChange request) async {
+    return await _client.post(
+      ApiConstants.buildApiPath('/files/owner'),
       data: request.toJson(),
     );
   }

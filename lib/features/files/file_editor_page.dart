@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
-import 'package:onepanelapp_app/features/files/files_provider.dart';
+import 'package:onepanelapp_app/features/files/files_service.dart';
 import 'package:onepanelapp_app/core/utils/debug_error_dialog.dart';
-import 'package:provider/provider.dart';
 
 class FileEditorPage extends StatefulWidget {
   final String filePath;
@@ -28,6 +27,7 @@ class _FileEditorPageState extends State<FileEditorPage> {
   bool _hasChanges = false;
   String? _error;
   String _encoding = 'utf-8';
+  FilesService? _service;
 
   static const List<String> _availableEncodings = [
     'utf-8',
@@ -43,10 +43,18 @@ class _FileEditorPageState extends State<FileEditorPage> {
     super.initState();
     _controller = TextEditingController();
     _controller.addListener(_onTextChanged);
+    _initService();
+  }
+
+  Future<void> _initService() async {
+    _service = FilesService();
+    await _service!.getCurrentServer();
     
     if (widget.initialContent != null) {
       _controller.text = widget.initialContent!;
-      _isLoading = false;
+      setState(() {
+        _isLoading = false;
+      });
     } else {
       _loadContent();
     }
@@ -76,8 +84,11 @@ class _FileEditorPageState extends State<FileEditorPage> {
     });
 
     try {
-      final provider = context.read<FilesProvider>();
-      final content = await provider.getFileContent(widget.filePath);
+      if (_service == null) {
+        _service = FilesService();
+        await _service!.getCurrentServer();
+      }
+      final content = await _service!.getFileContent(widget.filePath);
       appLogger.iWithPackage('file_editor', '_loadContent: 成功加载, 长度=${content.length}');
       if (mounted) {
         _controller.text = content;
@@ -106,8 +117,11 @@ class _FileEditorPageState extends State<FileEditorPage> {
     });
 
     try {
-      final provider = context.read<FilesProvider>();
-      await provider.saveFileContent(widget.filePath, _controller.text);
+      if (_service == null) {
+        _service = FilesService();
+        await _service!.getCurrentServer();
+      }
+      await _service!.updateFileContent(widget.filePath, _controller.text);
       appLogger.iWithPackage('file_editor', '_saveContent: 保存成功');
       if (mounted) {
         setState(() {
@@ -173,9 +187,10 @@ class _FileEditorPageState extends State<FileEditorPage> {
       canPop: !_hasChanges,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
+        final navigator = Navigator.of(context);
         final shouldPop = await _onWillPop();
         if (shouldPop && mounted) {
-          Navigator.of(context).pop();
+          navigator.pop();
         }
       },
       child: Scaffold(

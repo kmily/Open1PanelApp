@@ -5,9 +5,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
-import 'package:onepanelapp_app/features/files/files_provider.dart';
+import 'package:onepanelapp_app/features/files/files_service.dart';
 import 'package:onepanelapp_app/features/files/file_editor_page.dart';
-import 'package:provider/provider.dart';
+import 'package:onepanelapp_app/core/config/api_config.dart';
 
 class FilePreviewPage extends StatefulWidget {
   final String filePath;
@@ -28,6 +28,8 @@ class _FilePreviewPageState extends State<FilePreviewPage> {
   bool _isLoading = true;
   String? _error;
   late FileType _fileType;
+  FilesService? _service;
+  ApiConfig? _serverConfig;
 
   static const Set<String> _imageExtensions = {
     'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico'
@@ -45,10 +47,18 @@ class _FilePreviewPageState extends State<FilePreviewPage> {
   void initState() {
     super.initState();
     _fileType = _getFileType(widget.fileName);
-    if (_fileType != FileType.image) {
+    _initService();
+  }
+
+  Future<void> _initService() async {
+    _service = FilesService();
+    _serverConfig = await _service!.getCurrentServer();
+    if (_fileType != FileType.image && mounted) {
       _loadContent();
     } else {
-      _isLoading = false;
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -82,8 +92,11 @@ class _FilePreviewPageState extends State<FilePreviewPage> {
     });
 
     try {
-      final provider = context.read<FilesProvider>();
-      final content = await provider.getFileContent(widget.filePath);
+      if (_service == null) {
+        _service = FilesService();
+        await _service!.getCurrentServer();
+      }
+      final content = await _service!.getFileContent(widget.filePath);
       appLogger.iWithPackage('file_preview', '_loadContent: 成功加载, 长度=${content.length}');
       if (mounted) {
         setState(() {
@@ -215,8 +228,7 @@ class _FilePreviewPageState extends State<FilePreviewPage> {
   }
 
   String _getImageUrl(BuildContext context) {
-    final provider = context.read<FilesProvider>();
-    final server = provider.data.currentServer;
+    final server = _serverConfig;
     if (server == null) {
       return '';
     }
