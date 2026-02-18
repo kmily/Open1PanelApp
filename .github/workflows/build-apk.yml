@@ -1,0 +1,129 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.16.0'
+        channel: 'stable'
+        cache: true
+
+    - name: Get dependencies
+      run: flutter pub get
+
+    - name: Generate code
+      run: flutter packages pub run build_runner build --delete-conflicting-outputs
+
+    - name: Analyze code
+      run: flutter analyze --no-fatal-infos
+
+    - name: Run tests
+      run: flutter test --coverage
+
+    - name: Build APK
+      run: flutter build apk --release --tree-shake-icons
+
+    - name: Build App Bundle
+      run: flutter build appbundle --release
+
+    - name: Sign APK (if release)
+      if: github.event_name == 'release'
+      run: |
+        echo "APK signing would go here for production releases"
+        echo "For now, we'll just copy the APK with a signed suffix"
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release-apk
+        path: |
+          build/app/outputs/flutter-apk/app-release.apk
+          build/app/outputs/bundle/release/app-release.aab
+        retention-days: 30
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          coverage/
+          test_results.xml
+        retention-days: 7
+
+    - name: Get app version
+      id: version
+      run: |
+        APP_VERSION=$(grep -E "^\s*version:\s+" pubspec.yaml | awk '{print $2}')
+        echo "app_version=${APP_VERSION%+*}" >> $GITHUB_OUTPUT
+        echo "app_version_code=${APP_VERSION##*+}" >> $GITHUB_OUTPUT
+
+    - name: Create Release (on release)
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.version.outputs.app_version }}
+        name: Release v${{ steps.version.outputs.app_version }}
+        body: |
+          ## 1Panel Open Mobile App v${{ steps.version.outputs.app_version }}
+          
+          ### 📱 下载安装包
+          - **APK文件**: app-release.apk
+          - **AAB文件**: app-release.aab (Google Play)
+          
+          ### 📋 构建信息
+          - **构建版本**: ${{ steps.version.outputs.app_version }}
+          - **构建时间**: ${{ github.run_id }}
+          - **Git提交**: ${{ github.sha }}
+          - **构建分支**: ${{ github.ref_name }}
+          
+          ### 🚀 功能特性
+          - 1Panel 服务器管理
+          - AI 管理 (Ollama 模型)
+          - 应用程序管理
+          - 容器管理
+          - 网站管理
+          - 数据库管理
+          - 文件管理
+          - 系统监控
+        files: |
+          build/app/outputs/flutter-apk/app-release.apk
+          build/app/outputs/bundle/release/app-release.aab
+        generate_release_notes: true
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Summary
+      run: |
+        echo "### 🎉 构建完成" >> $GITHUB_STEP_SUMMARY
+        echo "- **构建状态**: ✅ 成功" >> $GITHUB_STEP_SUMMARY
+        echo "- **APK文件**: build/app/outputs/flutter-apk/app-release.apk" >> $GITHUB_STEP_SUMMARY
+        echo "- **AAB文件**: build/app/outputs/bundle/release/app-release.aab" >> $GITHUB_STEP_SUMMARY
+        echo "- **文件大小**: " >> $GITHUB_STEP_SUMMARY
+        ls -lh build/app/outputs/flutter-apk/app-release.apk | awk '{print "  - APK: " $5}' >> $GITHUB_STEP_SUMMARY
+        ls -lh build/app/outputs/bundle/release/app-release.aab | awk '{print "  - AAB: " $5}' >> $GITHUB_STEP_SUMMARY

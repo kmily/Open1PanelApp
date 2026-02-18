@@ -1,0 +1,75 @@
+name: Download Latest Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type to download'
+        required: true
+        default: 'apk'
+        type: choice
+        options:
+          - apk
+          - aab
+          - both
+      version:
+        description: 'Version to download (leave empty for latest)'
+        required: false
+        default: ''
+      artifact_name:
+        description: 'Custom artifact name (leave empty for default)'
+        required: false
+        default: ''
+
+jobs:
+  download:
+    name: Download Build Artifact
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Get latest build artifacts
+      uses: dawidd6/action-download-artifact@v6
+      with:
+        workflow: build-apk.yml
+        name: app-release-apk
+        path: ./
+        if_no_artifact_found: fail
+        if_multiple_artifact_found: warn
+
+    - name: List downloaded files
+      run: |
+        echo "Downloaded files:"
+        ls -la
+
+    - name: Get version info
+      id: version_info
+      run: |
+        echo "=== Version Information ==="
+        if [ -f "app-release.apk" ]; then
+          echo "APK found: $(ls -lh app-release.apk)"
+        fi
+        if [ -f "app-release.aab" ]; then
+          echo "AAB found: $(ls -lh app-release.aab)"
+        fi
+        
+        # Extract version from pubspec.yaml
+        APP_VERSION=$(grep -E "^\s*version:\s+" pubspec.yaml | awk '{print $2}')
+        echo "app_version=${APP_VERSION}" >> $GITHUB_OUTPUT
+        echo "=== Build files available ==="
+        find . -name "*.apk" -o -name "*.aab" | head -10
+
+    - name: Create download summary
+      run: |
+        echo "### 📥 构建下载成功" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**下载信息**: " >> $GITHUB_STEP_SUMMARY
+        echo "- **版本**: ${{ github.event.inputs.version || 'Latest Build' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **下载时间**: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**可用文件**: " >> $GITHUB_STEP_SUMMARY
+        ls -la | grep -E '\.(apk|aab)' | awk '{print "- " $9 ": " $5}' >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**使用说明**: " >> $GITHUB_STEP_SUMMARY
+        echo "1. 下载 APK 文件到 Android 设备" >> $GITHUB_STEP_SUMMARY
+        echo "2. 在设备上启用\"未知来源\"安装" >> $GITHUB_STEP_SUMMARY
+        echo "3. 点击 APK 文件进行安装" >> $GITHUB_STEP_SUMMARY
