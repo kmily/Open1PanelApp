@@ -1,0 +1,609 @@
+{
+  "@@locale": "en",
+  "appName": "1Panel Open",
+  "commonLoading": "Loading...",
+  "commonRetry": "Retry",
+  "commonCancel": "Cancel",
+  "commonConfirm": "Confirm",
+  "commonSave": "Save",
+  "commonSaveSuccess": "Saved successfully",
+  "commonSaveFailed": "Failed to save",
+  "commonDelete": "Delete",
+  "commonRefresh": "Refresh",
+  "commonComingSoon": "Coming soon",
+  "commonEmpty": "No data",
+  "commonLoadFailedTitle": "Failed to load",
+  "monitorNetworkLabel": "Network",
+  "monitorMetricCurrent": "Current",
+  "monitorMetricMin": "Min",
+  "monitorMetricAvg": "Avg",
+  "monitorMetricMax": "Max",
+  "navServer": "Servers",
+  "navFiles": "Files",
+  "navSecurity": "Verification",
+  "navSettings": "Settings",
+  "serverPageTitle": "Servers",
+  "serverSearchHint": "Search server name or IP",
+  "serverAdd": "Add",
+  "serverListEmptyTitle": "No servers yet",
+  "serverListEmptyDesc": "Add your first 1Panel server to get started.",
+  "serverOnline": "Online",
+  "serverOffline": "Offline",
+  "serverCurrent": "Current",
+  "serverDefault": "Default",
+  "serverIpLabel": "IP",
+  "serverCpuLabel": "CPU",
+  "serverMemoryLabel": "Memory",
+  "serverLoadLabel": "Load",
+  "serverDiskLabel": "Disk",
+  "serverMetricsUnavailable": "Metrics unavailable",
+  "serverOpenDetail": "Open details",
+  "serverDetailTitle": "Server Details",
+  "serverModulesTitle": "Modules",
+  "serverModuleDashboard": "Overview",
+  "serverModuleApps": "Apps",
+  "serverModuleContainers": "Containers",
+  "serverModuleWebsites": "Websites",
+  "serverModuleDatabases": "Databases",
+  "serverModuleFirewall": "Firewall",
+  "serverModuleTerminal": "Terminal",
+  "serverModuleMonitoring": "Monitoring",
+  "serverModuleFiles": "File Manager",
+  "serverInsightsTitle": "Overview",
+  "serverActionsTitle": "Quick Actions",
+  "serverActionRefresh": "Refresh",
+  "serverActionSwitch": "Switch server",
+  "serverActionSecurity": "Verification",
+  "serverFormTitle": "Add Server",
+  "serverFormName": "Server name",
+  "serverFormNameHint": "e.g. Production",
+  "serverFormUrl": "Server URL",
+  "serverFormUrlHint": "e.g. https://panel.example.com",
+  "serverFormApiKey": "API key",
+  "serverFormApiKeyHint": "Enter API key",
+  "serverFormSaveConnect": "Save and continue",
+  "serverFormTest": "Test connection",
+  "serverFormRequired": "This field is required",
+  "serverFormSaveSuccess": "Server saved",
+  "serverFormSaveFailed": "Failed to save server: {error}",
+  "@serverFormSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "serverFormTestHint": "Connection test can be added after client adaptation.",
+  "serverTestSuccess": "Connection successful",
+  "serverTestFailed": "Connection failed",
+  "serverTestTesting": "Testing connection...",
+  "serverMetricsAvailable": "Metrics loaded",
+  "serverMetricsUnavailable": "Metrics unavailable",
+  "serverTokenValidity": "Token validity (minutes)",
+  "serverTokenValidityHint": "Set to 0 to skip timestamp validation",
+  "serverFormMinutes": "minutes",
+  "filesPageTitle": "Files",
+  "filesPath": "Path",
+  "filesRoot": "Root",
+  "filesNavigateUp": "Back to parent",
+  "filesEmptyTitle": "This folder is empty",
+  "filesEmptyDesc": "Tap the button below to create a new file or folder.",
+  "filesActionUpload": "Upload",
+  "filesActionNewFile": "New file",
+  "filesActionNewFolder": "New folder",
+  "filesActionNew": "New",
+  "filesActionOpen": "Open",
+  "filesActionRename": "Rename",
+  "filesActionCopy": "Copy",
+  "filesActionMove": "Move",
+  "filesActionExtract": "Extract",
+  "filesActionCompress": "Compress",
+  "filesActionDelete": "Delete",
+  "filesActionSelectAll": "Select all",
+  "filesActionDeselect": "Deselect",
+  "filesActionSort": "Sort",
+  "filesActionSearch": "Search",
+  "filesNameLabel": "Name",
+  "filesNameHint": "Enter name",
+  "filesTargetPath": "Target path",
+  "filesTypeDirectory": "Directory",
+  "filesSelected": "selected",
+  "filesSelectPath": "Select Path",
+  "filesCurrentFolder": "Current Folder",
+  "filesNoSubfolders": "No subfolders",
+  "filesPathSelectorTitle": "Select Target Path",
+  "filesDeleteTitle": "Delete files",
+  "filesDeleteConfirm": "Delete {count} selected items?",
+  "@filesDeleteConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "filesSortByName": "Sort by name",
+  "filesSortBySize": "Sort by size",
+  "filesSortByDate": "Sort by date",
+  "filesSearchHint": "Search files",
+  "filesSearchClear": "Clear",
+  "filesRecycleBin": "Recycle bin",
+  "filesCopyFailed": "Copy failed",
+  "filesMoveFailed": "Move failed",
+  "filesRenameFailed": "Rename failed",
+  "filesDeleteFailed": "Delete failed",
+  "filesCompressFailed": "Compress failed",
+  "filesExtractFailed": "Extract failed",
+  "filesCreateFailed": "Create failed",
+  "filesOperationSuccess": "Operation successful",
+  "filesCompressType": "Type",
+  "filesUploadDeveloping": "Upload feature is under development",
+  "commonCreate": "Create",
+  "commonSearch": "Search",
+  "securityPageTitle": "Dynamic Verification",
+  "securityStatusTitle": "MFA status",
+  "securityStatusEnabled": "Enabled",
+  "securityStatusDisabled": "Not enabled",
+  "securitySecretLabel": "Secret",
+  "securityCodeLabel": "Verification code",
+  "securityCodeHint": "Enter 6-digit code",
+  "securityLoadInfo": "Load MFA info",
+  "securityBind": "Bind MFA",
+  "securityBindSuccess": "MFA binding request submitted",
+  "securityBindFailed": "Failed to bind MFA: {error}",
+  "@securityBindFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securityMockNotice": "Current screen uses UI adapter mode. API client can be connected later.",
+  "settingsPageTitle": "Settings",
+  "settingsGeneral": "General",
+  "settingsLanguage": "Language",
+  "settingsTheme": "Theme",
+  "settingsServerManagement": "Server management",
+  "settingsResetOnboarding": "Replay onboarding",
+  "settingsAbout": "About",
+  "settingsResetOnboardingDone": "Onboarding state has been reset",
+  "themeSystem": "Follow system",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "languageSystem": "System",
+  "languageZh": "Chinese",
+  "languageEn": "English",
+  "onboardingSkip": "Skip",
+  "onboardingNext": "Next",
+  "onboardingStart": "Start",
+  "onboardingTitle1": "Manage your 1Panel servers",
+  "onboardingDesc1": "Unified mobile operations for monitoring, files, and security.",
+  "onboardingTitle2": "Fast switching and clear status",
+  "onboardingDesc2": "View key metrics and switch servers quickly with a card-based layout.",
+  "onboardingTitle3": "Built for progressive API integration",
+  "onboardingDesc3": "UI is stable first. Missing APIs are tracked in review docs for follow-up.",
+  "coachServerAddTitle": "Add your first server",
+  "coachServerAddDesc": "Tap here to create a server profile.",
+  "coachServerCardTitle": "Open server details",
+  "coachServerCardDesc": "Tap a server card to see modules and quick actions.",
+  "dashboardTitle": "Dashboard",
+  "dashboardLoadFailedTitle": "Failed to load",
+  "dashboardServerInfoTitle": "Server info",
+  "dashboardServerStatusOk": "Running",
+  "dashboardServerStatusConnecting": "Connecting...",
+  "dashboardHostNameLabel": "Hostname",
+  "dashboardOsLabel": "Operating system",
+  "dashboardUptimeLabel": "Uptime",
+  "dashboardUptimeDaysHours": "{days}d {hours}h",
+  "@dashboardUptimeDaysHours": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardUptimeHours": "{hours}h",
+  "@dashboardUptimeHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardUpdatedAt": "Updated at {time}",
+  "@dashboardUpdatedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardResourceTitle": "System resources",
+  "dashboardCpuUsage": "CPU usage",
+  "dashboardMemoryUsage": "Memory usage",
+  "dashboardDiskUsage": "Disk usage",
+  "dashboardQuickActionsTitle": "Quick actions",
+  "dashboardActionRestart": "Restart server",
+  "dashboardActionUpdate": "System update",
+  "dashboardActionBackup": "Create backup",
+  "dashboardActionSecurity": "Security check",
+  "dashboardRestartTitle": "Restart server",
+  "dashboardRestartDesc": "Restarting will temporarily interrupt all services. Continue?",
+  "dashboardRestartSuccess": "Restart request sent",
+  "dashboardRestartFailed": "Failed to restart: {error}",
+  "@dashboardRestartFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardUpdateTitle": "System update",
+  "dashboardUpdateDesc": "Start the update now? The panel may be temporarily unavailable.",
+  "dashboardUpdateSuccess": "Update request sent",
+  "dashboardUpdateFailed": "Failed to update: {error}",
+  "@dashboardUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardActivityTitle": "Recent activity",
+  "dashboardActivityEmpty": "No recent activity",
+  "dashboardActivityDaysAgo": "{count}d ago",
+  "@dashboardActivityDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardActivityHoursAgo": "{count}h ago",
+  "@dashboardActivityHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardActivityMinutesAgo": "{count}m ago",
+  "@dashboardActivityMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardActivityJustNow": "Just now",
+  "dashboardTopProcessesTitle": "Process Monitor",
+  "dashboardCpuTab": "CPU",
+  "dashboardMemoryTab": "Memory",
+  "dashboardNoProcesses": "No process data",
+  "authLoginTitle": "1Panel Login",
+  "authLoginSubtitle": "Please enter your credentials",
+  "authUsername": "Username",
+  "authPassword": "Password",
+  "authCaptcha": "Captcha",
+  "authLogin": "Login",
+  "authUsernameRequired": "Please enter username",
+  "authPasswordRequired": "Please enter password",
+  "authCaptchaRequired": "Please enter captcha",
+  "authMfaTitle": "Two-Factor Authentication",
+  "authMfaDesc": "Please enter the verification code from your authenticator app",
+  "authMfaHint": "000000",
+  "authMfaVerify": "Verify",
+  "authMfaCancel": "Back to login",
+  "authDemoMode": "Demo mode: Some features are limited",
+  "authLoginFailed": "Login failed",
+  "authLogoutSuccess": "Logged out successfully",
+  "coachDone": "Got it",
+  "notFoundTitle": "Page not found",
+  "notFoundDesc": "The requested page does not exist.",
+  "legacyRouteRedirect": "This legacy route is redirected to the new shell.",
+  "monitorDataPoints": "Data points",
+  "monitorDataPointsCount": "{count} points ({time})",
+  "@monitorDataPointsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "monitorRefreshInterval": "Refresh interval",
+  "monitorSeconds": "{count} seconds",
+  "@monitorSeconds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monitorSecondsDefault": "{count} seconds (default)",
+  "@monitorSecondsDefault": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monitorMinute": "{count} minute",
+  "@monitorMinute": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monitorTimeMinutes": "{count} min",
+  "@monitorTimeMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monitorTimeHours": "{count} hour",
+  "@monitorTimeHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monitorDataPointsLabel": "{count} data points",
+  "@monitorDataPointsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monitorSettings": "Monitor Settings",
+  "monitorEnable": "Enable Monitoring",
+  "monitorInterval": "Monitor Interval",
+  "monitorIntervalUnit": "seconds",
+  "monitorRetention": "Data Retention",
+  "monitorRetentionUnit": "days",
+  "monitorCleanData": "Clean Monitor Data",
+  "monitorCleanConfirm": "Are you sure you want to clean all monitor data? This action cannot be undone.",
+  "monitorCleanSuccess": "Monitor data cleaned successfully",
+  "monitorCleanFailed": "Failed to clean monitor data",
+  "monitorSettingsSaved": "Settings saved successfully",
+  "monitorSettingsFailed": "Failed to save settings",
+  "monitorGPU": "GPU Monitor",
+  "monitorGPUName": "Name",
+  "monitorGPUUtilization": "Utilization",
+  "monitorGPUMemory": "Memory",
+  "monitorGPUTemperature": "Temperature",
+  "monitorGPUNotAvailable": "GPU monitoring not available",
+  "monitorTimeRange": "Time Range",
+  "monitorTimeRangeLast1h": "Last 1 hour",
+  "monitorTimeRangeLast6h": "Last 6 hours",
+  "monitorTimeRangeLast24h": "Last 24 hours",
+  "monitorTimeRangeLast7d": "Last 7 days",
+  "monitorTimeRangeCustom": "Custom",
+  "monitorTimeRangeFrom": "From",
+  "monitorTimeRangeTo": "To",
+  "systemSettingsTitle": "System Settings",
+  "systemSettingsRefresh": "Refresh",
+  "systemSettingsLoadFailed": "Failed to load settings",
+  "systemSettingsPanelSection": "Panel Settings",
+  "systemSettingsPanelConfig": "Panel Config",
+  "systemSettingsPanelConfigDesc": "Panel name, port, bind address, etc.",
+  "systemSettingsTerminal": "Terminal Settings",
+  "systemSettingsTerminalDesc": "Terminal style, font, scrolling, etc.",
+  "systemSettingsSecuritySection": "Security Settings",
+  "systemSettingsSecurityConfig": "Security Config",
+  "systemSettingsSecurityConfigDesc": "MFA authentication, access control, etc.",
+  "systemSettingsApiKey": "API Key",
+  "systemSettingsBackupSection": "Backup & Recovery",
+  "systemSettingsSnapshot": "Snapshot Management",
+  "systemSettingsSnapshotDesc": "Create, restore, delete system snapshots",
+  "systemSettingsSystemSection": "System Info",
+  "systemSettingsUpgrade": "System Upgrade",
+  "systemSettingsAbout": "About",
+  "systemSettingsAboutDesc": "System info and version",
+  "systemSettingsLastUpdated": "Last updated: {time}",
+  "@systemSettingsLastUpdated": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "systemSettingsPanelName": "1Panel",
+  "systemSettingsSystemVersion": "System Version",
+  "systemSettingsMfaStatus": "MFA Status",
+  "systemSettingsEnabled": "Enabled",
+  "systemSettingsDisabled": "Disabled",
+  "systemSettingsApiKeyManage": "API Key Management",
+  "systemSettingsCurrentStatus": "Current Status",
+  "systemSettingsUnknown": "Unknown",
+  "systemSettingsApiKeyLabel": "API Key",
+  "systemSettingsNotSet": "Not set",
+  "systemSettingsGenerateNewKey": "Generate New Key",
+  "systemSettingsApiKeyGenerated": "API key generated",
+  "systemSettingsGenerateFailed": "Generation failed",
+  "apiKeySettingsTitle": "API Key Management",
+  "apiKeySettingsStatus": "Status",
+  "apiKeySettingsEnabled": "API Interface",
+  "apiKeySettingsInfo": "Key Information",
+  "apiKeySettingsKey": "API Key",
+  "apiKeySettingsIpWhitelist": "IP Whitelist",
+  "apiKeySettingsValidityTime": "Validity Time",
+  "apiKeySettingsActions": "Actions",
+  "apiKeySettingsRegenerate": "Regenerate",
+  "apiKeySettingsRegenerateDesc": "Generate new API key",
+  "apiKeySettingsRegenerateConfirm": "Are you sure you want to regenerate the API key? The old key will be invalid immediately.",
+  "apiKeySettingsRegenerateSuccess": "API key regenerated",
+  "apiKeySettingsEnable": "Enable API",
+  "apiKeySettingsDisable": "Disable API",
+  "apiKeySettingsEnableConfirm": "Are you sure you want to enable API interface?",
+  "apiKeySettingsDisableConfirm": "Are you sure you want to disable API interface?",
+  "commonCopied": "Copied to clipboard",
+  "sslSettingsTitle": "SSL Certificate Management",
+  "sslSettingsInfo": "Certificate Information",
+  "sslSettingsDomain": "Domain",
+  "sslSettingsStatus": "Status",
+  "sslSettingsType": "Type",
+  "sslSettingsProvider": "Provider",
+  "sslSettingsExpiration": "Expiration",
+  "sslSettingsActions": "Actions",
+  "sslSettingsUpload": "Upload Certificate",
+  "sslSettingsUploadDesc": "Upload SSL certificate file",
+  "sslSettingsDownload": "Download Certificate",
+  "sslSettingsDownloadDesc": "Download current SSL certificate",
+  "sslSettingsDownloadSuccess": "Certificate downloaded successfully",
+  "sslSettingsCert": "Certificate Content",
+  "sslSettingsKey": "Private Key Content",
+  "upgradeTitle": "System Upgrade",
+  "upgradeCurrentVersion": "Current Version",
+  "upgradeCurrentVersionLabel": "Current System Version",
+  "upgradeAvailableVersions": "Available Versions",
+  "upgradeNoUpdates": "Already up to date",
+  "upgradeLatest": "Latest",
+  "upgradeConfirm": "Confirm Upgrade",
+  "upgradeConfirmMessage": "Are you sure you want to upgrade to version {version}?",
+  "upgradeDowngradeConfirm": "Confirm Downgrade",
+  "upgradeDowngradeMessage": "Are you sure you want to downgrade to version {version}? Downgrade may cause data incompatibility.",
+  "upgradeButton": "Upgrade",
+  "upgradeDowngradeButton": "Downgrade",
+  "upgradeStarted": "Upgrade started",
+  "upgradeViewNotes": "View Release Notes",
+  "upgradeNotesTitle": "Version {version} Release Notes",
+  "upgradeNotesLoading": "Loading...",
+  "upgradeNotesEmpty": "No release notes available",
+  "upgradeNotesError": "Failed to load",
+  "monitorSettingsTitle": "Monitor Settings",
+  "monitorSettingsInterval": "Monitor Interval",
+  "monitorSettingsStoreDays": "Data Retention Days",
+  "monitorSettingsEnable": "Enable Monitoring",
+  "systemSettingsCurrentVersion": "Current Version",
+  "systemSettingsCheckingUpdate": "Checking for updates...",
+  "systemSettingsClose": "Close",
+  "panelSettingsTitle": "Panel Settings",
+  "panelSettingsBasicInfo": "Basic Info",
+  "panelSettingsPanelName": "Panel Name",
+  "panelSettingsVersion": "System Version",
+  "panelSettingsPort": "Listen Port",
+  "panelSettingsBindAddress": "Bind Address",
+  "panelSettingsInterface": "Interface Settings",
+  "panelSettingsTheme": "Theme",
+  "panelSettingsLanguage": "Language",
+  "panelSettingsMenuTabs": "Menu Tabs",
+  "panelSettingsAdvanced": "Advanced Settings",
+  "panelSettingsDeveloperMode": "Developer Mode",
+  "panelSettingsIpv6": "IPv6",
+  "panelSettingsSessionTimeout": "Session Timeout",
+  "panelSettingsMinutes": "{count} minutes",
+  "@panelSettingsMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "terminalSettingsTitle": "Terminal Settings",
+  "terminalSettingsDisplay": "Display Settings",
+  "terminalSettingsCursorStyle": "Cursor Style",
+  "terminalSettingsCursorBlink": "Cursor Blink",
+  "terminalSettingsFontSize": "Font Size",
+  "terminalSettingsScroll": "Scroll Settings",
+  "terminalSettingsScrollSensitivity": "Scroll Sensitivity",
+  "terminalSettingsScrollback": "Scrollback Buffer",
+  "terminalSettingsStyle": "Style Settings",
+  "terminalSettingsLineHeight": "Line Height",
+  "terminalSettingsLetterSpacing": "Letter Spacing",
+  "securitySettingsTitle": "Security Settings",
+  "securitySettingsPasswordSection": "Password Management",
+  "securitySettingsChangePassword": "Change Password",
+  "securitySettingsChangePasswordDesc": "Change login password",
+  "securitySettingsOldPassword": "Current Password",
+  "securitySettingsNewPassword": "New Password",
+  "securitySettingsConfirmPassword": "Confirm Password",
+  "securitySettingsPasswordMismatch": "Passwords do not match",
+  "securitySettingsMfaSection": "MFA Authentication",
+  "securitySettingsMfaStatus": "MFA Status",
+  "securitySettingsMfaBind": "Bind MFA",
+  "securitySettingsMfaUnbind": "Unbind MFA",
+  "securitySettingsMfaUnbindDesc": "MFA authentication will be disabled after unbinding. Are you sure?",
+  "securitySettingsMfaScanQr": "Scan QR code with authenticator app",
+  "securitySettingsMfaSecret": "Secret: {secret}",
+  "securitySettingsMfaCode": "Verification Code",
+  "securitySettingsUnbindMfa": "Unbind MFA",
+  "securitySettingsAccessControl": "Access Control",
+  "securitySettingsSecurityEntrance": "Security Entrance",
+  "securitySettingsBindDomain": "Bind Domain",
+  "securitySettingsAllowIPs": "Allowed IPs",
+  "securitySettingsPasswordPolicy": "Password Policy",
+  "securitySettingsComplexityVerification": "Complexity Verification",
+  "securitySettingsExpirationDays": "Expiration Days",
+  "securitySettingsEnableMfa": "Enable MFA",
+  "securitySettingsDisableMfa": "Disable MFA",
+  "securitySettingsEnableMfaConfirm": "Are you sure you want to enable MFA?",
+  "securitySettingsDisableMfaConfirm": "Are you sure you want to disable MFA?",
+  "securitySettingsEnterMfaCode": "Please enter MFA verification code",
+  "securitySettingsVerifyCode": "Verification Code",
+  "securitySettingsMfaCodeHint": "Enter 6-digit code",
+  "securitySettingsMfaUnbound": "MFA unbound",
+  "securitySettingsUnbindFailed": "Unbind failed",
+  "snapshotTitle": "Snapshot Management",
+  "snapshotCreate": "Create Snapshot",
+  "snapshotEmpty": "No snapshots",
+  "snapshotCreatedAt": "Created At",
+  "snapshotDescription": "Description",
+  "snapshotRecover": "Recover",
+  "snapshotDownload": "Download",
+  "snapshotDelete": "Delete",
+  "snapshotImport": "Import Snapshot",
+  "snapshotRollback": "Rollback",
+  "snapshotEditDesc": "Edit Description",
+  "snapshotEnterDesc": "Enter snapshot description (optional)",
+  "snapshotDescLabel": "Description",
+  "snapshotDescHint": "Enter snapshot description",
+  "snapshotCreateSuccess": "Snapshot created successfully",
+  "snapshotCreateFailed": "Failed to create snapshot",
+  "snapshotImportTitle": "Import Snapshot",
+  "snapshotImportPath": "Snapshot File Path",
+  "snapshotImportPathHint": "Enter snapshot file path",
+  "snapshotImportSuccess": "Snapshot imported successfully",
+  "snapshotImportFailed": "Failed to import snapshot",
+  "snapshotRollbackTitle": "Rollback Snapshot",
+  "snapshotRollbackConfirm": "Are you sure you want to rollback to this snapshot? Current configuration will be overwritten.",
+  "snapshotRollbackSuccess": "Snapshot rolled back successfully",
+  "snapshotRollbackFailed": "Failed to rollback snapshot",
+  "snapshotEditDescTitle": "Edit Snapshot Description",
+  "snapshotEditDescSuccess": "Description updated successfully",
+  "snapshotEditDescFailed": "Failed to update description",
+  "snapshotRecoverTitle": "Recover Snapshot",
+  "snapshotRecoverConfirm": "Are you sure you want to recover this snapshot? Current configuration will be overwritten.",
+  "snapshotRecoverSuccess": "Snapshot recovered successfully",
+  "snapshotRecoverFailed": "Failed to recover snapshot",
+  "snapshotDeleteTitle": "Delete Snapshot",
+  "snapshotDeleteConfirm": "Are you sure you want to delete selected snapshots? This action cannot be undone.",
+  "snapshotDeleteSuccess": "Snapshot deleted successfully",
+  "snapshotDeleteFailed": "Failed to delete snapshot",
+  "proxySettingsTitle": "Proxy Settings",
+  "proxySettingsEnable": "Enable Proxy",
+  "proxySettingsType": "Proxy Type",
+  "proxySettingsHttp": "HTTP Proxy",
+  "proxySettingsHttps": "HTTPS Proxy",
+  "proxySettingsHost": "Proxy Host",
+  "proxySettingsPort": "Proxy Port",
+  "proxySettingsUser": "Username",
+  "proxySettingsPassword": "Password",
+  "proxySettingsSaved": "Proxy settings saved",
+  "proxySettingsFailed": "Failed to save",
+  "bindSettingsTitle": "Bind Address",
+  "bindSettingsAddress": "Bind Address",
+  "bindSettingsPort": "Panel Port",
+  "bindSettingsSaved": "Bind settings saved",
+  "bindSettingsFailed": "Failed to save",
+  "serverModuleSystemSettings": "System Settings"
+}

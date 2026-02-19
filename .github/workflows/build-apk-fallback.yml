@@ -1,0 +1,71 @@
+name: Build APK (Alternative)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    name: Build Android APK (Alternative)
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Node.js (for fallback)
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Cache Flutter SDK
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ runner.tool_cache }}/flutter
+          ~/.pub-cache
+        key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-flutter-
+
+    - name: Download Flutter
+      run: |
+        cd ${{ runner.tool_cache }}
+        wget -q https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.16.9-stable.tar.xz
+        tar xf flutter_linux_3.16.9-stable.tar.xz
+        chmod +x flutter/bin/flutter
+        echo "${{ runner.tool_cache }}/flutter/bin" >> $GITHUB_PATH
+
+    - name: Check Flutter version
+      run: flutter --version
+
+    - name: Enable Flutter web and desktop
+      run: flutter config --enable-web --enable-windows-desktop --enable-macos-desktop --enable-linux-desktop
+
+    - name: Get dependencies
+      run: flutter pub get
+
+    - name: Analyze code
+      run: flutter analyze --no-fatal-infos
+
+    - name: Build APK
+      run: flutter build apk --release --tree-shake-icons
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release-apk-alt
+        path: build/app/outputs/flutter-apk/app-release.apk
+        retention-days: 30

@@ -1,0 +1,1519 @@
+{
+  "module": "file",
+  "generatedAt": "2026-02-16T23:11:15.924638",
+  "summary": {
+    "endpointCount": 53,
+    "methodCount": 53
+  },
+  "endpoints": [
+    {
+      "path": "/backups/search/files",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "List files from backup accounts",
+          "description": "",
+          "tags": [
+            "Backup Account"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/containers/daemonjson/file",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load docker daemon.json",
+          "description": "",
+          "tags": [
+            "Container Docker"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/databases/common/load/file",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load Database conf",
+          "description": "",
+          "tags": [
+            "Database Common"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Create file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/batch/check",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Batch check file exist",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/batch/del",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Batch delete file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/batch/role",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Batch change file mode and owner",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/check",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Check file exist",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/chunkdownload",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Chunk Download file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/chunkupload",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "ChunkUpload file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "file",
+              "in": "formData",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/compress",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Compress file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/content",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load file content",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/convert",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Convert file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/convert/log",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Convert file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/decompress",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Decompress file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/del",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Delete file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/depth/size",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Multi file size",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/download",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Download file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/favorite",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Create favorite",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/favorite/del",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Delete favorite",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/favorite/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "List favorites",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/mode",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Change file mode",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/mount",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "system mount",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/move",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Move file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/owner",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Change file owner",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/preview",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Preview file content",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/read",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Read file by Line",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/recycle/clear",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Clear RecycleBin files",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/recycle/reduce",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Reduce RecycleBin files",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/recycle/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "List RecycleBin files",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/recycle/status",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Get RecycleBin status",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/rename",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Change file name",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/save",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update file content",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "List files",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/size",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load file size",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/tree",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load files tree",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/upload",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Upload file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "file",
+              "in": "formData",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/upload/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Page file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/user/group",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "system user and group",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/files/wget",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Wget file",
+          "description": "",
+          "tags": [
+            "File"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/file",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load host SSH conf",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/file/update",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update host SSH setting by file",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/tool/supervisor/process/file",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Get Supervisor process config file",
+          "description": "",
+          "tags": [
+            "Host tool"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/logs/system/files",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load system log files",
+          "description": "",
+          "tags": [
+            "Logs"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/openresty/file",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update OpenResty conf by upload file",
+          "description": "",
+          "tags": [
+            "OpenResty"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/runtimes/php/file",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Get php conf file",
+          "description": "",
+          "tags": [
+            "Runtime"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/runtimes/supervisor/process/file",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Operate supervisor process file",
+          "description": "",
+          "tags": [
+            "Runtime"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/toolbox/clam/file/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load clam file",
+          "description": "",
+          "tags": [
+            "Clam"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/toolbox/clam/file/update",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update clam file",
+          "description": "",
+          "tags": [
+            "Clam"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/websites/lbs/file",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update website upstream file",
+          "description": "",
+          "tags": [
+            "Website"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/websites/proxies/file",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update proxy file",
+          "description": "",
+          "tags": [
+            "Website"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/websites/redirect/file",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update redirect file",
+          "description": "",
+          "tags": [
+            "Website"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/websites/ssl/upload/file",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Upload SSL file",
+          "description": "",
+          "tags": [
+            "Website SSL"
+          ],
+          "parameters": [
+            {
+              "name": "type",
+              "in": "formData",
+              "required": true,
+              "type": "unknown",
+              "description": "type"
+            },
+            {
+              "name": "description",
+              "in": "formData",
+              "required": false,
+              "type": "unknown",
+              "description": "description"
+            },
+            {
+              "name": "sslID",
+              "in": "formData",
+              "required": false,
+              "type": "unknown",
+              "description": "sslID"
+            },
+            {
+              "name": "privateKeyFile",
+              "in": "formData",
+              "required": true,
+              "type": "unknown",
+              "description": "privateKeyFile"
+            },
+            {
+              "name": "certificateFile",
+              "in": "formData",
+              "required": true,
+              "type": "unknown",
+              "description": "certificateFile"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    }
+  ]
+}

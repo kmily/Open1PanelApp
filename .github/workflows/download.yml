@@ -1,0 +1,101 @@
+name: Download Latest APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download:
+    name: Download Latest APK
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Get latest successful build
+      uses: actions/github-script@v7
+      id: get-latest-run
+      with:
+        result-encoding: string
+        script: |
+          const runs = await github.rest.actions.listWorkflowRuns({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            workflow_id: 'build-apk.yml',
+            status: 'success',
+            per_page: 1
+          });
+          
+          if (runs.data.workflow_runs.length === 0) {
+            throw new Error('No successful builds found');
+          }
+          
+          const runId = runs.data.workflow_runs[0].id;
+          console.log('Latest successful build run ID:', runId);
+          return runId;
+
+    - name: Get artifacts
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const runId = ${{ steps.get-latest-run.outputs.result }};
+          
+          const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: parseInt(runId)
+          });
+          
+          const apkArtifact = artifacts.data.artifacts.find(a => a.name === 'app-release-apk');
+          
+          if (!apkArtifact) {
+            throw new Error('No APK artifact found in latest build');
+          }
+          
+          console.log('Found artifact:', apkArtifact.name, 'ID:', apkArtifact.id);
+          
+          // Download the artifact
+          const download = await github.rest.actions.downloadArtifact({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            artifact_id: apkArtifact.id,
+            archive_format: 'zip'
+          });
+          
+          const fs = require('fs');
+          fs.writeFileSync('apk-artifact.zip', Buffer.from(download.data));
+          console.log('Artifact downloaded successfully');
+
+    - name: Extract artifact
+      run: |
+        unzip -o apk-artifact.zip
+        ls -la
+
+    - name: Find APK files
+      id: find-apk
+      run: |
+        APK_FILES=$(find . -name "*.apk" -type f)
+        "$APK_FILES" ]; then
+          echo "No if [ -z APK files found"
+          exit 1
+        fi
+        echo "Found APK files:"
+        ls -lh $APK_FILES
+        echo "apk_files=$APK_FILES" >> $GITHUB_OUTPUT
+
+    - name: Upload to workflow artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: downloaded-apk
+        path: ${{ steps.find-apk.outputs.apk_files }}
+        retention-days: 1
+
+    - name: Create download summary
+      run: |
+        echo "### ✅ APK 下载成功" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**构建信息**: " >> $GITHUB_STEP_SUMMARY
+        echo "- **最新成功构建**: Run #${{ steps.get-latest-run.outputs.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**APK文件**: " >> $GITHUB_STEP_SUMMARY
+        ls -lh ${{ steps.find-apk.outputs.apk_files }} | awk '{print "- " $9 ": " $5}' >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**💾 下载方法**: " >> $GITHUB_STEP_SUMMARY
+        echo "点击上方 **downloaded-apk** Artifacts 进行下载" >> $GITHUB_STEP_SUMMARY

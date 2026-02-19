@@ -1,0 +1,1515 @@
+{
+  "module": "host",
+  "generatedAt": "2026-02-15T15:17:32.198247",
+  "summary": {
+    "endpointCount": 53,
+    "methodCount": 54
+  },
+  "endpoints": [
+    {
+      "path": "/core/hosts",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Create host",
+          "description": "",
+          "tags": [
+            "Host"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/core/hosts/del",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Delete host",
+          "description": "",
+          "tags": [
+            "Host"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/core/hosts/info",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Get host info",
+          "description": "",
+          "tags": [
+            "Host"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/core/hosts/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Page host",
+          "description": "",
+          "tags": [
+            "Host"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/core/hosts/test/byid/:id",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Test host conn by host id",
+          "description": "",
+          "tags": [
+            "Host"
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/core/hosts/test/byinfo",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Test host conn by info",
+          "description": "",
+          "tags": [
+            "Host"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/core/hosts/tree",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load host tree",
+          "description": "",
+          "tags": [
+            "Host"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/core/hosts/update",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update host",
+          "description": "",
+          "tags": [
+            "Host"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/core/hosts/update/group",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update host group",
+          "description": "",
+          "tags": [
+            "Host"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/components/{name}",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Check if a system component exists",
+          "description": "",
+          "tags": [
+            "Host"
+          ],
+          "parameters": [
+            {
+              "name": "name",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "Component name to check (e.g., rsync, docker)"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/disks",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Get complete disk information",
+          "description": "Get information about all disks including partitioned and unpartitioned disks",
+          "tags": [
+            "Disk Management"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/disks/mount",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Mount disk",
+          "description": "Mount partition to specified mount point",
+          "tags": [
+            "Disk Management"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "mount request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "Disk mounted successfully"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/disks/partition",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Partition disk",
+          "description": "Create partition and format disk with specified filesystem",
+          "tags": [
+            "Disk Management"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "partition request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "Partition created successfully"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/disks/unmount",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Unmount disk",
+          "description": "Unmount partition from mount point",
+          "tags": [
+            "Disk Management"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "unmount request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "Disk unmounted successfully"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/base",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load firewall base info",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/batch",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Batch operate rule",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/filter/chain/status",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "load chain status with name",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/filter/operate",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Apply/Unload/Init iptables filter",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/filter/rule/batch",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Batch operate iptables filter rules",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/filter/rule/operate",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Operate iptables filter rule",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/filter/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "search iptables filter rules",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/forward",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Operate forward rule",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/ip",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Operate Ip rule",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/operate",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Operate firewall",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/port",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Create group",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Page firewall rules",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/update/addr",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update Ip rule",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/update/description",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update rule description",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/firewall/update/port",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update port rule",
+          "description": "",
+          "tags": [
+            "Firewall"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/monitor/clean",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Clean monitor data",
+          "description": "",
+          "tags": [
+            "Monitor"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/monitor/gpu/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load monitor data",
+          "description": "",
+          "tags": [
+            "Monitor"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/monitor/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load monitor data",
+          "description": "",
+          "tags": [
+            "Monitor"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/monitor/setting",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load monitor setting",
+          "description": "",
+          "tags": [
+            "Monitor"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/monitor/setting/update",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update monitor setting",
+          "description": "",
+          "tags": [
+            "Monitor"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/cert",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Generate host SSH secret",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/cert/delete",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Delete host SSH secret",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/cert/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load host SSH secret",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/cert/sync",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Sycn host SSH secret",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/cert/update",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update host SSH secret",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/file",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load host SSH conf",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/file/update",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update host SSH setting by file",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/log",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load host SSH logs",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/log/export",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Export host SSH logs",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/operate",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Operate SSH",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load host SSH setting info",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/ssh/update",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update host SSH setting",
+          "description": "",
+          "tags": [
+            "SSH"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/tool",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Get tool status",
+          "description": "",
+          "tags": [
+            "Host tool"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/tool/config",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Get tool config",
+          "description": "",
+          "tags": [
+            "Host tool"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/tool/init",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Create Host tool Config",
+          "description": "",
+          "tags": [
+            "Host tool"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/tool/operate",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Operate tool",
+          "description": "",
+          "tags": [
+            "Host tool"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/tool/supervisor/process",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Get Supervisor process config",
+          "description": "",
+          "tags": [
+            "Host tool"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        },
+        {
+          "method": "POST",
+          "summary": "Create Supervisor process",
+          "description": "",
+          "tags": [
+            "Host tool"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/hosts/tool/supervisor/process/file",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Get Supervisor process config file",
+          "description": "",
+          "tags": [
+            "Host tool"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/toolbox/device/update/host",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update device hosts",
+          "description": "",
+          "tags": [
+            "Device"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    }
+  ]
+}
