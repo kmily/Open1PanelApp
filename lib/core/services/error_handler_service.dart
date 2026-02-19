@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
-import 'package:onepanelapp_app/core/services/logger_service.dart';
+import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
 
 /// 统一错误处理服务
 /// 
@@ -62,7 +62,7 @@ class ErrorHandlerService {
       
       case DioExceptionType.unknown:
         appLogger.eWithPackage(_defaultPackage, '未知网络错误', error: error);
-        return l10n.errorUnknown(error.message ?? l10n.unknownError(''));
+        return l10n.unknownError(error.message ?? '');
     }
   }
 

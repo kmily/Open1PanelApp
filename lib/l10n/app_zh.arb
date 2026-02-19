@@ -631,5 +631,9 @@
   "errorDetailMessage": "错误信息",
   "errorDetailStackTrace": "堆栈跟踪",
   "errorDetailCopy": "复制错误信息",
-  "errorDetailCopied": "已复制到剪贴板"
+  "errorDetailCopied": "已复制到剪贴板",
+
+  "cancel": "取消",
+  "retry": "重试",
+  "close": "关闭"
 }
