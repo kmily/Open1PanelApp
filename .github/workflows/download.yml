@@ -2,6 +2,12 @@ name: Download Latest APK
 
 on:
   workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create a release for easy download'
+        required: false
+        default: 'true'
+        type: boolean
 
 jobs:
   download:
@@ -72,8 +78,8 @@ jobs:
       id: find-apk
       run: |
         APK_FILES=$(find . -name "*.apk" -type f)
-        "$APK_FILES" ]; then
-          echo "No if [ -z APK files found"
+        if [ -z "$APK_FILES" ]; then
+          echo "No APK files found"
           exit 1
         fi
         echo "Found APK files:"
@@ -87,6 +93,47 @@ jobs:
         path: ${{ steps.find-apk.outputs.apk_files }}
         retention-days: 1
 
+    - name: Create release for download
+      if: github.event.inputs.create_release == 'true'
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: download-${{ github.run_number }}
+        name: 📱 1Panel Open Mobile App - Download Build ${{ github.run_number }}
+        body: |
+          ## 📥 1Panel Open Mobile App - 下载版本
+
+          ### 📱 下载信息
+          - **构建号**: ${{ github.run_number }}
+          - **构建时间**: ${{ github.run_started_at }}
+          - **Git提交**: ${{ github.sha }}
+
+          ### 🚀 功能特性
+          - 1Panel 服务器管理
+          - AI 管理 (Ollama 模型)
+          - 应用程序管理
+          - 容器管理
+          - 网站管理
+          - 数据库管理
+          - 文件管理
+          - 系统监控
+
+          ### 📋 使用说明
+          1. **APK安装**:
+             - 下载 APK 文件到 Android 设备
+             - 在设备上启用"未知来源"安装
+             - 点击 APK 文件进行安装
+
+          ### ⚠️ 重要提示
+          - 这是自动生成的临时下载版本
+          - 仅供测试使用，稳定性不保证
+          - 如需稳定版本，请等待正式 Release
+
+        files: ${{ steps.find-apk.outputs.apk_files }}
+        draft: false
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Create download summary
       run: |
         echo "### ✅ APK 下载成功" >> $GITHUB_STEP_SUMMARY
@@ -97,5 +144,15 @@ jobs:
         echo "**APK文件**: " >> $GITHUB_STEP_SUMMARY
         ls -lh ${{ steps.find-apk.outputs.apk_files }} | awk '{print "- " $9 ": " $5}' >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "**💾 下载方法**: " >> $GITHUB_STEP_SUMMARY
-        echo "点击上方 **downloaded-apk** Artifacts 进行下载" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ github.event.inputs.create_release }}" = "true" ]; then
+          echo "**🔗 下载链接**: " >> $GITHUB_STEP_SUMMARY
+          echo "https://github.com/${{ github.repository }}/releases/tag/download-${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**💾 GitHub App下载方法**: " >> $GITHUB_STEP_SUMMARY
+          echo "1. 点击上方链接打开 Release 页面" >> $GITHUB_STEP_SUMMARY
+          echo "2. 在 Release 页面找到 APK 文件" >> $GITHUB_STEP_SUMMARY
+          echo "3. 点击文件名即可下载" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "**💾 下载方法**: " >> $GITHUB_STEP_SUMMARY
+          echo "点击上方 **downloaded-apk** Artifacts 进行下载" >> $GITHUB_STEP_SUMMARY
+        fi
