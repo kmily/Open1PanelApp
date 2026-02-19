@@ -79,6 +79,7 @@ class _DashboardPageState extends State<DashboardPage> {
               return DashboardErrorView(
                 error: provider.errorMessage,
                 onRetry: () => provider.loadData(),
+                originalError: provider.originalError,
               );
 
             case DashboardStatus.loaded:

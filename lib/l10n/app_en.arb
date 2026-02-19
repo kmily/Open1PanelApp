@@ -605,5 +605,83 @@
   "bindSettingsPort": "Panel Port",
   "bindSettingsSaved": "Bind settings saved",
   "bindSettingsFailed": "Failed to save",
-  "serverModuleSystemSettings": "System Settings"
+  "serverModuleSystemSettings": "System Settings",
+
+  "unknownError": "Unknown error: {details}",
+  "@unknownError": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errorNetworkTitle": "Network Error",
+  "errorConnectionTimeout": "Connection timeout, please check your network connection or try again later",
+  "errorSendTimeout": "Send timeout, please check your network connection",
+  "errorReceiveTimeout": "Receive timeout, please check your network connection",
+  "errorConnectionRefused": "Connection refused, please check if the server address is correct and the server is running",
+  "errorHostNotFound": "Server not found, please check if the server address is correct",
+  "errorNetworkUnreachable": "Network unreachable, please check your network connection",
+  "errorCannotConnectServer": "Cannot connect to server, please check your network connection and server status",
+  "errorSslError": "SSL certificate verification failed, please check if the server certificate is valid",
+  "errorRequestCancelled": "Request cancelled",
+  "errorBadCertificate": "Certificate verification failed, please confirm the server SSL certificate is configured correctly",
+  "errorNoInternet": "No internet connection, please check your network settings",
+  "errorServerUnreachable": "Server is unreachable, please check if the server is online",
+  "errorBadRequest": "Bad request: {message}",
+  "@errorBadRequest": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUnauthorized": "Authentication failed, please check if the API key is correct",
+  "errorForbidden": "Permission denied, you don't have permission to perform this operation",
+  "errorNotFound": "Requested resource not found",
+  "errorInternalServerError": "Internal server error, please try again later",
+  "errorServiceUnavailable": "Service temporarily unavailable, please try again later",
+  "errorServerError": "Server error ({code}): {message}",
+  "@errorServerError": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUnexpectedStatus": "Unexpected response status code: {code}",
+  "@errorUnexpectedStatus": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errorConnectionTestFailed": "Connection test failed",
+  "errorConnectionTestTimeout": "Connection test timeout, please check:\n1. If the server address is correct\n2. If the server is online\n3. If the network connection is normal\n4. If the firewall allows the connection",
+  "errorConnectionTestInvalidUrl": "Server address format is incorrect, please use a full address starting with https:// or http://",
+  "errorConnectionTestInvalidKey": "API key is invalid, please check:\n1. If the key is copied correctly\n2. If the key has expired\n3. If the key is enabled\n4. If you have sufficient permissions",
+  "errorConnectionTestServerDown": "Server is not responding, please check:\n1. If the server is running\n2. If the panel port is correct\n3. Firewall settings\n4. Server network connection",
+
+  "errorApiCallFailed": "API call failed",
+  "errorDataLoadFailed": "Failed to load data",
+  "errorDataSaveFailed": "Failed to save data",
+  "errorOperationFailed": "Operation failed",
+
+  "errorTipCheckNetwork": "💡 Tip: Please check if your network connection is normal",
+  "errorTipCheckServer": "💡 Tip: Please confirm the server address and API key are correct",
+  "errorTipCheckServerStatus": "💡 Tip: Please confirm the server is running and the panel service is started",
+  "errorTipContactSupport": "💡 Tip: If the problem persists, please contact technical support",
+  "errorTipRetryLater": "💡 Tip: Please try again later, if the problem persists check your network settings",
+
+  "errorDetailTitle": "Error Details",
+  "errorDetailMessage": "Error Message",
+  "errorDetailStackTrace": "Stack Trace",
+  "errorDetailCopy": "Copy Error Info",
+  "errorDetailCopied": "Copied to clipboard"
 }
