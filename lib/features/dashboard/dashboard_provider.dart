@@ -191,11 +191,12 @@ class DashboardProvider extends ChangeNotifier {
   DashboardStatus _status = DashboardStatus.initial;
   DashboardData _data = const DashboardData();
   String _errorMessage = '';
+  dynamic _originalError; // 保存原始错误对象
   List<DashboardActivity> _activities = [];
   bool _isLoadingTopProcesses = false;
   bool _isLoadingAppLaunchers = false;
   bool _isLoadingQuickOptions = false;
-  
+
   // 自动刷新设置
   Duration _refreshInterval = const Duration(seconds: 5);
   bool _autoRefreshEnabled = false;
@@ -204,6 +205,7 @@ class DashboardProvider extends ChangeNotifier {
   DashboardStatus get status => _status;
   DashboardData get data => _data;
   String get errorMessage => _errorMessage;
+  dynamic get originalError => _originalError;
   List<DashboardActivity> get activities => _activities;
   bool get isLoadingTopProcesses => _isLoadingTopProcesses;
   bool get isLoadingAppLaunchers => _isLoadingAppLaunchers;
@@ -356,6 +358,7 @@ class DashboardProvider extends ChangeNotifier {
       debugPrint('[DashboardProvider] Stack: $stack');
       _status = DashboardStatus.error;
       _errorMessage = e.toString();
+      _originalError = e; // 保存原始错误对象
       _isRefreshing = false;
     }
 

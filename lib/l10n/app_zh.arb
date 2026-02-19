@@ -553,5 +553,83 @@
   "bindSettingsPort": "面板端口",
   "bindSettingsSaved": "绑定设置已保存",
   "bindSettingsFailed": "保存失败",
-  "serverModuleSystemSettings": "系统设置"
+  "serverModuleSystemSettings": "系统设置",
+
+  "unknownError": "未知错误: {details}",
+  "@unknownError": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errorNetworkTitle": "网络错误",
+  "errorConnectionTimeout": "连接超时，请检查网络连接或稍后重试",
+  "errorSendTimeout": "发送数据超时，请检查网络连接",
+  "errorReceiveTimeout": "接收数据超时，请检查网络连接",
+  "errorConnectionRefused": "连接被拒绝，请检查服务器地址是否正确且服务器正在运行",
+  "errorHostNotFound": "无法找到服务器，请检查服务器地址是否正确",
+  "errorNetworkUnreachable": "网络不可达，请检查您的网络连接",
+  "errorCannotConnectServer": "无法连接到服务器，请检查网络连接和服务器状态",
+  "errorSslError": "SSL证书验证失败，请检查服务器证书是否有效",
+  "errorRequestCancelled": "请求已取消",
+  "errorBadCertificate": "证书验证失败，请确认服务器SSL证书配置正确",
+  "errorNoInternet": "没有网络连接，请检查您的网络设置",
+  "errorServerUnreachable": "服务器无法访问，请检查服务器是否在线",
+  "errorBadRequest": "请求错误: {message}",
+  "@errorBadRequest": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUnauthorized": "认证失败，请检查API密钥是否正确",
+  "errorForbidden": "权限不足，您没有权限执行此操作",
+  "errorNotFound": "请求的资源不存在",
+  "errorInternalServerError": "服务器内部错误，请稍后重试",
+  "errorServiceUnavailable": "服务暂时不可用，请稍后重试",
+  "errorServerError": "服务器错误 ({code}): {message}",
+  "@errorServerError": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUnexpectedStatus": "意外的响应状态码: {code}",
+  "@errorUnexpectedStatus": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errorConnectionTestFailed": "连接测试失败",
+  "errorConnectionTestTimeout": "连接测试超时，请检查:\n1. 服务器地址是否正确\n2. 服务器是否在线\n3. 网络连接是否正常\n4. 防火墙是否允许连接",
+  "errorConnectionTestInvalidUrl": "服务器地址格式不正确，请使用 https:// 或 http:// 开头的完整地址",
+  "errorConnectionTestInvalidKey": "API密钥无效，请检查:\n1. 密钥是否正确复制\n2. 密钥是否已过期\n3. 密钥是否已启用\n4. 是否有足够的权限",
+  "errorConnectionTestServerDown": "服务器无响应，请检查:\n1. 服务器是否正在运行\n2. 面板端口是否正确\n3. 防火墙设置\n4. 服务器网络连接",
+
+  "errorApiCallFailed": "API调用失败",
+  "errorDataLoadFailed": "数据加载失败",
+  "errorDataSaveFailed": "数据保存失败",
+  "errorOperationFailed": "操作失败",
+
+  "errorTipCheckNetwork": "💡 提示: 请检查您的网络连接是否正常",
+  "errorTipCheckServer": "💡 提示: 请确认服务器地址和API密钥是否正确",
+  "errorTipCheckServerStatus": "💡 提示: 请确认服务器正在运行且面板服务已启动",
+  "errorTipContactSupport": "💡 提示: 如果问题仍然存在，请联系技术支持",
+  "errorTipRetryLater": "💡 提示: 请稍后重试，如果问题持续存在请检查网络设置",
+
+  "errorDetailTitle": "错误详情",
+  "errorDetailMessage": "错误信息",
+  "errorDetailStackTrace": "堆栈跟踪",
+  "errorDetailCopy": "复制错误信息",
+  "errorDetailCopied": "已复制到剪贴板"
 }

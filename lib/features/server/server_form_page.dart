@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:onepanelapp_app/core/config/api_config.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
+import 'package:onepanelapp_app/core/services/error_handler_service.dart';
 import 'package:onepanelapp_app/core/theme/app_design_tokens.dart';
 import 'package:onepanelapp_app/features/server/server_repository.dart';
 import 'server_connection_service.dart';
@@ -70,12 +71,8 @@ class _ServerFormPageState extends State<ServerFormPage> {
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${context.l10n.serverTestFailed}: ${result.errorMessage}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        // 显示详细的错误对话框
+        await _showErrorDialog(result);
       }
     } finally {
       if (mounted) {
@@ -83,6 +80,84 @@ class _ServerFormPageState extends State<ServerFormPage> {
           _testing = false;
         });
       }
+    }
+  }
+
+  /// 显示详细的错误对话框
+  Future<void> _showErrorDialog(ServerConnectionResult result) async {
+    final l10n = context.l10n;
+    String errorMessage;
+    String? details;
+
+    // 根据错误类型获取本地化的错误消息
+    if (result.errorMessage != null && result.errorMessage!.startsWith('error') || result.errorMessage!.startsWith('server')) {
+      // 如果是国际化 key，需要手动获取对应的值
+      errorMessage = _getLocalizedErrorMessage(result.errorMessage!);
+    } else {
+      errorMessage = result.errorMessage ?? l10n.serverTestFailed;
+    }
+
+    // 根据错误类型添加提示信息
+    String? tip;
+    switch (result.errorType) {
+      case ServerConnectionErrorType.timeout:
+        tip = l10n.errorTipCheckNetwork;
+        break;
+      case ServerConnectionErrorType.connectionError:
+        tip = l10n.errorTipCheckServerStatus;
+        break;
+      case ServerConnectionErrorType.invalidUrl:
+        tip = l10n.errorTipCheckServer;
+        break;
+      case ServerConnectionErrorType.authenticationFailed:
+        tip = l10n.errorTipCheckServer;
+        break;
+      case ServerConnectionErrorType.serverError:
+        tip = l10n.errorTipRetryLater;
+        break;
+      case ServerConnectionErrorType.unknown:
+      case null:
+        tip = l10n.errorTipContactSupport;
+    }
+
+    await ErrorHandlerService.showErrorDialog(
+      context: context,
+      title: l10n.errorConnectionTestFailed,
+      message: '$errorMessage\n\n$tip',
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            _testConnection(); // 重试
+          },
+          child: Text(l10n.retry),
+        ),
+      ],
+    );
+  }
+
+  /// 获取本地化的错误消息
+  String _getLocalizedErrorMessage(String messageKey) {
+    final l10n = context.l10n;
+    
+    // 手动映射国际化 key 到实际消息
+    switch (messageKey) {
+      case 'serverConnectionTestInvalidUrl':
+        return l10n.errorConnectionTestInvalidUrl;
+      case 'serverConnectionTestTimeout':
+        return l10n.errorConnectionTestTimeout;
+      case 'serverConnectionTestInvalidKey':
+        return l10n.errorConnectionTestInvalidKey;
+      case 'serverConnectionTestServerDown':
+        return l10n.errorConnectionTestServerDown;
+      case 'errorSslError':
+        return l10n.errorSslError;
+      default:
+        return messageKey;
     }
   }
 
@@ -120,8 +195,18 @@ class _ServerFormPageState extends State<ServerFormPage> {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.serverFormSaveFailed(e.toString()))),
+      // 使用新的错误处理系统
+      final errorMessage = ErrorHandlerService.getErrorMessage(context, e);
+      await ErrorHandlerService.showErrorDialog(
+        context: context,
+        title: l10n.errorDataSaveFailed,
+        message: errorMessage,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.cancel),
+          ),
+        ],
       );
     } finally {
       if (mounted) {
@@ -261,7 +346,7 @@ class _ServerFormPageState extends State<ServerFormPage> {
                       if (_testResult!.errorMessage != null) ...[
                         const SizedBox(height: 4),
                         Text(
-                          _testResult!.errorMessage!,
+                          _getLocalizedErrorMessage(_testResult!.errorMessage!),
                           style: const TextStyle(fontSize: 12),
                         ),
                       ],
