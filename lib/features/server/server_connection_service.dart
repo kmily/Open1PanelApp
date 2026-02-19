@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
-import 'package:onepanelapp_app/core/services/logger_service.dart';
+import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
 
 class ServerConnectionResult {
   const ServerConnectionResult({
