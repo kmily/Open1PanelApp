@@ -55,7 +55,7 @@ class _PermissionDialogState extends State<_PermissionDialog> {
   
   String? _selectedUser;
   String? _selectedGroup;
-  bool _recursive = false;
+  bool _sub = false;
 
   @override
   void initState() {
@@ -65,21 +65,15 @@ class _PermissionDialogState extends State<_PermissionDialog> {
 
   Future<void> _loadPermissionData() async {
     try {
-      final results = await Future.wait([
-        widget.provider.getFilePermission(widget.file.path),
-        widget.provider.getUserGroup(),
-      ]);
+      final userGroup = await widget.provider.getUserGroup();
       
-      final permission = results[0] as FilePermission;
-      final userGroup = results[1] as FileUserGroupResponse;
-      
-      final mode = permission.permission ?? widget.file.permission ?? widget.file.mode ?? '755';
+      final mode = widget.file.permission ?? widget.file.mode ?? '755';
       _parseMode(mode);
       
       setState(() {
         _userGroup = userGroup;
-        _selectedUser = permission.user ?? widget.file.user;
-        _selectedGroup = permission.group ?? widget.file.group;
+        _selectedUser = widget.file.user;
+        _selectedGroup = widget.file.group;
         _isLoading = false;
       });
     } catch (e, stackTrace) {
@@ -116,7 +110,14 @@ class _PermissionDialogState extends State<_PermissionDialog> {
     _otherExecute = otherBits & 1;
   }
 
-  String _calculateMode() {
+  int _calculateMode() {
+    final owner = (_ownerRead << 2) | (_ownerWrite << 1) | _ownerExecute;
+    final group = (_groupRead << 2) | (_groupWrite << 1) | _groupExecute;
+    final other = (_otherRead << 2) | (_otherWrite << 1) | _otherExecute;
+    return (owner << 6) | (group << 3) | other;
+  }
+
+  String _calculateModeString() {
     final owner = (_ownerRead << 2) | (_ownerWrite << 1) | _ownerExecute;
     final group = (_groupRead << 2) | (_groupWrite << 1) | _groupExecute;
     final other = (_otherRead << 2) | (_otherWrite << 1) | _otherExecute;
@@ -125,22 +126,22 @@ class _PermissionDialogState extends State<_PermissionDialog> {
 
   Future<void> _savePermission() async {
     final mode = _calculateMode();
-    appLogger.dWithPackage('permission_dialog', '_savePermission: mode=$mode, user=$_selectedUser, group=$_selectedGroup, recursive=$_recursive');
+    appLogger.dWithPackage('permission_dialog', '_savePermission: mode=$mode, user=$_selectedUser, group=$_selectedGroup, sub=$_sub');
     
     try {
-      if (_selectedUser != null || _selectedGroup != null) {
+      if (_selectedUser != null && _selectedGroup != null) {
         await widget.provider.changeFileOwner(
           widget.file.path,
-          user: _selectedUser,
-          group: _selectedGroup,
-          recursive: _recursive,
+          _selectedUser!,
+          _selectedGroup!,
+          sub: _sub,
         );
       }
       
       await widget.provider.changeFileMode(
         widget.file.path,
         mode,
-        recursive: _recursive,
+        sub: _sub,
       );
       
       if (mounted) {
@@ -279,7 +280,7 @@ class _PermissionDialogState extends State<_PermissionDialog> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                _calculateMode(),
+                _calculateModeString(),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontFamily: 'monospace',
                   fontWeight: FontWeight.bold,
@@ -471,9 +472,9 @@ class _PermissionDialogState extends State<_PermissionDialog> {
             : widget.l10n.filesPermissionRecursive,
           style: theme.textTheme.bodySmall,
         ),
-        value: _recursive,
+        value: _sub,
         onChanged: widget.file.isDir 
-          ? (v) => setState(() => _recursive = v)
+          ? (v) => setState(() => _sub = v)
           : null,
       ),
     );

@@ -229,27 +229,6 @@ class FileV2Api {
     return decompressFile(request);
   }
 
-  /// 获取文件权限
-  ///
-  /// 获取指定文件的权限信息
-  /// @param path 文件路径
-  /// @return 文件权限
-  Future<Response<FilePermission>> getFilePermission(String path) async {
-    final data = {
-      'path': path,
-    };
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/files/mode'),
-      data: data,
-    );
-    return Response(
-      data: FilePermission.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
   /// 更新文件权限模式
   ///
   /// 更新指定文件的权限模式

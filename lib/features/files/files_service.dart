@@ -229,31 +229,24 @@ class FilesService {
     appLogger.iWithPackage('files', 'extractFile: 成功解压到 $dst');
   }
 
-  Future<FilePermission> getFilePermission(String path) async {
-    appLogger.dWithPackage('files', 'getFilePermission: path=$path');
+  Future<void> changeFileMode(String path, int mode, {bool? sub}) async {
+    appLogger.dWithPackage('files', 'changeFileMode: path=$path, mode=$mode, sub=$sub');
     final api = await _getApi();
-    final response = await api.getFilePermission(path);
-    return response.data!;
-  }
-
-  Future<void> changeFileMode(String path, String mode, {bool? recursive}) async {
-    appLogger.dWithPackage('files', 'changeFileMode: path=$path, mode=$mode');
-    final api = await _getApi();
-    await api.changeFileMode(FileModeChange(
+    await api.updateFileMode(FileModeChange(
       path: path,
       mode: mode,
-      recursive: recursive,
+      sub: sub,
     ));
   }
 
-  Future<void> changeFileOwner(String path, {String? user, String? group, bool? recursive}) async {
-    appLogger.dWithPackage('files', 'changeFileOwner: path=$path, user=$user, group=$group');
+  Future<void> changeFileOwner(String path, String user, String group, {bool? sub}) async {
+    appLogger.dWithPackage('files', 'changeFileOwner: path=$path, user=$user, group=$group, sub=$sub');
     final api = await _getApi();
-    await api.changeFileOwner(FileOwnerChange(
+    await api.updateFileOwner(FileOwnerChange(
       path: path,
       user: user,
       group: group,
-      recursive: recursive,
+      sub: sub,
     ));
   }
 

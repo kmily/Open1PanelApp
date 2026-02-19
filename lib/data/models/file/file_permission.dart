@@ -47,20 +47,20 @@ class FilePermission extends Equatable {
 
 class FileModeChange extends Equatable {
   final String path;
-  final String mode;
-  final bool? recursive;
+  final int mode;
+  final bool? sub;
 
   const FileModeChange({
     required this.path,
     required this.mode,
-    this.recursive,
+    this.sub,
   });
 
   factory FileModeChange.fromJson(Map<String, dynamic> json) {
     return FileModeChange(
       path: json['path'] as String,
-      mode: json['mode'] as String,
-      recursive: json['recursive'] as bool?,
+      mode: json['mode'] as int,
+      sub: json['sub'] as bool?,
     );
   }
 
@@ -68,33 +68,33 @@ class FileModeChange extends Equatable {
     return {
       'path': path,
       'mode': mode,
-      'recursive': recursive,
+      if (sub != null) 'sub': sub,
     };
   }
 
   @override
-  List<Object?> get props => [path, mode, recursive];
+  List<Object?> get props => [path, mode, sub];
 }
 
 class FileOwnerChange extends Equatable {
   final String path;
-  final String? user;
-  final String? group;
-  final bool? recursive;
+  final String user;
+  final String group;
+  final bool? sub;
 
   const FileOwnerChange({
     required this.path,
-    this.user,
-    this.group,
-    this.recursive,
+    required this.user,
+    required this.group,
+    this.sub,
   });
 
   factory FileOwnerChange.fromJson(Map<String, dynamic> json) {
     return FileOwnerChange(
       path: json['path'] as String,
-      user: json['user'] as String?,
-      group: json['group'] as String?,
-      recursive: json['recursive'] as bool?,
+      user: json['user'] as String,
+      group: json['group'] as String,
+      sub: json['sub'] as bool?,
     );
   }
 
@@ -103,12 +103,12 @@ class FileOwnerChange extends Equatable {
       'path': path,
       'user': user,
       'group': group,
-      'recursive': recursive,
+      if (sub != null) 'sub': sub,
     };
   }
 
   @override
-  List<Object?> get props => [path, user, group, recursive];
+  List<Object?> get props => [path, user, group, sub];
 }
 
 class FileUserGroup extends Equatable {

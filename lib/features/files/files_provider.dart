@@ -588,22 +588,10 @@ class FilesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<FilePermission> getFilePermission(String path) async {
-    appLogger.dWithPackage('files_provider', 'getFilePermission: path=$path');
+  Future<void> changeFileMode(String path, int mode, {bool? sub}) async {
+    appLogger.dWithPackage('files_provider', 'changeFileMode: path=$path, mode=$mode, sub=$sub');
     try {
-      final permission = await _service.getFilePermission(path);
-      appLogger.iWithPackage('files_provider', 'getFilePermission: 成功获取权限信息');
-      return permission;
-    } catch (e, stackTrace) {
-      appLogger.eWithPackage('files_provider', 'getFilePermission: 获取权限失败', error: e, stackTrace: stackTrace);
-      rethrow;
-    }
-  }
-
-  Future<void> changeFileMode(String path, String mode, {bool? recursive}) async {
-    appLogger.dWithPackage('files_provider', 'changeFileMode: path=$path, mode=$mode, recursive=$recursive');
-    try {
-      await _service.changeFileMode(path, mode, recursive: recursive);
+      await _service.changeFileMode(path, mode, sub: sub);
       appLogger.iWithPackage('files_provider', 'changeFileMode: 成功修改权限模式');
       await refresh();
     } catch (e, stackTrace) {
@@ -612,10 +600,10 @@ class FilesProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> changeFileOwner(String path, {String? user, String? group, bool? recursive}) async {
-    appLogger.dWithPackage('files_provider', 'changeFileOwner: path=$path, user=$user, group=$group, recursive=$recursive');
+  Future<void> changeFileOwner(String path, String user, String group, {bool? sub}) async {
+    appLogger.dWithPackage('files_provider', 'changeFileOwner: path=$path, user=$user, group=$group, sub=$sub');
     try {
-      await _service.changeFileOwner(path, user: user, group: group, recursive: recursive);
+      await _service.changeFileOwner(path, user, group, sub: sub);
       appLogger.iWithPackage('files_provider', 'changeFileOwner: 成功修改所有者');
       await refresh();
     } catch (e, stackTrace) {
