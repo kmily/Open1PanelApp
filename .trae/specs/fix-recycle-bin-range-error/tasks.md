@@ -29,9 +29,17 @@
   - [x] SubTask 7.1: 运行 flutter analyze
   - [x] SubTask 7.2: 测试回收站恢复功能正常工作
 
+- [x] Task 8: 修复 FileInfo.path 解析，支持 sourcePath
+  - [x] SubTask 8.1: 修改 `fromJson` 中 `path` 字段解析，支持 `sourcePath` 备选
+
+- [x] Task 9: 修复彻底删除方法
+  - [x] SubTask 9.1: 删除错误的 `deleteRecycleBinFile` API
+  - [x] SubTask 9.2: 修改 `files_service.dart` 使用正确的路径 `from/rName` 调用普通删除 API
+
+- [x] Task 10: 验证彻底删除功能
+  - [x] SubTask 10.1: 运行 flutter analyze
+  - [x] SubTask 10.2: 测试回收站彻底删除功能正常工作
+
 # Task Dependencies
-- Task 2 依赖 Task 1
-- Task 3 依赖 Task 1 和 Task 2
-- Task 4 依赖 Task 1, Task 2, Task 3
-- Task 6 依赖 Task 5
-- Task 7 依赖 Task 5 和 Task 6
+- Task 9 依赖 Task 8
+- Task 10 依赖 Task 9

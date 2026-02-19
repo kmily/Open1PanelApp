@@ -181,7 +181,7 @@ class FileInfo extends Equatable {
   factory FileInfo.fromJson(Map<String, dynamic> json) {
     return FileInfo(
       name: json['name'] as String? ?? '',
-      path: json['path'] as String? ?? '',
+      path: json['path'] as String? ?? json['sourcePath'] as String? ?? '',
       type: json['type'] as String? ?? 'file',
       size: json['size'] as int? ?? 0,
       permission: json['mode'] as String? ?? json['permission'] as String?,

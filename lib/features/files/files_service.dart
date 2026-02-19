@@ -366,7 +366,9 @@ class FilesService {
     appLogger.dWithPackage('files', 'deleteRecycleBinFiles: 删除${files.length}个回收站文件');
     final api = await _getApi();
     for (final file in files) {
-      await api.deleteFile(FileDelete(path: file.rName, forceDelete: true));
+      final recyclePath = '${file.from}/${file.rName}';
+      appLogger.dWithPackage('files', 'deleteRecycleBinFiles: 删除路径=$recyclePath');
+      await api.deleteFile(FileDelete(path: recyclePath, forceDelete: true));
     }
     appLogger.iWithPackage('files', 'deleteRecycleBinFiles: 成功永久删除${files.length}个文件');
   }

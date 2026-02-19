@@ -13,3 +13,9 @@
 - [x] rName 字段在 toJson 中正确序列化
 - [x] recycle_bin_page.dart 使用 f.rName 而非 f.gid
 - [x] 回收站恢复功能正常工作
+
+- [x] FileInfo.path 支持 sourcePath 备选解析
+- [x] 回收站页面正确显示原路径
+
+- [x] 彻底删除使用正确的路径 `from/rName`
+- [x] 回收站彻底删除功能正常工作
