@@ -206,11 +206,8 @@ void main() {
           filePath: '/file.zip',
         );
 
-        final reset = status.copyWith(
+        const reset = WgetDownloadStatus(
           state: WgetDownloadState.idle,
-          message: null,
-          filePath: null,
-          downloadedSize: null,
         );
 
         expect(reset.state, equals(WgetDownloadState.idle));
