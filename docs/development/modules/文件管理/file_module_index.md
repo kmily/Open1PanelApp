@@ -20,6 +20,7 @@ Open1PanelApp 的文件管理模块负责服务器文件系统的浏览、操作
 | 权限管理 | lib/features/files/permission/ | ✅ 完成 |
 | 文件下载 | lib/features/files/download/ | ✅ 完成 |
 | wget远程下载 | lib/features/files/wget/ | ✅ 完成 |
+| 缓存管理 | lib/core/services/cache/ | ✅ 完成 |
 | API测试 | test/api_client/file_api_test.dart | ✅ 完成 |
 
 ### 📋 待优化
@@ -53,6 +54,11 @@ Open1PanelApp 的文件管理模块负责服务器文件系统的浏览、操作
 - [x] 图片预览（支持缩放、手势操作）
 - [x] 代码高亮预览（支持多种语言）
 - [x] 文件编码自动检测
+- [x] PDF预览
+- [x] 视频预览
+- [x] 音频预览
+- [x] Markdown预览
+- [x] SVG预览
 
 ### 文件编辑器
 - [x] 文本文件编辑
@@ -65,12 +71,23 @@ Open1PanelApp 的文件管理模块负责服务器文件系统的浏览、操作
 - [x] 下载文件到本地
 - [x] 下载进度显示
 - [x] 支持分块下载大文件
+- [x] 权限引导
+
+### 文件缓存
+- [x] 内存缓存（2分钟过期）
+- [x] 硬盘缓存（支持离线）
+- [x] 混合缓存模式
+- [x] 缓存策略设置
+- [x] 缓存大小限制
+- [x] 主动清除缓存
+- [x] 文件哈希验证
 
 ### 权限管理
 - [x] 查看文件权限
 - [x] chmod 权限修改
 - [x] chown 所有者修改
 - [x] 批量权限修改
+- [x] 递归权限修改
 
 ### 回收站管理
 - [x] 查看回收站文件列表
@@ -90,39 +107,47 @@ Open1PanelApp 的文件管理模块负责服务器文件系统的浏览、操作
 - [x] 下载状态管理
 
 ### API端点覆盖
-| 端点 | 功能 | 状态 | 测试 |
-|------|------|------|------|
-| POST /files/search | 搜索文件 | ✅ | ✅ |
-| POST /files/check | 检查文件 | ✅ | ✅ |
-| POST /files/tree | 获取文件树 | ✅ | ✅ |
-| POST /files/size | 获取文件大小 | ✅ | ✅ |
-| GET /files/recycle/status | 回收站状态 | ✅ | ✅ |
-| POST /files/create | 创建文件/目录 | ✅ | ✅ |
-| POST /files/delete | 删除文件 | ✅ | ✅ |
-| POST /files/rename | 重命名 | ✅ | ✅ |
-| POST /files/move | 移动文件 | ✅ | ✅ |
-| POST /files/copy | 复制文件 | ✅ | ✅ |
-| POST /files/compress | 压缩文件 | ✅ | ✅ |
-| POST /files/extract | 解压文件 | ✅ | ✅ |
-| POST /files/content | 获取文件内容 | ✅ | ✅ |
-| POST /files/content/update | 更新文件内容 | ✅ | ✅ |
-| POST /files/upload | 上传文件 | ✅ | ✅ |
-| POST /files/download | 下载文件 | ✅ | ✅ |
-| POST /files/wget | wget远程下载 | ✅ | ✅ |
-| POST /files/permission | 获取权限 | ✅ | ✅ |
-| POST /files/permission/update | 更新权限 | ✅ | ✅ |
-| POST /files/mode | 修改文件模式 | ✅ | ✅ |
-| POST /files/owner | 修改所有者 | ✅ | ✅ |
-| POST /files/favorite | 收藏文件 | ✅ | ✅ |
-| POST /files/favorite/del | 取消收藏 | ✅ | ✅ |
-| POST /files/favorite/search | 搜索收藏 | ✅ | ✅ |
-| POST /files/recycle/clear | 清空回收站 | ✅ | ✅ |
-| POST /files/recycle/reduce | 减少回收站 | ✅ | ✅ |
-| POST /files/recycle/search | 搜索回收站 | ✅ | ✅ |
-| POST /files/encoding/convert | 转换编码 | ✅ | ✅ |
+| 端点 | 功能 | 状态 |
+|------|------|------|
+| POST /files/search | 搜索文件 | ✅ |
+| POST /files/check | 检查文件 | ✅ |
+| POST /files/batch/check | 批量检查文件 | ✅ |
+| POST /files/tree | 获取文件树 | ✅ |
+| POST /files/size | 获取文件大小 | ✅ |
+| POST /files/depth/size | 多文件大小 | ✅ |
+| GET /files/recycle/status | 回收站状态 | ✅ |
+| POST /files | 创建文件/目录 | ✅ |
+| POST /files/del | 删除文件 | ✅ |
+| POST /files/batch/del | 批量删除 | ✅ |
+| POST /files/rename | 重命名 | ✅ |
+| POST /files/move | 移动文件 | ✅ |
+| POST /files/compress | 压缩文件 | ✅ |
+| POST /files/decompress | 解压文件 | ✅ |
+| POST /files/content | 获取文件内容 | ✅ |
+| POST /files/save | 保存文件内容 | ✅ |
+| POST /files/upload | 上传文件 | ✅ |
+| GET /files/download | 下载文件 | ✅ |
+| POST /files/chunkupload | 分块上传 | ✅ |
+| POST /files/chunkdownload | 分块下载 | ✅ |
+| POST /files/wget | wget远程下载 | ✅ |
+| POST /files/mode | 修改文件模式 | ✅ |
+| POST /files/owner | 修改所有者 | ✅ |
+| POST /files/batch/role | 批量修改角色 | ✅ |
+| POST /files/favorite | 收藏文件 | ✅ |
+| POST /files/favorite/del | 取消收藏 | ✅ |
+| POST /files/favorite/search | 搜索收藏 | ✅ |
+| POST /files/recycle/clear | 清空回收站 | ✅ |
+| POST /files/recycle/reduce | 减少回收站 | ✅ |
+| POST /files/recycle/search | 搜索回收站 | ✅ |
+| POST /files/convert | 转换文件编码 | ✅ |
+| POST /files/convert/log | 转换日志 | ✅ |
+| POST /files/preview | 预览文件 | ✅ |
+| POST /files/read | 读取文件 | ✅ |
+| POST /files/user/group | 获取用户组 | ✅ |
+| POST /files/mount | 获取挂载信息 | ✅ |
+| POST /files/encoding/convert | 编码转换 | ✅ |
 
 ## 后续规划
 - 文件分享功能实现
 - 大文件分块传输性能优化
-- 文件预览功能增强（视频、PDF预览）
 - 文件搜索性能优化

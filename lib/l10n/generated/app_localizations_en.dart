@@ -1634,6 +1634,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filesPermissionSuccess => 'Permission changed successfully';
 
   @override
+  String get transferListTitle => 'Transfer List';
+
+  @override
+  String get transferClearCompleted => 'Clear Completed';
+
+  @override
+  String get transferEmpty => 'No transfer tasks';
+
+  @override
+  String get transferStatusRunning => 'Running';
+
+  @override
+  String get transferStatusPaused => 'Paused';
+
+  @override
+  String get transferStatusCompleted => 'Completed';
+
+  @override
+  String get transferStatusFailed => 'Failed';
+
+  @override
+  String get transferStatusCancelled => 'Cancelled';
+
+  @override
+  String get transferStatusPending => 'Pending';
+
+  @override
+  String get transferUploading => 'Uploading';
+
+  @override
+  String get transferDownloading => 'Downloading';
+
+  @override
+  String get transferChunks => 'chunks';
+
+  @override
+  String get transferSpeed => 'Speed';
+
+  @override
+  String get transferEta => 'ETA';
+
+  @override
   String get filesPermissionFailed => 'Failed to change permission';
 
   @override

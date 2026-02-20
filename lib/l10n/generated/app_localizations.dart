@@ -3176,6 +3176,90 @@ abstract class AppLocalizations {
   /// **'Permission changed successfully'**
   String get filesPermissionSuccess;
 
+  /// No description provided for @transferListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer List'**
+  String get transferListTitle;
+
+  /// No description provided for @transferClearCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Completed'**
+  String get transferClearCompleted;
+
+  /// No description provided for @transferEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No transfer tasks'**
+  String get transferEmpty;
+
+  /// No description provided for @transferStatusRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get transferStatusRunning;
+
+  /// No description provided for @transferStatusPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get transferStatusPaused;
+
+  /// No description provided for @transferStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get transferStatusCompleted;
+
+  /// No description provided for @transferStatusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get transferStatusFailed;
+
+  /// No description provided for @transferStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get transferStatusCancelled;
+
+  /// No description provided for @transferStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get transferStatusPending;
+
+  /// No description provided for @transferUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading'**
+  String get transferUploading;
+
+  /// No description provided for @transferDownloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading'**
+  String get transferDownloading;
+
+  /// No description provided for @transferChunks.
+  ///
+  /// In en, this message translates to:
+  /// **'chunks'**
+  String get transferChunks;
+
+  /// No description provided for @transferSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get transferSpeed;
+
+  /// No description provided for @transferEta.
+  ///
+  /// In en, this message translates to:
+  /// **'ETA'**
+  String get transferEta;
+
   /// No description provided for @filesPermissionFailed.
   ///
   /// In en, this message translates to:

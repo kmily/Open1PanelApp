@@ -1600,6 +1600,48 @@ class AppLocalizationsZh extends AppLocalizations {
   String get filesPermissionSuccess => '权限修改成功';
 
   @override
+  String get transferListTitle => '传输列表';
+
+  @override
+  String get transferClearCompleted => '清除已完成';
+
+  @override
+  String get transferEmpty => '暂无传输任务';
+
+  @override
+  String get transferStatusRunning => '传输中';
+
+  @override
+  String get transferStatusPaused => '已暂停';
+
+  @override
+  String get transferStatusCompleted => '已完成';
+
+  @override
+  String get transferStatusFailed => '失败';
+
+  @override
+  String get transferStatusCancelled => '已取消';
+
+  @override
+  String get transferStatusPending => '等待中';
+
+  @override
+  String get transferUploading => '上传中';
+
+  @override
+  String get transferDownloading => '下载中';
+
+  @override
+  String get transferChunks => '分块';
+
+  @override
+  String get transferSpeed => '速度';
+
+  @override
+  String get transferEta => '剩余时间';
+
+  @override
   String get filesPermissionFailed => '权限修改失败';
 
   @override
