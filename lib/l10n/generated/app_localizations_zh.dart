@@ -1788,4 +1788,84 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get recycleBinSourcePath => '原路径';
+
+  @override
+  String get transferManagerTitle => '传输管理';
+
+  @override
+  String get transferFilterAll => '全部';
+
+  @override
+  String get transferFilterUploading => '上传中';
+
+  @override
+  String get transferFilterDownloading => '下载中';
+
+  @override
+  String get transferSortNewest => '最新';
+
+  @override
+  String get transferSortOldest => '最旧';
+
+  @override
+  String get transferSortName => '名称';
+
+  @override
+  String get transferSortSize => '大小';
+
+  @override
+  String get transferTabActive => '进行中';
+
+  @override
+  String get transferTabPending => '等待中';
+
+  @override
+  String get transferTabCompleted => '已完成';
+
+  @override
+  String get transferFileNotFound => '文件不存在';
+
+  @override
+  String get transferFileLocationOpened => '已打开文件位置';
+
+  @override
+  String get transferOpenFileError => '打开文件失败';
+
+  @override
+  String get transferClearTitle => '清除已完成任务';
+
+  @override
+  String get transferClearConfirm => '确定要清除所有已完成的传输任务吗？';
+
+  @override
+  String get transferPause => '暂停';
+
+  @override
+  String get transferCancel => '取消';
+
+  @override
+  String get transferResume => '继续';
+
+  @override
+  String get transferOpenLocation => '打开位置';
+
+  @override
+  String get permissionRequired => '需要权限';
+
+  @override
+  String get permissionStorageRequired => '需要存储权限才能保存文件';
+
+  @override
+  String get permissionGoToSettings => '去设置';
+
+  @override
+  String get fileSaveSuccess => '文件已保存';
+
+  @override
+  String get fileSaveFailed => '保存文件失败';
+
+  @override
+  String fileSaveLocation(String path) {
+    return '保存位置: $path';
+  }
 }

@@ -717,5 +717,38 @@
   "recycleBinSearch": "搜索文件",
   "recycleBinEmpty": "回收站为空",
   "recycleBinNoResults": "未找到文件",
-  "recycleBinSourcePath": "原路径"
+  "recycleBinSourcePath": "原路径",
+  "transferManagerTitle": "传输管理",
+  "transferFilterAll": "全部",
+  "transferFilterUploading": "上传中",
+  "transferFilterDownloading": "下载中",
+  "transferSortNewest": "最新",
+  "transferSortOldest": "最旧",
+  "transferSortName": "名称",
+  "transferSortSize": "大小",
+  "transferTabActive": "进行中",
+  "transferTabPending": "等待中",
+  "transferTabCompleted": "已完成",
+  "transferFileNotFound": "文件不存在",
+  "transferFileLocationOpened": "已打开文件位置",
+  "transferOpenFileError": "打开文件失败",
+  "transferClearTitle": "清除已完成任务",
+  "transferClearConfirm": "确定要清除所有已完成的传输任务吗？",
+  "transferPause": "暂停",
+  "transferCancel": "取消",
+  "transferResume": "继续",
+  "transferOpenLocation": "打开位置",
+  "permissionRequired": "需要权限",
+  "permissionStorageRequired": "需要存储权限才能保存文件",
+  "permissionGoToSettings": "去设置",
+  "fileSaveSuccess": "文件已保存",
+  "fileSaveFailed": "保存文件失败",
+  "fileSaveLocation": "保存位置: {path}",
+  "@fileSaveLocation": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  }
 }

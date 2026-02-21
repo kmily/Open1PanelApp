@@ -1824,4 +1824,86 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recycleBinSourcePath => 'Original path';
+
+  @override
+  String get transferManagerTitle => 'Transfer Manager';
+
+  @override
+  String get transferFilterAll => 'All';
+
+  @override
+  String get transferFilterUploading => 'Uploading';
+
+  @override
+  String get transferFilterDownloading => 'Downloading';
+
+  @override
+  String get transferSortNewest => 'Newest';
+
+  @override
+  String get transferSortOldest => 'Oldest';
+
+  @override
+  String get transferSortName => 'Name';
+
+  @override
+  String get transferSortSize => 'Size';
+
+  @override
+  String get transferTabActive => 'Active';
+
+  @override
+  String get transferTabPending => 'Pending';
+
+  @override
+  String get transferTabCompleted => 'Completed';
+
+  @override
+  String get transferFileNotFound => 'File not found';
+
+  @override
+  String get transferFileLocationOpened => 'File location opened';
+
+  @override
+  String get transferOpenFileError => 'Failed to open file';
+
+  @override
+  String get transferClearTitle => 'Clear Completed Tasks';
+
+  @override
+  String get transferClearConfirm =>
+      'Are you sure you want to clear all completed transfer tasks?';
+
+  @override
+  String get transferPause => 'Pause';
+
+  @override
+  String get transferCancel => 'Cancel';
+
+  @override
+  String get transferResume => 'Resume';
+
+  @override
+  String get transferOpenLocation => 'Open Location';
+
+  @override
+  String get permissionRequired => 'Permission Required';
+
+  @override
+  String get permissionStorageRequired =>
+      'Storage permission is required to save files';
+
+  @override
+  String get permissionGoToSettings => 'Go to Settings';
+
+  @override
+  String get fileSaveSuccess => 'File saved';
+
+  @override
+  String get fileSaveFailed => 'Failed to save file';
+
+  @override
+  String fileSaveLocation(String path) {
+    return 'Saved to: $path';
+  }
 }

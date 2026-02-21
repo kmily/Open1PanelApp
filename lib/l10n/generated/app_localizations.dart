@@ -3535,6 +3535,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Original path'**
   String get recycleBinSourcePath;
+
+  /// No description provided for @transferManagerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer Manager'**
+  String get transferManagerTitle;
+
+  /// No description provided for @transferFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get transferFilterAll;
+
+  /// No description provided for @transferFilterUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading'**
+  String get transferFilterUploading;
+
+  /// No description provided for @transferFilterDownloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading'**
+  String get transferFilterDownloading;
+
+  /// No description provided for @transferSortNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get transferSortNewest;
+
+  /// No description provided for @transferSortOldest.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest'**
+  String get transferSortOldest;
+
+  /// No description provided for @transferSortName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get transferSortName;
+
+  /// No description provided for @transferSortSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get transferSortSize;
+
+  /// No description provided for @transferTabActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get transferTabActive;
+
+  /// No description provided for @transferTabPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get transferTabPending;
+
+  /// No description provided for @transferTabCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get transferTabCompleted;
+
+  /// No description provided for @transferFileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'File not found'**
+  String get transferFileNotFound;
+
+  /// No description provided for @transferFileLocationOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'File location opened'**
+  String get transferFileLocationOpened;
+
+  /// No description provided for @transferOpenFileError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to open file'**
+  String get transferOpenFileError;
+
+  /// No description provided for @transferClearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Completed Tasks'**
+  String get transferClearTitle;
+
+  /// No description provided for @transferClearConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear all completed transfer tasks?'**
+  String get transferClearConfirm;
+
+  /// No description provided for @transferPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get transferPause;
+
+  /// No description provided for @transferCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get transferCancel;
+
+  /// No description provided for @transferResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get transferResume;
+
+  /// No description provided for @transferOpenLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Location'**
+  String get transferOpenLocation;
+
+  /// No description provided for @permissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission Required'**
+  String get permissionRequired;
+
+  /// No description provided for @permissionStorageRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage permission is required to save files'**
+  String get permissionStorageRequired;
+
+  /// No description provided for @permissionGoToSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Settings'**
+  String get permissionGoToSettings;
+
+  /// No description provided for @fileSaveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'File saved'**
+  String get fileSaveSuccess;
+
+  /// No description provided for @fileSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save file'**
+  String get fileSaveFailed;
+
+  /// No description provided for @fileSaveLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to: {path}'**
+  String fileSaveLocation(String path);
 }
 
 class _AppLocalizationsDelegate

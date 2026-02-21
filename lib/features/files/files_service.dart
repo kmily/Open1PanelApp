@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -505,8 +507,13 @@ class FilesService {
 
       final downloadUrl = '${config.url}${ApiConstants.buildApiPath('/files/download')}?path=${Uri.encodeComponent(filePath)}';
 
+      // 使用 1Panel API 认证头部
+      final timestamp = (DateTime.now().millisecondsSinceEpoch / 1000).floor().toString();
+      final authToken = _generate1PanelAuthToken(config.apiKey, timestamp);
+
       final dio = Dio();
-      dio.options.headers['Authorization'] = 'Bearer ${config.apiKey}';
+      dio.options.headers['1Panel-Token'] = authToken;
+      dio.options.headers['1Panel-Timestamp'] = timestamp;
 
       await dio.download(
         downloadUrl,
@@ -579,6 +586,13 @@ class FilesService {
 
   String _sanitizeFileName(String fileName) {
     return fileName.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_');
+  }
+
+  String _generate1PanelAuthToken(String apiKey, String timestamp) {
+    final authString = '1panel$apiKey$timestamp';
+    final bytes = utf8.encode(authString);
+    final digest = md5.convert(bytes);
+    return digest.toString();
   }
 
   Future<bool> _requestStoragePermission() async {

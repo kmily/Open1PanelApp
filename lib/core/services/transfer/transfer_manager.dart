@@ -2,11 +2,14 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
 import 'package:onepanelapp_app/core/services/transfer/transfer_task.dart';
+import 'package:onepanelapp_app/core/services/file_save_service.dart';
 import 'package:onepanelapp_app/api/v2/file_v2.dart';
 import 'package:onepanelapp_app/data/models/file/file_transfer.dart';
 
@@ -22,8 +25,14 @@ class TransferManager extends ChangeNotifier {
   
   static const int _maxConcurrent = 3;
   static const int _defaultChunkSize = 1024 * 1024;
+  static const String _tasksBoxName = 'transfer_tasks';
   
   FileV2Api? _api;
+  Box? _tasksBox;
+  final FileSaveService _fileSaveService = FileSaveService();
+  
+  Function(TransferTask task)? onTaskCompleted;
+  Function(TransferTask task)? onTaskFailed;
   
   List<TransferTask> get pendingTasks => _pendingQueue.toList();
   List<TransferTask> get activeTasks => _activeTasks.values.toList();
@@ -36,6 +45,72 @@ class TransferManager extends ChangeNotifier {
   
   void setApi(FileV2Api api) {
     _api = api;
+  }
+  
+  Future<void> init() async {
+    if (Hive.isBoxOpen(_tasksBoxName)) {
+      _tasksBox = Hive.box(_tasksBoxName);
+    } else {
+      _tasksBox = await Hive.openBox(_tasksBoxName);
+    }
+  }
+  
+  Future<void> _saveTask(TransferTask task) async {
+    try {
+      if (_tasksBox != null) {
+        await _tasksBox!.put(task.id, task.toJson());
+      }
+    } catch (e) {
+      appLogger.wWithPackage('transfer', '_saveTask: 保存任务失败: $e');
+    }
+  }
+  
+  Future<void> _deleteTask(String taskId) async {
+    try {
+      if (_tasksBox != null) {
+        await _tasksBox!.delete(taskId);
+      }
+    } catch (e) {
+      appLogger.wWithPackage('transfer', '_deleteTask: 删除任务失败: $e');
+    }
+  }
+  
+  Future<void> restoreTasks() async {
+    try {
+      if (_tasksBox == null) {
+        await init();
+      }
+      
+      if (_tasksBox == null || _tasksBox!.isEmpty) return;
+      
+      final restorableStatuses = [
+        TransferStatus.pending,
+        TransferStatus.running,
+        TransferStatus.paused,
+      ];
+      
+      for (final key in _tasksBox!.keys) {
+        final data = _tasksBox!.get(key);
+        if (data == null) continue;
+        
+        try {
+          final task = TransferTask.fromJson(Map<String, dynamic>.from(data));
+          
+          if (restorableStatuses.contains(task.status)) {
+            final restoredTask = task.copyWith(status: TransferStatus.pending);
+            _pendingQueue.add(restoredTask);
+            appLogger.iWithPackage('transfer', 'restoreTasks: 恢复任务 ${task.id} 到待处理队列');
+          }
+        } catch (e) {
+          appLogger.wWithPackage('transfer', 'restoreTasks: 解析任务失败: $e');
+        }
+      }
+      
+      notifyListeners();
+      _processQueue();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('transfer', 'restoreTasks: 恢复任务失败', error: e, stackTrace: stackTrace);
+    }
   }
   
   Future<String> _generateTaskId(String path, TransferType type) async {
@@ -66,6 +141,7 @@ class TransferManager extends ChangeNotifier {
     await _loadProgress(task);
     
     _pendingQueue.add(task);
+    await _saveTask(task);
     notifyListeners();
     _processQueue();
     
@@ -92,6 +168,7 @@ class TransferManager extends ChangeNotifier {
     await _loadProgress(task);
     
     _pendingQueue.add(task);
+    await _saveTask(task);
     notifyListeners();
     _processQueue();
     
@@ -151,6 +228,7 @@ class TransferManager extends ChangeNotifier {
       startedAt: DateTime.now(),
     );
     _activeTasks[task.id] = task;
+    await _saveTask(task);
     notifyListeners();
     
     try {
@@ -171,13 +249,20 @@ class TransferManager extends ChangeNotifier {
       if (await progressFile.exists()) {
         await progressFile.delete();
       }
+      
+      await _deleteTask(task.id);
+      
+      onTaskCompleted?.call(task);
     } catch (e, stackTrace) {
       appLogger.eWithPackage('transfer', '_startTask: 传输失败', error: e, stackTrace: stackTrace);
       task = task.copyWith(
         status: TransferStatus.failed,
         error: e.toString(),
       );
-      _activeTasks[task.id] = task;
+      _activeTasks.remove(task.id);
+      _completedTasks[task.id] = task;
+      await _saveTask(task);
+      onTaskFailed?.call(task);
     }
     
     notifyListeners();
@@ -277,30 +362,42 @@ class TransferManager extends ChangeNotifier {
               : transferredSize,
         );
         _activeTasks[task.id] = task;
+        await _saveProgress(task);
+        await _saveTask(task);
         notifyListeners();
       }
       
       if (response.data?.isLastChunk == true) break;
     }
     
-    final tempDir = await getTemporaryDirectory();
-    final localPath = '${tempDir.path}/${task.fileName}';
-    final outputFile = File(localPath);
-    final sink = outputFile.openWrite();
-    
+    final bytesBuilder = BytesBuilder();
     for (var i = 0; i < totalChunks; i++) {
       if (chunks.containsKey(i)) {
-        sink.add(chunks[i]!);
+        bytesBuilder.add(chunks[i]!);
       }
     }
+    final fileBytes = bytesBuilder.takeBytes();
     
-    await sink.close();
+    final saveResult = await _fileSaveService.saveFile(
+      fileName: task.fileName ?? 'download_file',
+      bytes: fileBytes,
+    );
+    
+    if (saveResult.success && saveResult.filePath != null) {
+      task = task.copyWith(localPath: saveResult.filePath);
+      _activeTasks[task.id] = task;
+      appLogger.iWithPackage('transfer', '_executeDownload: 文件已保存到 ${saveResult.filePath}');
+    } else {
+      appLogger.wWithPackage('transfer', '_executeDownload: 保存文件失败: ${saveResult.errorMessage}');
+    }
   }
   
   void pauseTask(String taskId) {
     final task = _activeTasks[taskId];
     if (task != null) {
-      _activeTasks[taskId] = task.copyWith(status: TransferStatus.paused);
+      final pausedTask = task.copyWith(status: TransferStatus.paused);
+      _activeTasks[taskId] = pausedTask;
+      _saveTask(pausedTask);
       notifyListeners();
     }
   }
@@ -313,6 +410,7 @@ class TransferManager extends ChangeNotifier {
       
       final resumedTask = task.copyWith(status: TransferStatus.pending);
       _pendingQueue.add(resumedTask);
+      _saveTask(resumedTask);
       notifyListeners();
       _processQueue();
     }
@@ -333,6 +431,7 @@ class TransferManager extends ChangeNotifier {
       completedAt: DateTime.now(),
     );
     _completedTasks[taskId] = cancelledTask;
+    _deleteTask(taskId);
     notifyListeners();
     _processQueue();
   }

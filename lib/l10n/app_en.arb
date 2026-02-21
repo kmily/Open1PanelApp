@@ -769,5 +769,38 @@
   "recycleBinSearch": "Search files",
   "recycleBinEmpty": "Recycle bin is empty",
   "recycleBinNoResults": "No files found",
-  "recycleBinSourcePath": "Original path"
+  "recycleBinSourcePath": "Original path",
+  "transferManagerTitle": "Transfer Manager",
+  "transferFilterAll": "All",
+  "transferFilterUploading": "Uploading",
+  "transferFilterDownloading": "Downloading",
+  "transferSortNewest": "Newest",
+  "transferSortOldest": "Oldest",
+  "transferSortName": "Name",
+  "transferSortSize": "Size",
+  "transferTabActive": "Active",
+  "transferTabPending": "Pending",
+  "transferTabCompleted": "Completed",
+  "transferFileNotFound": "File not found",
+  "transferFileLocationOpened": "File location opened",
+  "transferOpenFileError": "Failed to open file",
+  "transferClearTitle": "Clear Completed Tasks",
+  "transferClearConfirm": "Are you sure you want to clear all completed transfer tasks?",
+  "transferPause": "Pause",
+  "transferCancel": "Cancel",
+  "transferResume": "Resume",
+  "transferOpenLocation": "Open Location",
+  "permissionRequired": "Permission Required",
+  "permissionStorageRequired": "Storage permission is required to save files",
+  "permissionGoToSettings": "Go to Settings",
+  "fileSaveSuccess": "File saved",
+  "fileSaveFailed": "Failed to save file",
+  "fileSaveLocation": "Saved to: {path}",
+  "@fileSaveLocation": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  }
 }

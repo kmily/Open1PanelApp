@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:onepanelapp_app/config/app_router.dart';
 import 'package:onepanelapp_app/core/services/app_settings_controller.dart';
+import 'package:onepanelapp_app/core/services/transfer/transfer_manager.dart';
 import 'package:onepanelapp_app/core/theme/app_theme.dart';
 import 'package:onepanelapp_app/l10n/generated/app_localizations.dart';
 
@@ -44,6 +45,10 @@ void main() {
         ),
         ChangeNotifierProvider(
           create: (_) => MonitoringProvider(),
+        ),
+        // Transfer Manager
+        ChangeNotifierProvider(
+          create: (_) => TransferManager(),
         ),
       ],
       child: const MyApp(),

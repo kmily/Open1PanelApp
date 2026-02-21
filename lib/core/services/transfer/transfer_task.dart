@@ -29,6 +29,7 @@ class TransferTask extends Equatable {
   final DateTime? completedAt;
   final double? speed;
   final int? eta;
+  final String? localPath;
 
   const TransferTask({
     required this.id,
@@ -47,6 +48,7 @@ class TransferTask extends Equatable {
     this.completedAt,
     this.speed,
     this.eta,
+    this.localPath,
   });
 
   double get progress => totalSize > 0 ? transferredSize / totalSize : 0;
@@ -78,6 +80,7 @@ class TransferTask extends Equatable {
     DateTime? completedAt,
     double? speed,
     int? eta,
+    String? localPath,
   }) {
     return TransferTask(
       id: id ?? this.id,
@@ -96,6 +99,51 @@ class TransferTask extends Equatable {
       completedAt: completedAt ?? this.completedAt,
       speed: speed ?? this.speed,
       eta: eta ?? this.eta,
+      localPath: localPath ?? this.localPath,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'path': path,
+      'fileName': fileName,
+      'totalSize': totalSize,
+      'transferredSize': transferredSize,
+      'type': type.index,
+      'status': status.index,
+      'totalChunks': totalChunks,
+      'completedChunks': completedChunks,
+      'uploadedChunks': uploadedChunks.toList(),
+      'error': error,
+      'createdAt': createdAt.toIso8601String(),
+      'startedAt': startedAt?.toIso8601String(),
+      'completedAt': completedAt?.toIso8601String(),
+      'localPath': localPath,
+    };
+  }
+
+  factory TransferTask.fromJson(Map<String, dynamic> json) {
+    return TransferTask(
+      id: json['id'] as String,
+      path: json['path'] as String,
+      fileName: json['fileName'] as String?,
+      totalSize: json['totalSize'] as int,
+      transferredSize: json['transferredSize'] as int? ?? 0,
+      type: TransferType.values[json['type'] as int],
+      status: TransferStatus.values[json['status'] as int],
+      totalChunks: json['totalChunks'] as int? ?? 0,
+      completedChunks: json['completedChunks'] as int? ?? 0,
+      uploadedChunks: Set<int>.from(json['uploadedChunks'] as List? ?? []),
+      error: json['error'] as String?,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      startedAt: json['startedAt'] != null 
+          ? DateTime.parse(json['startedAt'] as String) 
+          : null,
+      completedAt: json['completedAt'] != null 
+          ? DateTime.parse(json['completedAt'] as String) 
+          : null,
+      localPath: json['localPath'] as String?,
     );
   }
 
@@ -117,6 +165,7 @@ class TransferTask extends Equatable {
     completedAt,
     speed,
     eta,
+    localPath,
   ];
 }
 

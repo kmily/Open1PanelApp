@@ -10,9 +10,11 @@ import 'package:onepanelapp_app/features/files/file_preview_page.dart';
 import 'package:onepanelapp_app/features/files/file_editor_page.dart';
 import 'package:onepanelapp_app/features/files/favorites_page.dart';
 import 'package:onepanelapp_app/features/files/recycle_bin_page.dart';
+import 'package:onepanelapp_app/features/files/transfer_manager_page.dart';
 import 'package:onepanelapp_app/core/utils/debug_error_dialog.dart';
 import 'package:onepanelapp_app/core/config/api_config.dart';
 import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
+import 'package:onepanelapp_app/core/services/transfer/transfer_manager.dart';
 import 'package:onepanelapp_app/features/files/widgets/dialogs/permission_dialog.dart';
 import 'package:onepanelapp_app/features/files/widgets/dialogs/create_directory_dialog.dart';
 import 'package:onepanelapp_app/features/files/widgets/dialogs/create_file_dialog.dart';
@@ -865,12 +867,44 @@ class _FilesViewState extends State<FilesView> {
 
   void _showMoreOptions(BuildContext context) {
     final provider = context.read<FilesProvider>();
+    final transferManager = context.read<TransferManager>();
     showModalBottomSheet(
       context: context,
       builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ListTile(
+              leading: Stack(
+                children: [
+                  const Icon(Icons.swap_vert),
+                  if (transferManager.activeCount > 0)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Theme.of(sheetContext).colorScheme.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          '${transferManager.activeCount}',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Theme.of(sheetContext).colorScheme.onPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              title: Text(sheetContext.l10n.transferManagerTitle),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                _openTransferManager(context);
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.star_outline),
               title: Text(sheetContext.l10n.filesFavorites),
@@ -905,6 +939,15 @@ class _FilesViewState extends State<FilesView> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _openTransferManager(BuildContext context) {
+    appLogger.dWithPackage('files_page', '_openTransferManager: 打开传输管理器页面');
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const TransferManagerPage(),
       ),
     );
   }
