@@ -86,6 +86,7 @@ dependencies:
   # Download Manager
   flutter_downloader: ^1.11.4  # Professional download manager with background support
   android_intent_plus: ^5.3.0
+  open_filex: ^4.7.0
 
 dev_dependencies:
   flutter_test:

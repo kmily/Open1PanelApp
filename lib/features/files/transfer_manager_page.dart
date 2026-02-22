@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:provider/provider.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/core/services/transfer/transfer_task.dart';
@@ -540,9 +541,24 @@ class _DownloadTaskTile extends StatelessWidget {
     return task.status;
   }
 
+  String _resolveFileName() {
+    final fromTask = task.filename;
+    if (fromTask != null && fromTask.trim().isNotEmpty) return fromTask.trim();
+
+    final uri = Uri.tryParse(task.url);
+    final rawPath = uri?.queryParameters['path'];
+    if (rawPath == null || rawPath.isEmpty) return '';
+
+    final decoded = Uri.decodeComponent(rawPath);
+    final lastSlash = decoded.lastIndexOf('/');
+    if (lastSlash < 0) return decoded;
+    return decoded.substring(lastSlash + 1);
+  }
+
   Future<void> _openDownloadedFile(BuildContext context) async {
     final l10n = context.l10n;
-    final filePath = '${task.savedDir}/${task.filename ?? ''}';
+    final fileName = _resolveFileName();
+    final filePath = fileName.isEmpty ? task.savedDir : '${task.savedDir}/$fileName';
     final file = File(filePath);
     if (!await file.exists()) {
       if (context.mounted) {
@@ -558,8 +574,13 @@ class _DownloadTaskTile extends StatelessWidget {
 
     try {
       if (Platform.isAndroid || Platform.isIOS) {
-        final ok = await FlutterDownloader.open(taskId: task.taskId);
-        if (ok != true && context.mounted) {
+        if (task.status == DownloadTaskStatus.complete) {
+          final ok = await FlutterDownloader.open(taskId: task.taskId);
+          if (ok == true) return;
+        }
+
+        final result = await OpenFilex.open(filePath);
+        if (result.type != ResultType.done && context.mounted) {
           _showFloatingSnackBar(
             context,
             l10n.transferOpenFileError,
@@ -588,7 +609,8 @@ class _DownloadTaskTile extends StatelessWidget {
 
   Future<void> _showMoreActions(BuildContext context) async {
     final l10n = context.l10n;
-    final filePath = '${task.savedDir}/${task.filename ?? ''}';
+    final fileName = _resolveFileName();
+    final filePath = fileName.isEmpty ? task.savedDir : '${task.savedDir}/$fileName';
     final dirPath = task.savedDir;
     await showModalBottomSheet<void>(
       context: context,
