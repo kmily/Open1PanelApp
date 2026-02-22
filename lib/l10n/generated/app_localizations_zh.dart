@@ -24,6 +24,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get commonConfirm => '确认';
 
   @override
+  String get commonCopy => '复制';
+
+  @override
+  String get commonMore => '更多';
+
+  @override
   String get commonSave => '保存';
 
   @override
@@ -1835,6 +1841,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transferOpenFileError => '打开文件失败';
 
   @override
+  String get transferOpenFile => '打开文件';
+
+  @override
   String get transferClearTitle => '清除已完成任务';
 
   @override
@@ -1851,6 +1860,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get transferOpenLocation => '打开位置';
+
+  @override
+  String get transferOpenDownloadsFolder => '打开下载目录';
+
+  @override
+  String get transferCopyPath => '复制路径';
+
+  @override
+  String get transferCopyDirectoryPath => '复制目录路径';
+
+  @override
+  String get transferDownloads => '下载';
+
+  @override
+  String get transferUploads => '上传';
 
   @override
   String get transferSettings => '设置';

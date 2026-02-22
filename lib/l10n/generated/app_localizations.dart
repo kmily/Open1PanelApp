@@ -128,6 +128,18 @@ abstract class AppLocalizations {
   /// **'Confirm'**
   String get commonConfirm;
 
+  /// No description provided for @commonCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get commonCopy;
+
+  /// No description provided for @commonMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get commonMore;
+
   /// No description provided for @commonSave.
   ///
   /// In en, this message translates to:
@@ -3626,6 +3638,12 @@ abstract class AppLocalizations {
   /// **'Failed to open file'**
   String get transferOpenFileError;
 
+  /// No description provided for @transferOpenFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Open File'**
+  String get transferOpenFile;
+
   /// No description provided for @transferClearTitle.
   ///
   /// In en, this message translates to:
@@ -3661,6 +3679,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open Location'**
   String get transferOpenLocation;
+
+  /// No description provided for @transferOpenDownloadsFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Downloads'**
+  String get transferOpenDownloadsFolder;
+
+  /// No description provided for @transferCopyPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Path'**
+  String get transferCopyPath;
+
+  /// No description provided for @transferCopyDirectoryPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Folder Path'**
+  String get transferCopyDirectoryPath;
+
+  /// No description provided for @transferDownloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloads'**
+  String get transferDownloads;
+
+  /// No description provided for @transferUploads.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploads'**
+  String get transferUploads;
 
   /// No description provided for @transferSettings.
   ///

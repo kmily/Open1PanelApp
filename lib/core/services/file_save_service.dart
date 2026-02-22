@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:file_picker/file_picker.dart';
@@ -296,11 +297,50 @@ class FileSaveService {
       await Process.run('explorer', [directory.path]);
     } else if (Platform.isLinux) {
       await Process.run('xdg-open', [directory.path]);
+    } else if (Platform.isAndroid) {
+      await openDownloadsDirectory();
     } else {
       throw UnsupportedError('当前平台不支持打开文件所在目录');
     }
 
     appLogger.iWithPackage('file_save', 'openFileLocation: 已打开目录 ${directory.path}');
+  }
+
+  Future<bool> openDownloadsDirectory() async {
+    if (Platform.isAndroid) {
+      const data =
+          'content://com.android.externalstorage.documents/document/primary%3ADownload';
+      try {
+        final intent = AndroidIntent(
+          action: 'android.intent.action.VIEW',
+          data: data,
+          type: 'vnd.android.document/directory',
+          flags: <int>[268435456],
+        );
+        await intent.launch();
+        return true;
+      } catch (e) {
+        appLogger.wWithPackage('file_save', 'openDownloadsDirectory: Android 打开失败: $e');
+        return false;
+      }
+    }
+
+    final downloadDir =
+        await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
+    if (Platform.isMacOS) {
+      await Process.run('open', [downloadDir.path]);
+      return true;
+    }
+    if (Platform.isWindows) {
+      await Process.run('explorer', [downloadDir.path]);
+      return true;
+    }
+    if (Platform.isLinux) {
+      await Process.run('xdg-open', [downloadDir.path]);
+      return true;
+    }
+
+    return false;
   }
 
   Future<int> _getAndroidVersion() async {

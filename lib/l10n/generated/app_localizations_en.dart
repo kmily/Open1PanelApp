@@ -24,6 +24,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonConfirm => 'Confirm';
 
   @override
+  String get commonCopy => 'Copy';
+
+  @override
+  String get commonMore => 'More';
+
+  @override
   String get commonSave => 'Save';
 
   @override
@@ -1871,6 +1877,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transferOpenFileError => 'Failed to open file';
 
   @override
+  String get transferOpenFile => 'Open File';
+
+  @override
   String get transferClearTitle => 'Clear Completed Tasks';
 
   @override
@@ -1888,6 +1897,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get transferOpenLocation => 'Open Location';
+
+  @override
+  String get transferOpenDownloadsFolder => 'Open Downloads';
+
+  @override
+  String get transferCopyPath => 'Copy Path';
+
+  @override
+  String get transferCopyDirectoryPath => 'Copy Folder Path';
+
+  @override
+  String get transferDownloads => 'Downloads';
+
+  @override
+  String get transferUploads => 'Uploads';
 
   @override
   String get transferSettings => 'Settings';

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:provider/provider.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
@@ -8,8 +9,7 @@ import 'package:onepanelapp_app/core/services/transfer/transfer_task.dart';
 import 'package:onepanelapp_app/core/services/transfer/transfer_manager.dart';
 import 'package:onepanelapp_app/core/services/file_save_service.dart';
 
-enum TransferFilter { all, uploading, downloading }
-enum TransferSort { newest, oldest, name, size }
+enum TransferChannel { downloads, uploads }
 
 class TransferManagerPage extends StatefulWidget {
   const TransferManagerPage({super.key});
@@ -18,9 +18,8 @@ class TransferManagerPage extends StatefulWidget {
   State<TransferManagerPage> createState() => _TransferManagerPageState();
 }
 
-class _TransferManagerPageState extends State<TransferManagerPage>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _TransferManagerPageState extends State<TransferManagerPage> {
+  TransferChannel _channel = TransferChannel.downloads;
   List<DownloadTask>? _downloadTasks;
   bool _isLoading = true;
   Timer? _refreshTimer;
@@ -28,14 +27,12 @@ class _TransferManagerPageState extends State<TransferManagerPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
     _loadTasks();
     _startAutoRefresh();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
     _refreshTimer?.cancel();
     super.dispose();
   }
@@ -76,32 +73,124 @@ class _TransferManagerPageState extends State<TransferManagerPage>
             tooltip: l10n.transferClearCompleted,
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: l10n.transferTabActive),
-            Tab(text: l10n.transferTabPending),
-            Tab(text: l10n.transferTabCompleted),
-          ],
-        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                _buildDownloadTaskList(context, _getActiveDownloads(), l10n, theme),
-                Consumer<TransferManager>(
-                  builder: (context, manager, _) {
-                    return _buildUploadTaskList(context, manager.pendingTasks, l10n, theme);
-                  },
-                ),
-                _buildDownloadTaskList(context, _getCompletedDownloads(), l10n, theme),
-              ],
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth >= 840;
+                if (isWide) {
+                  return Row(
+                    children: [
+                      Expanded(child: _buildDownloadsPane(context, l10n, theme)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _buildUploadsPane(context, l10n, theme)),
+                    ],
+                  );
+                }
+
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                      child: SegmentedButton<TransferChannel>(
+                        segments: [
+                          ButtonSegment<TransferChannel>(
+                            value: TransferChannel.downloads,
+                            icon: const Icon(Icons.download),
+                            label: Text(l10n.transferDownloads),
+                          ),
+                          ButtonSegment<TransferChannel>(
+                            value: TransferChannel.uploads,
+                            icon: const Icon(Icons.upload),
+                            label: Text(l10n.transferUploads),
+                          ),
+                        ],
+                        selected: {_channel},
+                        onSelectionChanged: (value) {
+                          setState(() => _channel = value.first);
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: _channel == TransferChannel.downloads
+                            ? _buildDownloadsPane(context, l10n, theme)
+                            : _buildUploadsPane(context, l10n, theme),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
     );
   }
-  
+
+  Widget _buildDownloadsPane(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+    final active = _getActiveDownloads();
+    final completed = _getCompletedDownloads();
+
+    if (active.isEmpty && completed.isEmpty) {
+      return _EmptyState(text: l10n.transferEmpty);
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      children: [
+        if (active.isNotEmpty) ...[
+          _SectionHeader(text: l10n.transferTabActive),
+          const SizedBox(height: 8),
+          for (final task in active)
+            _DownloadTaskTile(
+              task: task,
+              onRefresh: _loadTasks,
+            ),
+          const SizedBox(height: 16),
+        ],
+        if (completed.isNotEmpty) ...[
+          _SectionHeader(text: l10n.transferTabCompleted),
+          const SizedBox(height: 8),
+          for (final task in completed)
+            _DownloadTaskTile(
+              task: task,
+              onRefresh: _loadTasks,
+            ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildUploadsPane(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+    return Consumer<TransferManager>(
+      builder: (context, manager, _) {
+        final active = manager.activeTasks;
+        final pending = manager.pendingTasks;
+
+        if (active.isEmpty && pending.isEmpty) {
+          return _EmptyState(text: l10n.transferEmpty);
+        }
+
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          children: [
+            if (active.isNotEmpty) ...[
+              _SectionHeader(text: l10n.transferTabActive),
+              const SizedBox(height: 8),
+              for (final task in active) _UploadTaskTile(task: task),
+              const SizedBox(height: 16),
+            ],
+            if (pending.isNotEmpty) ...[
+              _SectionHeader(text: l10n.transferTabPending),
+              const SizedBox(height: 8),
+              for (final task in pending) _UploadTaskTile(task: task),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
   List<DownloadTask> _getActiveDownloads() {
     if (_downloadTasks == null) return [];
     return _downloadTasks!
@@ -110,11 +199,12 @@ class _TransferManagerPageState extends State<TransferManagerPage>
               t.status == DownloadTaskStatus.running ||
               t.status == DownloadTaskStatus.paused ||
               t.status == DownloadTaskStatus.enqueued ||
+              t.status == DownloadTaskStatus.undefined ||
               (t.status == DownloadTaskStatus.failed && t.progress != 100),
         )
         .toList();
   }
-  
+
   List<DownloadTask> _getCompletedDownloads() {
     if (_downloadTasks == null) return [];
     return _downloadTasks!
@@ -125,83 +215,6 @@ class _TransferManagerPageState extends State<TransferManagerPage>
               (t.status == DownloadTaskStatus.failed && t.progress == 100),
         )
         .toList();
-  }
-
-  Widget _buildDownloadTaskList(
-    BuildContext context,
-    List<DownloadTask> tasks,
-    AppLocalizations l10n,
-    ThemeData theme,
-  ) {
-    if (tasks.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.inbox_outlined,
-              size: 64,
-              color: theme.colorScheme.outline,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l10n.transferEmpty,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.outline,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {
-        final task = tasks[index];
-        return _DownloadTaskTile(
-          task: task,
-          onRefresh: _loadTasks,
-        );
-      },
-    );
-  }
-  
-  Widget _buildUploadTaskList(
-    BuildContext context,
-    List<TransferTask> tasks,
-    AppLocalizations l10n,
-    ThemeData theme,
-  ) {
-    if (tasks.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.inbox_outlined,
-              size: 64,
-              color: theme.colorScheme.outline,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l10n.transferEmpty,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.outline,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {
-        final task = tasks[index];
-        return _UploadTaskTile(task: task);
-      },
-    );
   }
 
   void _showClearDialog(BuildContext context) {
@@ -230,6 +243,57 @@ class _TransferManagerPageState extends State<TransferManagerPage>
   }
 }
 
+class _SectionHeader extends StatelessWidget {
+  final String text;
+
+  const _SectionHeader({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Text(
+      text,
+      style: theme.textTheme.titleSmall?.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final String text;
+
+  const _EmptyState({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.inbox_outlined,
+              size: 64,
+              color: theme.colorScheme.outline,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              text,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.outline,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _DownloadTaskTile extends StatelessWidget {
   final DownloadTask task;
   final VoidCallback onRefresh;
@@ -245,8 +309,9 @@ class _DownloadTaskTile extends StatelessWidget {
     final theme = Theme.of(context);
     final displayStatus = _getDisplayStatus(task);
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return Card.filled(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -272,7 +337,7 @@ class _DownloadTaskTile extends StatelessWidget {
                       Text(
                         task.savedDir.split('/').last,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.outline,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -283,9 +348,9 @@ class _DownloadTaskTile extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(999),
               child: LinearProgressIndicator(
-                value: task.progress / 100,
+                value: (task.progress / 100).clamp(0, 1),
                 minHeight: 8,
                 backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 valueColor: AlwaysStoppedAnimation(
@@ -348,7 +413,7 @@ class _DownloadTaskTile extends StatelessWidget {
     switch (displayStatus) {
       case DownloadTaskStatus.running:
         buttons.addAll([
-          TextButton.icon(
+          OutlinedButton.icon(
             icon: const Icon(Icons.pause),
             label: Text(l10n.transferPause),
             onPressed: () async {
@@ -356,6 +421,7 @@ class _DownloadTaskTile extends StatelessWidget {
               onRefresh();
             },
           ),
+          const SizedBox(width: 8),
           TextButton.icon(
             icon: const Icon(Icons.close),
             label: Text(l10n.transferCancel),
@@ -368,7 +434,7 @@ class _DownloadTaskTile extends StatelessWidget {
         break;
       case DownloadTaskStatus.paused:
         buttons.addAll([
-          TextButton.icon(
+          FilledButton.icon(
             icon: const Icon(Icons.play_arrow),
             label: Text(l10n.transferResume),
             onPressed: () async {
@@ -376,6 +442,7 @@ class _DownloadTaskTile extends StatelessWidget {
               onRefresh();
             },
           ),
+          const SizedBox(width: 8),
           TextButton.icon(
             icon: const Icon(Icons.close),
             label: Text(l10n.transferCancel),
@@ -388,7 +455,7 @@ class _DownloadTaskTile extends StatelessWidget {
         break;
       case DownloadTaskStatus.failed:
         buttons.addAll([
-          TextButton.icon(
+          FilledButton.icon(
             icon: const Icon(Icons.refresh),
             label: Text(l10n.commonRetry),
             onPressed: () async {
@@ -399,8 +466,9 @@ class _DownloadTaskTile extends StatelessWidget {
                   onRefresh();
                   break;
                 case RetryDownloadTaskWithNewAuthResult.fileAlreadyDownloaded:
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.transferFileAlreadyDownloaded)),
+                  _showFloatingSnackBar(
+                    context,
+                    l10n.transferFileAlreadyDownloaded,
                   );
                   onRefresh();
                   break;
@@ -409,6 +477,7 @@ class _DownloadTaskTile extends StatelessWidget {
               }
             },
           ),
+          const SizedBox(width: 8),
           TextButton.icon(
             icon: const Icon(Icons.delete),
             label: Text(l10n.commonDelete),
@@ -420,13 +489,19 @@ class _DownloadTaskTile extends StatelessWidget {
         ]);
         break;
       case DownloadTaskStatus.complete:
-        buttons.add(
-          TextButton.icon(
-            icon: const Icon(Icons.folder_open),
-            label: Text(l10n.transferOpenLocation),
-            onPressed: () => _openFile(context),
+        buttons.addAll([
+          FilledButton.icon(
+            icon: const Icon(Icons.open_in_new),
+            label: Text(l10n.transferOpenFile),
+            onPressed: () => _openDownloadedFile(context),
           ),
-        );
+          const SizedBox(width: 8),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.more_horiz),
+            label: Text(l10n.commonMore),
+            onPressed: () => _showMoreActions(context),
+          ),
+        ]);
         break;
       case DownloadTaskStatus.canceled:
       case DownloadTaskStatus.undefined:
@@ -464,36 +539,121 @@ class _DownloadTaskTile extends StatelessWidget {
     }
     return task.status;
   }
-  
-  Future<void> _openFile(BuildContext context) async {
+
+  Future<void> _openDownloadedFile(BuildContext context) async {
     final l10n = context.l10n;
+    final filePath = '${task.savedDir}/${task.filename ?? ''}';
+    final file = File(filePath);
+    if (!await file.exists()) {
+      if (context.mounted) {
+        _showFloatingSnackBar(
+          context,
+          l10n.transferFileNotFound,
+          actionLabel: l10n.transferCopyPath,
+          onAction: () => _copyToClipboard(context, filePath),
+        );
+      }
+      return;
+    }
+
     try {
-      final filePath = '${task.savedDir}/${task.filename}';
-      final file = File(filePath);
-      if (!await file.exists()) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.transferFileNotFound)),
+      if (Platform.isAndroid || Platform.isIOS) {
+        final ok = await FlutterDownloader.open(taskId: task.taskId);
+        if (ok != true && context.mounted) {
+          _showFloatingSnackBar(
+            context,
+            l10n.transferOpenFileError,
+            actionLabel: l10n.transferCopyPath,
+            onAction: () => _copyToClipboard(context, filePath),
           );
         }
         return;
       }
 
-      final fileSaveService = FileSaveService();
-      await fileSaveService.openFileLocation(filePath);
-
+      await FileSaveService().openFileLocation(filePath);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.transferFileLocationOpened)),
-        );
+        _showFloatingSnackBar(context, l10n.transferFileLocationOpened);
       }
-    } catch (e) {
+    } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.transferOpenFileError}: $e')),
+        _showFloatingSnackBar(
+          context,
+          l10n.transferOpenFileError,
+          actionLabel: l10n.transferCopyPath,
+          onAction: () => _copyToClipboard(context, filePath),
         );
       }
     }
+  }
+
+  Future<void> _showMoreActions(BuildContext context) async {
+    final l10n = context.l10n;
+    final filePath = '${task.savedDir}/${task.filename ?? ''}';
+    final dirPath = task.savedDir;
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.open_in_new),
+                title: Text(l10n.transferOpenFile),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _openDownloadedFile(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.folder_open),
+                title: Text(l10n.transferOpenDownloadsFolder),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final ok = await FileSaveService().openDownloadsDirectory();
+                  if (!context.mounted) return;
+                  if (!ok) {
+                    _showFloatingSnackBar(
+                      context,
+                      l10n.transferOpenFileError,
+                      actionLabel: l10n.transferCopyDirectoryPath,
+                      onAction: () => _copyToClipboard(context, dirPath),
+                    );
+                    return;
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.copy),
+                title: Text(l10n.transferCopyPath),
+                onTap: () async {
+                  Navigator.pop(context);
+                  _copyToClipboard(context, filePath);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete_outline),
+                title: Text(l10n.commonDelete),
+                textColor: Theme.of(context).colorScheme.error,
+                iconColor: Theme.of(context).colorScheme.error,
+                onTap: () async {
+                  Navigator.pop(context);
+                  await TransferManager().deleteDownloadTask(task.taskId);
+                  onRefresh();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _copyToClipboard(BuildContext context, String text) {
+    Clipboard.setData(ClipboardData(text: text));
+    if (!context.mounted) return;
+    _showFloatingSnackBar(context, context.l10n.commonCopied);
   }
 
   Color _getStatusColor(DownloadTaskStatus status, ThemeData theme) {
@@ -545,8 +705,9 @@ class _UploadTaskTile extends StatelessWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return Card.filled(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -572,7 +733,7 @@ class _UploadTaskTile extends StatelessWidget {
                       Text(
                         _formatSize(task.totalSize),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.outline,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -583,9 +744,9 @@ class _UploadTaskTile extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(999),
               child: LinearProgressIndicator(
-                value: task.progress,
+                value: task.progress.clamp(0, 1),
                 minHeight: 8,
                 backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 valueColor: AlwaysStoppedAnimation(
@@ -655,11 +816,12 @@ class _UploadTaskTile extends StatelessWidget {
     switch (task.status) {
       case TransferStatus.running:
         buttons.addAll([
-          TextButton.icon(
+          OutlinedButton.icon(
             icon: const Icon(Icons.pause),
             label: Text(l10n.transferPause),
             onPressed: () => manager.pauseTask(task.id),
           ),
+          const SizedBox(width: 8),
           TextButton.icon(
             icon: const Icon(Icons.close),
             label: Text(l10n.transferCancel),
@@ -670,11 +832,12 @@ class _UploadTaskTile extends StatelessWidget {
       case TransferStatus.paused:
       case TransferStatus.failed:
         buttons.addAll([
-          TextButton.icon(
+          FilledButton.icon(
             icon: const Icon(Icons.play_arrow),
             label: Text(l10n.transferResume),
             onPressed: () => manager.resumeTask(task.id),
           ),
+          const SizedBox(width: 8),
           TextButton.icon(
             icon: const Icon(Icons.close),
             label: Text(l10n.transferCancel),
@@ -706,7 +869,7 @@ class _UploadTaskTile extends StatelessWidget {
       case TransferStatus.paused:
         return theme.colorScheme.tertiary;
       case TransferStatus.completed:
-        return Colors.green;
+        return theme.colorScheme.secondary;
       case TransferStatus.failed:
         return theme.colorScheme.error;
       case TransferStatus.cancelled:
@@ -744,4 +907,29 @@ class _UploadTaskTile extends StatelessWidget {
       return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
     }
   }
+}
+
+void _showFloatingSnackBar(
+  BuildContext context,
+  String message, {
+  String? actionLabel,
+  VoidCallback? onAction,
+}) {
+  final theme = Theme.of(context);
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: true,
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      backgroundColor: theme.colorScheme.inverseSurface,
+      action: (actionLabel != null && onAction != null)
+          ? SnackBarAction(
+              label: actionLabel,
+              onPressed: onAction,
+            )
+          : null,
+    ),
+  );
 }
