@@ -1850,6 +1850,32 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transferOpenLocation => '打开位置';
 
   @override
+  String get transferSettings => '设置';
+
+  @override
+  String get transferSettingsTitle => '传输设置';
+
+  @override
+  String get transferHistoryRetentionHint => '历史记录保留天数（超过天数自动清理）';
+
+  @override
+  String transferHistoryDays(int days) {
+    return '$days天';
+  }
+
+  @override
+  String get transferHistorySaved => '设置已保存';
+
+  @override
+  String get largeFileDownloadTitle => '大文件下载';
+
+  @override
+  String get largeFileDownloadHint => '文件较大，已添加到后台下载队列';
+
+  @override
+  String get largeFileDownloadView => '查看下载';
+
+  @override
   String get permissionRequired => '需要权限';
 
   @override

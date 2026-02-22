@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onepanelapp_app/config/app_router.dart';
 import 'package:onepanelapp_app/core/services/app_settings_controller.dart';
 import 'package:onepanelapp_app/core/services/transfer/transfer_manager.dart';
@@ -15,7 +17,21 @@ import 'features/websites/websites_provider.dart';
 import 'features/server/server_provider.dart';
 import 'features/monitoring/monitoring_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Hive
+  await Hive.initFlutter();
+  
+  // Initialize Flutter Downloader
+  await FlutterDownloader.initialize(
+    debug: true,
+    ignoreSsl: true,
+  );
+  
+  // Set up download callback
+  TransferManager().setupDownloadCallback();
+  
   runApp(
     MultiProvider(
       providers: [
@@ -48,7 +64,7 @@ void main() {
         ),
         // Transfer Manager
         ChangeNotifierProvider(
-          create: (_) => TransferManager(),
+          create: (_) => TransferManager()..init(),
         ),
       ],
       child: const MyApp(),

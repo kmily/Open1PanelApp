@@ -82,6 +82,9 @@ dependencies:
   hive_flutter: ^1.1.0
   connectivity_plus: ^7.0.0
   battery_plus: ^7.0.0
+  
+  # Download Manager
+  flutter_downloader: ^1.11.4  # Professional download manager with background support
 
 dev_dependencies:
   flutter_test:

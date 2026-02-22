@@ -1887,6 +1887,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transferOpenLocation => 'Open Location';
 
   @override
+  String get transferSettings => 'Settings';
+
+  @override
+  String get transferSettingsTitle => 'Transfer Settings';
+
+  @override
+  String get transferHistoryRetentionHint =>
+      'History retention days (auto cleanup after)';
+
+  @override
+  String transferHistoryDays(int days) {
+    return '$days days';
+  }
+
+  @override
+  String get transferHistorySaved => 'Settings saved';
+
+  @override
+  String get largeFileDownloadTitle => 'Large File Download';
+
+  @override
+  String get largeFileDownloadHint =>
+      'File is large, added to background download queue';
+
+  @override
+  String get largeFileDownloadView => 'View Downloads';
+
+  @override
   String get permissionRequired => 'Permission Required';
 
   @override

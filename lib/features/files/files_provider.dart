@@ -1,10 +1,18 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
+import 'package:crypto/crypto.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:onepanelapp_app/core/config/api_config.dart';
+import 'package:onepanelapp_app/core/config/api_constants.dart';
 import 'files_service.dart';
 import 'models/models.dart';
 import '../../data/models/file_models.dart';
 import '../../core/network/api_client_manager.dart';
 import '../../core/services/logger/logger_service.dart';
+import '../../core/services/transfer/transfer_manager.dart';
+import '../../core/services/transfer/transfer_task.dart';
 
 class FilesProvider extends ChangeNotifier {
   final FilesService _service = FilesService();
@@ -637,42 +645,80 @@ class FilesProvider extends ChangeNotifier {
     }
 
     appLogger.dWithPackage('files_provider', 'downloadFile: 开始下载 ${file.name}');
-    _data = _data.copyWith(
-      isDownloading: true,
-      downloadProgress: 0.0,
-      downloadingFileName: file.name,
-    );
-    notifyListeners();
+    
+    // 所有文件都使用 FlutterDownloader
+    return await _downloadWithFlutterDownloader(file);
+  }
 
+  /// 使用 FlutterDownloader 下载文件（统一入口）
+  Future<String?> _downloadWithFlutterDownloader(FileInfo file) async {
     try {
-      final savePath = await _service.downloadFileToDevice(
-        file.path,
-        file.name,
-        onProgress: (received, total) {
-          final progress = received / total;
-          _data = _data.copyWith(downloadProgress: progress);
-          notifyListeners();
+      final config = await ApiConfigManager.getCurrentConfig();
+      if (config == null) {
+        throw StateError('No server configured');
+      }
+
+      // 获取下载目录
+      final downloadDir = await getDownloadsDirectory();
+      if (downloadDir == null) {
+        throw StateError('Cannot get download directory');
+      }
+
+      // 生成认证头部
+      final timestamp = (DateTime.now().millisecondsSinceEpoch / 1000).floor().toString();
+      final authToken = _generate1PanelAuthToken(config.apiKey, timestamp);
+
+      final downloadUrl = '${config.url}${ApiConstants.buildApiPath('/files/download')}?path=${Uri.encodeComponent(file.path)}';
+
+      appLogger.iWithPackage('files_provider', '_downloadWithFlutterDownloader: 使用 FlutterDownloader 下载 ${file.name}');
+
+      // 使用 FlutterDownloader 创建下载任务
+      final taskId = await FlutterDownloader.enqueue(
+        url: downloadUrl,
+        savedDir: downloadDir.path,
+        fileName: file.name,
+        showNotification: true,
+        openFileFromNotification: true,
+        headers: {
+          '1Panel-Token': authToken,
+          '1Panel-Timestamp': timestamp,
         },
       );
+
+      if (taskId != null) {
+        // 创建 TransferTask 并跟踪
+        final task = TransferTask(
+          id: taskId,
+          path: file.path,
+          fileName: file.name,
+          totalSize: file.size,
+          type: TransferType.download,
+          status: TransferStatus.running,
+          localPath: '${downloadDir.path}/${file.name}',
+          createdAt: DateTime.now(),
+          downloaderTaskId: taskId,
+        );
+        
+        await TransferManager().trackDownloaderTask(taskId, task);
+        
+        appLogger.iWithPackage('files_provider', '_downloadWithFlutterDownloader: 已创建下载任务 $taskId');
+        
+        // 返回任务 ID
+        return taskId;
+      }
       
-      appLogger.iWithPackage('files_provider', 'downloadFile: 下载成功, savePath=$savePath');
-      _data = _data.copyWith(
-        isDownloading: false,
-        downloadProgress: 1.0,
-        downloadingFileName: null,
-      );
-      notifyListeners();
-      return savePath;
+      return null;
     } catch (e, stackTrace) {
-      appLogger.eWithPackage('files_provider', 'downloadFile: 下载失败', error: e, stackTrace: stackTrace);
-      _data = _data.copyWith(
-        isDownloading: false,
-        downloadProgress: 0.0,
-        downloadingFileName: null,
-      );
-      notifyListeners();
+      appLogger.eWithPackage('files_provider', '_downloadWithFlutterDownloader: 创建下载任务失败', error: e, stackTrace: stackTrace);
       rethrow;
     }
+  }
+
+  String _generate1PanelAuthToken(String apiKey, String timestamp) {
+    final authString = '1panel$apiKey$timestamp';
+    final bytes = utf8.encode(authString);
+    final digest = md5.convert(bytes);
+    return digest.toString();
   }
 
   Future<bool> isStoragePermissionPermanentlyDenied() async {

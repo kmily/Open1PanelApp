@@ -126,6 +126,11 @@ class _TransferManagerPageState extends State<TransferManagerPage>
             onPressed: () => _showClearDialog(context),
             tooltip: l10n.transferClearCompleted,
           ),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => _showSettingsDialog(context),
+            tooltip: l10n.transferSettingsTitle,
+          ),
         ],
         bottom: TabBar(
           controller: _tabController,
@@ -243,6 +248,64 @@ class _TransferManagerPageState extends State<TransferManagerPage>
             child: Text(l10n.commonConfirm),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showSettingsDialog(BuildContext context) {
+    final l10n = context.l10n;
+    final manager = context.read<TransferManager>();
+    final currentDays = manager.historyRetentionDays;
+    
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          int selectedDays = currentDays;
+          return AlertDialog(
+            title: Text(l10n.transferSettingsTitle),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.transferHistoryRetentionHint),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [7, 14, 30, 60, 90].map((days) {
+                    final isSelected = selectedDays == days;
+                    return ChoiceChip(
+                      label: Text(l10n.transferHistoryDays(days)),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() => selectedDays = days);
+                        }
+                      },
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.commonCancel),
+              ),
+              FilledButton(
+                onPressed: () {
+                  manager.setHistoryRetentionDays(selectedDays);
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.transferHistorySaved)),
+                  );
+                },
+                child: Text(l10n.commonSave),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

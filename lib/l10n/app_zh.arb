@@ -738,6 +738,21 @@
   "transferCancel": "取消",
   "transferResume": "继续",
   "transferOpenLocation": "打开位置",
+  "transferSettings": "设置",
+  "transferSettingsTitle": "传输设置",
+  "transferHistoryRetentionHint": "历史记录保留天数（超过天数自动清理）",
+  "transferHistoryDays": "{days}天",
+  "@transferHistoryDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "transferHistorySaved": "设置已保存",
+  "largeFileDownloadTitle": "大文件下载",
+  "largeFileDownloadHint": "文件较大，已添加到后台下载队列",
+  "largeFileDownloadView": "查看下载",
   "permissionRequired": "需要权限",
   "permissionStorageRequired": "需要存储权限才能保存文件",
   "permissionGoToSettings": "去设置",

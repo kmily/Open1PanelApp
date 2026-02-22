@@ -790,6 +790,21 @@
   "transferCancel": "Cancel",
   "transferResume": "Resume",
   "transferOpenLocation": "Open Location",
+  "transferSettings": "Settings",
+  "transferSettingsTitle": "Transfer Settings",
+  "transferHistoryRetentionHint": "History retention days (auto cleanup after)",
+  "transferHistoryDays": "{days} days",
+  "@transferHistoryDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "transferHistorySaved": "Settings saved",
+  "largeFileDownloadTitle": "Large File Download",
+  "largeFileDownloadHint": "File is large, added to background download queue",
+  "largeFileDownloadView": "View Downloads",
   "permissionRequired": "Permission Required",
   "permissionStorageRequired": "Storage permission is required to save files",
   "permissionGoToSettings": "Go to Settings",

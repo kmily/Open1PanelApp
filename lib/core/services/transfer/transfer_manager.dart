@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
@@ -13,11 +14,91 @@ import 'package:onepanelapp_app/core/services/file_save_service.dart';
 import 'package:onepanelapp_app/api/v2/file_v2.dart';
 import 'package:onepanelapp_app/data/models/file/file_transfer.dart';
 
+@pragma('vm:entry-point')
 class TransferManager extends ChangeNotifier {
   static final TransferManager _instance = TransferManager._internal();
+  @pragma('vm:entry-point')
   factory TransferManager() => _instance;
   
-  TransferManager._internal();
+  TransferManager._internal() {
+    _ensureInitialized();
+  }
+  
+  bool _initialized = false;
+  
+  @pragma('vm:entry-point')
+  static void downloadCallback(String id, int status, int progress) {
+    // flutter_downloader 回调在后台隔离区运行
+    // 任务状态通过 getDownloaderTasks() 查询内置 SQLite 数据库获取
+  }
+  
+  void setupDownloadCallback() {
+    FlutterDownloader.registerCallback(downloadCallback);
+  }
+  
+  /// 获取 flutter_downloader 的所有下载任务（从内置 SQLite 数据库）
+  Future<List<DownloadTask>?> getDownloaderTasks() async {
+    try {
+      return await FlutterDownloader.loadTasksWithRawQuery(
+        query: "SELECT * FROM task ORDER BY created_at DESC",
+      );
+    } catch (e) {
+      appLogger.wWithPackage('transfer', 'getDownloaderTasks: 查询失败 $e');
+      return null;
+    }
+  }
+  
+  /// 获取 flutter_downloader 的进行中任务
+  Future<List<DownloadTask>?> getRunningDownloaderTasks() async {
+    try {
+      return await FlutterDownloader.loadTasksWithRawQuery(
+        query: "SELECT * FROM task WHERE status = 2 ORDER BY created_at DESC",
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+  
+  /// 获取 flutter_downloader 的已完成任务
+  Future<List<DownloadTask>?> getCompletedDownloaderTasks() async {
+    try {
+      return await FlutterDownloader.loadTasksWithRawQuery(
+        query: "SELECT * FROM task WHERE status = 3 ORDER BY created_at DESC",
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+  
+  /// 获取合并后的所有下载任务（Hive 小文件 + flutter_downloader 大文件）
+  Future<List<dynamic>> getAllDownloadTasks() async {
+    final List<dynamic> allTasks = [];
+    
+    // 1. 从 Hive 获取小文件历史记录
+    allTasks.addAll(_completedTasks.values);
+    
+    // 2. 从 flutter_downloader 获取大文件记录
+    final downloaderTasks = await getDownloaderTasks();
+    if (downloaderTasks != null) {
+      allTasks.addAll(downloaderTasks);
+    }
+    
+    return allTasks;
+  }
+  
+  /// 保存大文件下载任务（不使用 Hive，flutter_downloader 自动存储）
+  Future<void> trackDownloaderTask(String taskId, TransferTask task) async {
+    // flutter_downloader 自动存储到 SQLite，无需额外保存
+    // 这里只更新内存状态用于 UI 显示
+    _completedTasks[task.id] = task;
+    notifyListeners();
+  }
+  
+  Future<void> _ensureInitialized() async {
+    if (_initialized) return;
+    _initialized = true;
+    await init();
+  }
   
   final Queue<TransferTask> _pendingQueue = Queue();
   final Map<String, TransferTask> _activeTasks = {};
@@ -26,10 +107,15 @@ class TransferManager extends ChangeNotifier {
   static const int _maxConcurrent = 3;
   static const int _defaultChunkSize = 1024 * 1024;
   static const String _tasksBoxName = 'transfer_tasks';
+  static const String _historyBoxName = 'transfer_history';
+  static const int _defaultHistoryRetentionDays = 30;
   
   FileV2Api? _api;
   Box? _tasksBox;
+  Box? _historyBox;
   final FileSaveService _fileSaveService = FileSaveService();
+  
+  int _historyRetentionDays = _defaultHistoryRetentionDays;
   
   Function(TransferTask task)? onTaskCompleted;
   Function(TransferTask task)? onTaskFailed;
@@ -52,6 +138,90 @@ class TransferManager extends ChangeNotifier {
       _tasksBox = Hive.box(_tasksBoxName);
     } else {
       _tasksBox = await Hive.openBox(_tasksBoxName);
+    }
+    
+    if (Hive.isBoxOpen(_historyBoxName)) {
+      _historyBox = Hive.box(_historyBoxName);
+    } else {
+      _historyBox = await Hive.openBox(_historyBoxName);
+    }
+    
+    await _loadHistory();
+    await _cleanupHistory();
+  }
+  
+  void setHistoryRetentionDays(int days) {
+    _historyRetentionDays = days;
+    _cleanupHistory();
+  }
+  
+  int get historyRetentionDays => _historyRetentionDays;
+  
+  Future<void> _loadHistory() async {
+    try {
+      if (_historyBox == null || _historyBox!.isEmpty) return;
+      
+      for (final key in _historyBox!.keys) {
+        final data = _historyBox!.get(key);
+        if (data == null) continue;
+        
+        try {
+          final task = TransferTask.fromJson(Map<String, dynamic>.from(data));
+          _completedTasks[task.id] = task;
+        } catch (e) {
+          appLogger.wWithPackage('transfer', '_loadHistory: 解析历史记录失败: $e');
+        }
+      }
+      
+      appLogger.iWithPackage('transfer', '_loadHistory: 加载了 ${_completedTasks.length} 条历史记录');
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('transfer', '_loadHistory: 加载历史记录失败', error: e, stackTrace: stackTrace);
+    }
+  }
+  
+  Future<void> _cleanupHistory() async {
+    try {
+      if (_historyBox == null || _historyBox!.isEmpty) return;
+      
+      final now = DateTime.now();
+      final cutoffDate = now.subtract(Duration(days: _historyRetentionDays));
+      final keysToDelete = <dynamic>[];
+      
+      for (final key in _historyBox!.keys) {
+        final data = _historyBox!.get(key);
+        if (data == null) continue;
+        
+        try {
+          final task = TransferTask.fromJson(Map<String, dynamic>.from(data));
+          if (task.completedAt != null && task.completedAt!.isBefore(cutoffDate)) {
+            keysToDelete.add(key);
+          }
+        } catch (e) {
+          keysToDelete.add(key);
+        }
+      }
+      
+      for (final key in keysToDelete) {
+        await _historyBox!.delete(key);
+        _completedTasks.remove(key.toString());
+      }
+      
+      if (keysToDelete.isNotEmpty) {
+        appLogger.iWithPackage('transfer', '_cleanupHistory: 清理了 ${keysToDelete.length} 条过期历史记录');
+      }
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('transfer', '_cleanupHistory: 清理历史记录失败', error: e, stackTrace: stackTrace);
+    }
+  }
+  
+  Future<void> _saveToHistory(TransferTask task) async {
+    try {
+      if (_historyBox != null) {
+        await _historyBox!.put(task.id, task.toJson());
+        appLogger.iWithPackage('transfer', '_saveToHistory: 保存历史记录 ${task.id}');
+      }
+    } catch (e) {
+      appLogger.wWithPackage('transfer', '_saveToHistory: 保存历史记录失败: $e');
     }
   }
   
@@ -250,6 +420,8 @@ class TransferManager extends ChangeNotifier {
         await progressFile.delete();
       }
       
+      // 保存到历史记录而非删除
+      await _saveToHistory(task);
       await _deleteTask(task.id);
       
       onTaskCompleted?.call(task);
@@ -261,7 +433,8 @@ class TransferManager extends ChangeNotifier {
       );
       _activeTasks.remove(task.id);
       _completedTasks[task.id] = task;
-      await _saveTask(task);
+      await _saveToHistory(task);
+      await _deleteTask(task.id);
       onTaskFailed?.call(task);
     }
     
@@ -416,7 +589,16 @@ class TransferManager extends ChangeNotifier {
     }
   }
   
-  void cancelTask(String taskId) {
+  void cancelTask(String taskId) async {
+    // 先尝试取消 flutter_downloader 任务
+    try {
+      await FlutterDownloader.cancel(taskId: taskId);
+      appLogger.iWithPackage('transfer', 'cancelTask: 已取消 flutter_downloader 任务 $taskId');
+    } catch (e) {
+      appLogger.wWithPackage('transfer', 'cancelTask: 取消 flutter_downloader 任务失败 $e');
+    }
+    
+    // 同时更新内存中的任务状态
     TransferTask? task = _activeTasks[taskId];
     task ??= _pendingQueue.firstWhere(
       (t) => t.id == taskId,
@@ -438,6 +620,37 @@ class TransferManager extends ChangeNotifier {
   
   void clearCompleted() {
     _completedTasks.clear();
+    _historyBox?.clear();
+    notifyListeners();
+  }
+  
+  void clearHistory() {
+    _completedTasks.clear();
+    _historyBox?.clear();
+    notifyListeners();
+  }
+  
+  /// 从外部添加已完成的下载任务（用于 FilesProvider 直接下载）
+  Future<void> addCompletedTaskFromDownload({
+    required String fileName,
+    required String remotePath,
+    required String localPath,
+    required int fileSize,
+  }) async {
+    final task = TransferTask(
+      id: DateTime.now().millisecondsSinceEpoch.toRadixString(16),
+      path: remotePath,
+      fileName: fileName,
+      totalSize: fileSize,
+      type: TransferType.download,
+      status: TransferStatus.completed,
+      localPath: localPath,
+      createdAt: DateTime.now(),
+      completedAt: DateTime.now(),
+    );
+    
+    _completedTasks[task.id] = task;
+    await _saveToHistory(task);
     notifyListeners();
   }
   

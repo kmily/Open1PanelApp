@@ -3656,6 +3656,54 @@ abstract class AppLocalizations {
   /// **'Open Location'**
   String get transferOpenLocation;
 
+  /// No description provided for @transferSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get transferSettings;
+
+  /// No description provided for @transferSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer Settings'**
+  String get transferSettingsTitle;
+
+  /// No description provided for @transferHistoryRetentionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'History retention days (auto cleanup after)'**
+  String get transferHistoryRetentionHint;
+
+  /// No description provided for @transferHistoryDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days'**
+  String transferHistoryDays(int days);
+
+  /// No description provided for @transferHistorySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings saved'**
+  String get transferHistorySaved;
+
+  /// No description provided for @largeFileDownloadTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Large File Download'**
+  String get largeFileDownloadTitle;
+
+  /// No description provided for @largeFileDownloadHint.
+  ///
+  /// In en, this message translates to:
+  /// **'File is large, added to background download queue'**
+  String get largeFileDownloadHint;
+
+  /// No description provided for @largeFileDownloadView.
+  ///
+  /// In en, this message translates to:
+  /// **'View Downloads'**
+  String get largeFileDownloadView;
+
   /// No description provided for @permissionRequired.
   ///
   /// In en, this message translates to:
