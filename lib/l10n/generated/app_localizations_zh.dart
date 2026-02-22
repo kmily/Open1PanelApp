@@ -1826,6 +1826,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transferFileNotFound => '文件不存在';
 
   @override
+  String get transferFileAlreadyDownloaded => '文件已下载完成，无需重试';
+
+  @override
   String get transferFileLocationOpened => '已打开文件位置';
 
   @override

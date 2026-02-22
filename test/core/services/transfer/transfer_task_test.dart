@@ -178,9 +178,8 @@ void main() {
     });
 
     group('TransferType', () {
-      test('应该包含 upload 和 download 类型', () {
+      test('应该包含 upload 类型', () {
         expect(TransferType.values, contains(TransferType.upload));
-        expect(TransferType.values, contains(TransferType.download));
       });
     });
 

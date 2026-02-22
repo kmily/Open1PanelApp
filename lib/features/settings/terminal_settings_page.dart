@@ -206,52 +206,38 @@ class TerminalSettingsPage extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(context.l10n.terminalSettingsCursorStyle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<String>(
-              title: const Text('Block'),
-              value: 'block',
-              groupValue: currentStyle,
-              onChanged: (value) async {
-                Navigator.pop(context);
-                if (value != null) {
-                  final success = await provider.updateTerminalSettings(cursorStyle: value);
-                  if (context.mounted) {
-                    _showResultSnackBar(context, success, context.l10n);
-                  }
-                }
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('Underline'),
-              value: 'underline',
-              groupValue: currentStyle,
-              onChanged: (value) async {
-                Navigator.pop(context);
-                if (value != null) {
-                  final success = await provider.updateTerminalSettings(cursorStyle: value);
-                  if (context.mounted) {
-                    _showResultSnackBar(context, success, context.l10n);
-                  }
-                }
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('Bar'),
-              value: 'bar',
-              groupValue: currentStyle,
-              onChanged: (value) async {
-                Navigator.pop(context);
-                if (value != null) {
-                  final success = await provider.updateTerminalSettings(cursorStyle: value);
-                  if (context.mounted) {
-                    _showResultSnackBar(context, success, context.l10n);
-                  }
-                }
-              },
-            ),
-          ],
+        content: RadioGroup<String>(
+          groupValue: currentStyle,
+          onChanged: (value) async {
+            Navigator.pop(context);
+            if (value == null) {
+              return;
+            }
+            final success = await provider.updateTerminalSettings(cursorStyle: value);
+            if (context.mounted) {
+              _showResultSnackBar(context, success, context.l10n);
+            }
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: const Text('Block'),
+                value: 'block',
+                selected: currentStyle == 'block',
+              ),
+              RadioListTile<String>(
+                title: const Text('Underline'),
+                value: 'underline',
+                selected: currentStyle == 'underline',
+              ),
+              RadioListTile<String>(
+                title: const Text('Bar'),
+                value: 'bar',
+                selected: currentStyle == 'bar',
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -262,38 +248,33 @@ class TerminalSettingsPage extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(context.l10n.terminalSettingsCursorBlink),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<String>(
-              title: Text(context.l10n.systemSettingsEnabled),
-              value: 'true',
-              groupValue: currentValue,
-              onChanged: (value) async {
-                Navigator.pop(context);
-                if (value != null) {
-                  final success = await provider.updateTerminalSettings(cursorBlink: value);
-                  if (context.mounted) {
-                    _showResultSnackBar(context, success, context.l10n);
-                  }
-                }
-              },
-            ),
-            RadioListTile<String>(
-              title: Text(context.l10n.systemSettingsDisabled),
-              value: 'false',
-              groupValue: currentValue,
-              onChanged: (value) async {
-                Navigator.pop(context);
-                if (value != null) {
-                  final success = await provider.updateTerminalSettings(cursorBlink: value);
-                  if (context.mounted) {
-                    _showResultSnackBar(context, success, context.l10n);
-                  }
-                }
-              },
-            ),
-          ],
+        content: RadioGroup<String>(
+          groupValue: currentValue,
+          onChanged: (value) async {
+            Navigator.pop(context);
+            if (value == null) {
+              return;
+            }
+            final success = await provider.updateTerminalSettings(cursorBlink: value);
+            if (context.mounted) {
+              _showResultSnackBar(context, success, context.l10n);
+            }
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: Text(context.l10n.systemSettingsEnabled),
+                value: 'true',
+                selected: currentValue == 'true',
+              ),
+              RadioListTile<String>(
+                title: Text(context.l10n.systemSettingsDisabled),
+                value: 'false',
+                selected: currentValue == 'false',
+              ),
+            ],
+          ),
         ),
       ),
     );

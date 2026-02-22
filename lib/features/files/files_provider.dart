@@ -1,9 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:onepanelapp_app/core/config/api_config.dart';
 import 'package:onepanelapp_app/core/config/api_constants.dart';
 import 'files_service.dart';
@@ -11,12 +11,12 @@ import 'models/models.dart';
 import '../../data/models/file_models.dart';
 import '../../core/network/api_client_manager.dart';
 import '../../core/services/logger/logger_service.dart';
-import '../../core/services/transfer/transfer_manager.dart';
-import '../../core/services/transfer/transfer_task.dart';
 
 class FilesProvider extends ChangeNotifier {
   final FilesService _service = FilesService();
   FilesData _data = const FilesData();
+
+  static const int _chunkDownloadThreshold = 50 * 1024 * 1024;
 
   FilesData get data => _data;
 
@@ -634,23 +634,21 @@ class FilesProvider extends ChangeNotifier {
 
   Future<String?> downloadFile(FileInfo file) async {
     if (file.isDir) {
-      appLogger.wWithPackage('files_provider', 'downloadFile: 不能下载文件夹');
-      return null;
+      throw Exception('cannot_download_directory');
     }
 
     final hasPermission = await _service.checkAndRequestStoragePermission();
     if (!hasPermission) {
-      appLogger.wWithPackage('files_provider', 'downloadFile: 存储权限被拒绝');
       throw Exception('storage_permission_denied');
     }
 
-    appLogger.dWithPackage('files_provider', 'downloadFile: 开始下载 ${file.name}');
-    
-    // 所有文件都使用 FlutterDownloader
+    if (file.size >= _chunkDownloadThreshold) {
+      appLogger.iWithPackage('files_provider', 'downloadFile: 大文件(${file.size} bytes)，建议使用分块下载');
+    }
+
     return await _downloadWithFlutterDownloader(file);
   }
 
-  /// 使用 FlutterDownloader 下载文件（统一入口）
   Future<String?> _downloadWithFlutterDownloader(FileInfo file) async {
     try {
       final config = await ApiConfigManager.getCurrentConfig();
@@ -658,21 +656,35 @@ class FilesProvider extends ChangeNotifier {
         throw StateError('No server configured');
       }
 
-      // 获取下载目录
-      final downloadDir = await getDownloadsDirectory();
-      if (downloadDir == null) {
-        throw StateError('Cannot get download directory');
+      // 使用外部存储目录 /storage/emulated/0/Download
+      // 这样用户可以直接在文件管理器中找到下载的文件
+      final downloadDir = Directory('/storage/emulated/0/Download');
+      if (!await downloadDir.exists()) {
+        await downloadDir.create(recursive: true);
       }
 
-      // 生成认证头部
+      final localFile = File('${downloadDir.path}/${file.name}');
+      
+      // 检查文件是否已完全下载
+      // /files/download API 使用 http.ServeContent，自动支持 Range 头
+      // 如果本地文件大小等于服务器文件大小，说明文件已完全下载
+      if (await localFile.exists()) {
+        final localFileSize = await localFile.length();
+        if (localFileSize == file.size) {
+          appLogger.iWithPackage('files_provider', '_downloadWithFlutterDownloader: 文件已存在且完整，跳过下载');
+          return null; // 返回 null 表示文件已存在
+        }
+        // 文件存在但不完整，flutter_downloader 会自动断点续传
+        appLogger.iWithPackage('files_provider', '_downloadWithFlutterDownloader: 文件已存在但不完整($localFileSize/${file.size} bytes)，将断点续传');
+      }
+
       final timestamp = (DateTime.now().millisecondsSinceEpoch / 1000).floor().toString();
       final authToken = _generate1PanelAuthToken(config.apiKey, timestamp);
 
       final downloadUrl = '${config.url}${ApiConstants.buildApiPath('/files/download')}?path=${Uri.encodeComponent(file.path)}';
 
-      appLogger.iWithPackage('files_provider', '_downloadWithFlutterDownloader: 使用 FlutterDownloader 下载 ${file.name}');
+      appLogger.iWithPackage('files_provider', '_downloadWithFlutterDownloader: 下载到外部存储 ${downloadDir.path}');
 
-      // 使用 FlutterDownloader 创建下载任务
       final taskId = await FlutterDownloader.enqueue(
         url: downloadUrl,
         savedDir: downloadDir.path,
@@ -686,24 +698,7 @@ class FilesProvider extends ChangeNotifier {
       );
 
       if (taskId != null) {
-        // 创建 TransferTask 并跟踪
-        final task = TransferTask(
-          id: taskId,
-          path: file.path,
-          fileName: file.name,
-          totalSize: file.size,
-          type: TransferType.download,
-          status: TransferStatus.running,
-          localPath: '${downloadDir.path}/${file.name}',
-          createdAt: DateTime.now(),
-          downloaderTaskId: taskId,
-        );
-        
-        await TransferManager().trackDownloaderTask(taskId, task);
-        
         appLogger.iWithPackage('files_provider', '_downloadWithFlutterDownloader: 已创建下载任务 $taskId');
-        
-        // 返回任务 ID
         return taskId;
       }
       

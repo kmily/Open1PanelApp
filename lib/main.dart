@@ -29,9 +29,6 @@ void main() async {
     ignoreSsl: true,
   );
   
-  // Set up download callback
-  TransferManager().setupDownloadCallback();
-  
   runApp(
     MultiProvider(
       providers: [

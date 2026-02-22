@@ -185,7 +185,7 @@ void main() {
           path: '/remote/file.txt',
           totalSize: 2000,
           transferredSize: 1000,
-          type: TransferType.download,
+          type: TransferType.upload,
           status: TransferStatus.failed,
           error: 'Connection lost',
           createdAt: DateTime.now(),

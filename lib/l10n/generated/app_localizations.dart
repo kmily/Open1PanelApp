@@ -3608,6 +3608,12 @@ abstract class AppLocalizations {
   /// **'File not found'**
   String get transferFileNotFound;
 
+  /// No description provided for @transferFileAlreadyDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'File already downloaded'**
+  String get transferFileAlreadyDownloaded;
+
   /// No description provided for @transferFileLocationOpened.
   ///
   /// In en, this message translates to:

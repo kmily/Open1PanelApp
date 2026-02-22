@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:onepanelapp_app/core/theme/app_design_tokens.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
-import 'package:onepanelapp_app/features/settings/settings_provider.dart';
 import 'package:onepanelapp_app/api/v2/setting_v2.dart' as api;
 import 'package:onepanelapp_app/core/network/api_client_manager.dart';
 

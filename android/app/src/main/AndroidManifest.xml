@@ -36,11 +36,10 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        
-        <!-- Flutter Downloader Configuration -->
+        <!-- Flutter Downloader FileProvider for opening downloaded files -->
         <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
+            android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider"
+            android:authorities="${applicationId}.flutter_downloader.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

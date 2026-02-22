@@ -782,6 +782,7 @@
   "transferTabPending": "Pending",
   "transferTabCompleted": "Completed",
   "transferFileNotFound": "File not found",
+  "transferFileAlreadyDownloaded": "File already downloaded",
   "transferFileLocationOpened": "File location opened",
   "transferOpenFileError": "Failed to open file",
   "transferClearTitle": "Clear Completed Tasks",

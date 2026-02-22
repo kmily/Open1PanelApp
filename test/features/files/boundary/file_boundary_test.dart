@@ -265,7 +265,7 @@ void main() {
           path: '/file.txt',
           totalSize: 1000,
           transferredSize: 300,
-          type: TransferType.download,
+          type: TransferType.upload,
           status: TransferStatus.cancelled,
           createdAt: DateTime.now(),
         );

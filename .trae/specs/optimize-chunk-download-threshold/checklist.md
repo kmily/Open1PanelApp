@@ -8,24 +8,25 @@
 
 ## FlutterDownloader 初始化
 - [x] main.dart 已初始化 FlutterDownloader
-- [x] 下载回调已设置（可选）
+- [x] 下载回调已设置
 
 ## FilesProvider 集成
-- [x] `_chunkDownloadThreshold` 常量已添加（50MB）
-- [x] `downloadFile` 方法根据文件大小选择下载方式
-- [x] 大文件使用 `FlutterDownloader.enqueue()`
+- [x] 所有文件下载使用 `FlutterDownloader.enqueue()`
 - [x] 1Panel 认证头部已添加
 
 ## TransferManager 简化
-- [ ] 轮询机制已移除
-- [ ] `getDownloaderTasks()` 方法已实现
-- [ ] Hive 仅用于小文件历史记录
+- [x] Hive 下载历史已移除
+- [x] `getDownloaderTasks()` 方法已实现
+- [x] `cancelTask()` 使用 `FlutterDownloader.cancel()`
+- [x] `clearCompleted()` 已实现
 
 ## 传输管理器页面
-- [ ] 合并显示两种来源记录
-- [ ] 统一任务状态显示
+- [x] 显示 flutter_downloader 任务列表
+- [x] 统一任务状态显示
+- [x] 支持暂停/恢复/取消操作
 
 ## 测试验证
-- [ ] flutter analyze 无错误
-- [ ] 小文件下载正常（≤50MB）
-- [ ] 大文件下载正常（>50MB）
+- [x] flutter analyze 无错误（仅警告）
+- [ ] 小文件下载正常
+- [ ] 大文件下载正常
+- [ ] 取消/暂停/恢复功能正常

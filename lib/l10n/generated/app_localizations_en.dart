@@ -1862,6 +1862,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transferFileNotFound => 'File not found';
 
   @override
+  String get transferFileAlreadyDownloaded => 'File already downloaded';
+
+  @override
   String get transferFileLocationOpened => 'File location opened';
 
   @override

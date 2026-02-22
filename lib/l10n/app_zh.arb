@@ -730,6 +730,7 @@
   "transferTabPending": "等待中",
   "transferTabCompleted": "已完成",
   "transferFileNotFound": "文件不存在",
+  "transferFileAlreadyDownloaded": "文件已下载完成，无需重试",
   "transferFileLocationOpened": "已打开文件位置",
   "transferOpenFileError": "打开文件失败",
   "transferClearTitle": "清除已完成任务",

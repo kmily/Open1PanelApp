@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:equatable/equatable.dart';
 
-enum TransferType { upload, download }
+enum TransferType { upload }
 
 enum TransferStatus {
   pending,
@@ -30,7 +30,6 @@ class TransferTask extends Equatable {
   final double? speed;
   final int? eta;
   final String? localPath;
-  final String? downloaderTaskId;
 
   const TransferTask({
     required this.id,
@@ -50,7 +49,6 @@ class TransferTask extends Equatable {
     this.speed,
     this.eta,
     this.localPath,
-    this.downloaderTaskId,
   });
 
   double get progress => totalSize > 0 ? transferredSize / totalSize : 0;
@@ -83,7 +81,6 @@ class TransferTask extends Equatable {
     double? speed,
     int? eta,
     String? localPath,
-    String? downloaderTaskId,
   }) {
     return TransferTask(
       id: id ?? this.id,
@@ -103,7 +100,6 @@ class TransferTask extends Equatable {
       speed: speed ?? this.speed,
       eta: eta ?? this.eta,
       localPath: localPath ?? this.localPath,
-      downloaderTaskId: downloaderTaskId ?? this.downloaderTaskId,
     );
   }
 
@@ -124,7 +120,6 @@ class TransferTask extends Equatable {
       'startedAt': startedAt?.toIso8601String(),
       'completedAt': completedAt?.toIso8601String(),
       'localPath': localPath,
-      'downloaderTaskId': downloaderTaskId,
     };
   }
 
@@ -149,7 +144,6 @@ class TransferTask extends Equatable {
           ? DateTime.parse(json['completedAt'] as String) 
           : null,
       localPath: json['localPath'] as String?,
-      downloaderTaskId: json['downloaderTaskId'] as String?,
     );
   }
 
@@ -172,7 +166,6 @@ class TransferTask extends Equatable {
     speed,
     eta,
     localPath,
-    downloaderTaskId,
   ];
 }
 

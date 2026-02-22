@@ -2,17 +2,20 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:onepanelapp_app/core/config/api_config.dart';
 import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
 import 'package:onepanelapp_app/core/services/transfer/transfer_task.dart';
-import 'package:onepanelapp_app/core/services/file_save_service.dart';
 import 'package:onepanelapp_app/api/v2/file_v2.dart';
 import 'package:onepanelapp_app/data/models/file/file_transfer.dart';
+
+enum RetryDownloadTaskWithNewAuthResult {
+  recreated,
+  fileAlreadyDownloaded,
+  failed,
+}
 
 @pragma('vm:entry-point')
 class TransferManager extends ChangeNotifier {
@@ -20,28 +23,16 @@ class TransferManager extends ChangeNotifier {
   @pragma('vm:entry-point')
   factory TransferManager() => _instance;
   
-  TransferManager._internal() {
-    _ensureInitialized();
-  }
+  TransferManager._internal();
   
-  bool _initialized = false;
-  
-  @pragma('vm:entry-point')
-  static void downloadCallback(String id, int status, int progress) {
-    // flutter_downloader 回调在后台隔离区运行
-    // 任务状态通过 getDownloaderTasks() 查询内置 SQLite 数据库获取
-  }
-  
-  void setupDownloadCallback() {
-    FlutterDownloader.registerCallback(downloadCallback);
+  void init() {
+    // 初始化完成，flutter_downloader 使用内置 SQLite
   }
   
   /// 获取 flutter_downloader 的所有下载任务（从内置 SQLite 数据库）
   Future<List<DownloadTask>?> getDownloaderTasks() async {
     try {
-      return await FlutterDownloader.loadTasksWithRawQuery(
-        query: "SELECT * FROM task ORDER BY created_at DESC",
-      );
+      return await FlutterDownloader.loadTasks();
     } catch (e) {
       appLogger.wWithPackage('transfer', 'getDownloaderTasks: 查询失败 $e');
       return null;
@@ -52,7 +43,7 @@ class TransferManager extends ChangeNotifier {
   Future<List<DownloadTask>?> getRunningDownloaderTasks() async {
     try {
       return await FlutterDownloader.loadTasksWithRawQuery(
-        query: "SELECT * FROM task WHERE status = 2 ORDER BY created_at DESC",
+        query: "SELECT * FROM task WHERE status = 2",
       );
     } catch (e) {
       return null;
@@ -63,224 +54,193 @@ class TransferManager extends ChangeNotifier {
   Future<List<DownloadTask>?> getCompletedDownloaderTasks() async {
     try {
       return await FlutterDownloader.loadTasksWithRawQuery(
-        query: "SELECT * FROM task WHERE status = 3 ORDER BY created_at DESC",
+        query: "SELECT * FROM task WHERE status = 3",
       );
     } catch (e) {
       return null;
     }
   }
   
-  /// 获取合并后的所有下载任务（Hive 小文件 + flutter_downloader 大文件）
-  Future<List<dynamic>> getAllDownloadTasks() async {
-    final List<dynamic> allTasks = [];
-    
-    // 1. 从 Hive 获取小文件历史记录
-    allTasks.addAll(_completedTasks.values);
-    
-    // 2. 从 flutter_downloader 获取大文件记录
-    final downloaderTasks = await getDownloaderTasks();
-    if (downloaderTasks != null) {
-      allTasks.addAll(downloaderTasks);
+  /// 获取所有下载任务（仅从 flutter_downloader SQLite）
+  Future<List<DownloadTask>> getAllDownloadTasks() async {
+    final tasks = await getDownloaderTasks();
+    return tasks ?? [];
+  }
+  
+  /// 取消下载任务
+  Future<void> cancelDownloadTask(String taskId) async {
+    try {
+      await FlutterDownloader.cancel(taskId: taskId);
+      appLogger.iWithPackage('transfer', 'cancelDownloadTask: 已取消任务 $taskId');
+    } catch (e) {
+      appLogger.wWithPackage('transfer', 'cancelDownloadTask: 取消任务失败 $e');
     }
-    
-    return allTasks;
   }
   
-  /// 保存大文件下载任务（不使用 Hive，flutter_downloader 自动存储）
-  Future<void> trackDownloaderTask(String taskId, TransferTask task) async {
-    // flutter_downloader 自动存储到 SQLite，无需额外保存
-    // 这里只更新内存状态用于 UI 显示
-    _completedTasks[task.id] = task;
-    notifyListeners();
+  /// 暂停下载任务
+  Future<void> pauseDownloadTask(String taskId) async {
+    try {
+      await FlutterDownloader.pause(taskId: taskId);
+      appLogger.iWithPackage('transfer', 'pauseDownloadTask: 已暂停任务 $taskId');
+    } catch (e) {
+      appLogger.wWithPackage('transfer', 'pauseDownloadTask: 暂停任务失败 $e');
+    }
   }
   
-  Future<void> _ensureInitialized() async {
-    if (_initialized) return;
-    _initialized = true;
-    await init();
+  /// 恢复下载任务
+  Future<void> resumeDownloadTask(String taskId) async {
+    try {
+      await FlutterDownloader.resume(taskId: taskId);
+      appLogger.iWithPackage('transfer', 'resumeDownloadTask: 已恢复任务 $taskId');
+    } catch (e) {
+      appLogger.wWithPackage('transfer', 'resumeDownloadTask: 恢复任务失败 $e');
+    }
   }
+  
+  String _generate1PanelAuthToken(String apiKey, String timestamp) {
+    final authString = '1panel$apiKey$timestamp';
+    final bytes = utf8.encode(authString);
+    final digest = md5.convert(bytes);
+    return digest.toString();
+  }
+
+  /// 重试下载任务（使用新时间戳）
+  /// 不使用 FlutterDownloader.retry()，因为它会复用旧时间戳导致认证失败
+  /// 返回值：
+  /// - recreated: 成功创建新任务
+  /// - fileAlreadyDownloaded: 文件已下载完成，无需重试
+  /// - failed: 创建新任务失败
+  Future<RetryDownloadTaskWithNewAuthResult> retryDownloadTaskWithNewAuth(
+    DownloadTask task,
+  ) async {
+    try {
+      final uri = Uri.tryParse(task.url);
+      if (uri == null) {
+        appLogger.eWithPackage('transfer', 'retryDownloadTaskWithNewAuth: 无法解析 URL');
+        return RetryDownloadTaskWithNewAuthResult.failed;
+      }
+
+      final fileName = task.filename ??
+          (uri.pathSegments.isNotEmpty ? uri.pathSegments.last : null);
+      if (fileName == null || fileName.isEmpty) {
+        appLogger.eWithPackage('transfer', 'retryDownloadTaskWithNewAuth: 无法确定文件名');
+        return RetryDownloadTaskWithNewAuthResult.failed;
+      }
+
+      final file = File('${task.savedDir}/$fileName');
+      if (await file.exists()) {
+        final fileSize = await file.length();
+        final isLikelyComplete =
+            task.status == DownloadTaskStatus.complete || task.progress == 100;
+        if (fileSize > 0 && isLikelyComplete) {
+          appLogger.iWithPackage(
+            'transfer',
+            'retryDownloadTaskWithNewAuth: 文件已下载完成($fileSize bytes)，无需重试',
+          );
+          return RetryDownloadTaskWithNewAuthResult.fileAlreadyDownloaded;
+        }
+      }
+
+      // 3. 从 URL 提取文件路径
+      final filePath = uri.queryParameters['path'];
+      if (filePath == null) {
+        appLogger.eWithPackage('transfer', 'retryDownloadTaskWithNewAuth: 无法从 URL 提取文件路径');
+        return RetryDownloadTaskWithNewAuthResult.failed;
+      }
+
+      // 4. 获取服务器配置并生成新的认证
+      final config = await ApiConfigManager.getCurrentConfig();
+      if (config == null) {
+        appLogger.eWithPackage('transfer', 'retryDownloadTaskWithNewAuth: 未找到服务器配置');
+        return RetryDownloadTaskWithNewAuthResult.failed;
+      }
+
+      final timestamp = (DateTime.now().millisecondsSinceEpoch / 1000).floor().toString();
+      final authToken = _generate1PanelAuthToken(config.apiKey, timestamp);
+
+      // 5. 创建新任务（不删除部分文件，支持断点续传）
+      final newTaskId = await FlutterDownloader.enqueue(
+        url: task.url,
+        savedDir: task.savedDir,
+        fileName: fileName,
+        headers: {
+          '1Panel-Token': authToken,
+          '1Panel-Timestamp': timestamp,
+        },
+        showNotification: true,
+        openFileFromNotification: true,
+      );
+
+      if (newTaskId != null) {
+        try {
+          await FlutterDownloader.remove(taskId: task.taskId);
+          appLogger.iWithPackage(
+            'transfer',
+            'retryDownloadTaskWithNewAuth: 已创建新任务 $newTaskId，并删除旧任务 ${task.taskId}',
+          );
+        } catch (e) {
+          appLogger.wWithPackage(
+            'transfer',
+            'retryDownloadTaskWithNewAuth: 已创建新任务 $newTaskId，但删除旧任务失败: $e',
+          );
+        }
+        return RetryDownloadTaskWithNewAuthResult.recreated;
+      }
+      
+      return RetryDownloadTaskWithNewAuthResult.failed;
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('transfer', 'retryDownloadTaskWithNewAuth: 失败', error: e, stackTrace: stackTrace);
+      return RetryDownloadTaskWithNewAuthResult.failed;
+    }
+  }
+  
+  /// 删除下载任务记录
+  Future<void> deleteDownloadTask(String taskId) async {
+    try {
+      await FlutterDownloader.remove(taskId: taskId);
+      appLogger.iWithPackage('transfer', 'deleteDownloadTask: 已删除任务 $taskId');
+    } catch (e) {
+      appLogger.wWithPackage('transfer', 'deleteDownloadTask: 删除任务失败 $e');
+    }
+  }
+  
+  /// 清除已完成的下载任务
+  Future<void> clearCompletedDownloads() async {
+    try {
+      final completedTasks = await getCompletedDownloaderTasks();
+      if (completedTasks != null) {
+        for (final task in completedTasks) {
+          await FlutterDownloader.remove(taskId: task.taskId);
+        }
+      }
+      appLogger.iWithPackage('transfer', 'clearCompletedDownloads: 已清除已完成任务');
+    } catch (e) {
+      appLogger.wWithPackage('transfer', 'clearCompletedDownloads: 清除失败 $e');
+    }
+  }
+  
+
+  // ============ 上传相关代码（保留，因为 1Panel API 需要分块上传） ============
   
   final Queue<TransferTask> _pendingQueue = Queue();
   final Map<String, TransferTask> _activeTasks = {};
-  final Map<String, TransferTask> _completedTasks = {};
   
   static const int _maxConcurrent = 3;
   static const int _defaultChunkSize = 1024 * 1024;
-  static const String _tasksBoxName = 'transfer_tasks';
-  static const String _historyBoxName = 'transfer_history';
-  static const int _defaultHistoryRetentionDays = 30;
   
   FileV2Api? _api;
-  Box? _tasksBox;
-  Box? _historyBox;
-  final FileSaveService _fileSaveService = FileSaveService();
-  
-  int _historyRetentionDays = _defaultHistoryRetentionDays;
   
   Function(TransferTask task)? onTaskCompleted;
   Function(TransferTask task)? onTaskFailed;
   
   List<TransferTask> get pendingTasks => _pendingQueue.toList();
   List<TransferTask> get activeTasks => _activeTasks.values.toList();
-  List<TransferTask> get completedTasks => _completedTasks.values.toList();
-  List<TransferTask> get allTasks => [...activeTasks, ...pendingTasks, ...completedTasks];
   
   int get activeCount => _activeTasks.length;
   int get pendingCount => _pendingQueue.length;
-  int get completedCount => _completedTasks.length;
   
   void setApi(FileV2Api api) {
     _api = api;
-  }
-  
-  Future<void> init() async {
-    if (Hive.isBoxOpen(_tasksBoxName)) {
-      _tasksBox = Hive.box(_tasksBoxName);
-    } else {
-      _tasksBox = await Hive.openBox(_tasksBoxName);
-    }
-    
-    if (Hive.isBoxOpen(_historyBoxName)) {
-      _historyBox = Hive.box(_historyBoxName);
-    } else {
-      _historyBox = await Hive.openBox(_historyBoxName);
-    }
-    
-    await _loadHistory();
-    await _cleanupHistory();
-  }
-  
-  void setHistoryRetentionDays(int days) {
-    _historyRetentionDays = days;
-    _cleanupHistory();
-  }
-  
-  int get historyRetentionDays => _historyRetentionDays;
-  
-  Future<void> _loadHistory() async {
-    try {
-      if (_historyBox == null || _historyBox!.isEmpty) return;
-      
-      for (final key in _historyBox!.keys) {
-        final data = _historyBox!.get(key);
-        if (data == null) continue;
-        
-        try {
-          final task = TransferTask.fromJson(Map<String, dynamic>.from(data));
-          _completedTasks[task.id] = task;
-        } catch (e) {
-          appLogger.wWithPackage('transfer', '_loadHistory: 解析历史记录失败: $e');
-        }
-      }
-      
-      appLogger.iWithPackage('transfer', '_loadHistory: 加载了 ${_completedTasks.length} 条历史记录');
-    } catch (e, stackTrace) {
-      appLogger.eWithPackage('transfer', '_loadHistory: 加载历史记录失败', error: e, stackTrace: stackTrace);
-    }
-  }
-  
-  Future<void> _cleanupHistory() async {
-    try {
-      if (_historyBox == null || _historyBox!.isEmpty) return;
-      
-      final now = DateTime.now();
-      final cutoffDate = now.subtract(Duration(days: _historyRetentionDays));
-      final keysToDelete = <dynamic>[];
-      
-      for (final key in _historyBox!.keys) {
-        final data = _historyBox!.get(key);
-        if (data == null) continue;
-        
-        try {
-          final task = TransferTask.fromJson(Map<String, dynamic>.from(data));
-          if (task.completedAt != null && task.completedAt!.isBefore(cutoffDate)) {
-            keysToDelete.add(key);
-          }
-        } catch (e) {
-          keysToDelete.add(key);
-        }
-      }
-      
-      for (final key in keysToDelete) {
-        await _historyBox!.delete(key);
-        _completedTasks.remove(key.toString());
-      }
-      
-      if (keysToDelete.isNotEmpty) {
-        appLogger.iWithPackage('transfer', '_cleanupHistory: 清理了 ${keysToDelete.length} 条过期历史记录');
-      }
-    } catch (e, stackTrace) {
-      appLogger.eWithPackage('transfer', '_cleanupHistory: 清理历史记录失败', error: e, stackTrace: stackTrace);
-    }
-  }
-  
-  Future<void> _saveToHistory(TransferTask task) async {
-    try {
-      if (_historyBox != null) {
-        await _historyBox!.put(task.id, task.toJson());
-        appLogger.iWithPackage('transfer', '_saveToHistory: 保存历史记录 ${task.id}');
-      }
-    } catch (e) {
-      appLogger.wWithPackage('transfer', '_saveToHistory: 保存历史记录失败: $e');
-    }
-  }
-  
-  Future<void> _saveTask(TransferTask task) async {
-    try {
-      if (_tasksBox != null) {
-        await _tasksBox!.put(task.id, task.toJson());
-      }
-    } catch (e) {
-      appLogger.wWithPackage('transfer', '_saveTask: 保存任务失败: $e');
-    }
-  }
-  
-  Future<void> _deleteTask(String taskId) async {
-    try {
-      if (_tasksBox != null) {
-        await _tasksBox!.delete(taskId);
-      }
-    } catch (e) {
-      appLogger.wWithPackage('transfer', '_deleteTask: 删除任务失败: $e');
-    }
-  }
-  
-  Future<void> restoreTasks() async {
-    try {
-      if (_tasksBox == null) {
-        await init();
-      }
-      
-      if (_tasksBox == null || _tasksBox!.isEmpty) return;
-      
-      final restorableStatuses = [
-        TransferStatus.pending,
-        TransferStatus.running,
-        TransferStatus.paused,
-      ];
-      
-      for (final key in _tasksBox!.keys) {
-        final data = _tasksBox!.get(key);
-        if (data == null) continue;
-        
-        try {
-          final task = TransferTask.fromJson(Map<String, dynamic>.from(data));
-          
-          if (restorableStatuses.contains(task.status)) {
-            final restoredTask = task.copyWith(status: TransferStatus.pending);
-            _pendingQueue.add(restoredTask);
-            appLogger.iWithPackage('transfer', 'restoreTasks: 恢复任务 ${task.id} 到待处理队列');
-          }
-        } catch (e) {
-          appLogger.wWithPackage('transfer', 'restoreTasks: 解析任务失败: $e');
-        }
-      }
-      
-      notifyListeners();
-      _processQueue();
-    } catch (e, stackTrace) {
-      appLogger.eWithPackage('transfer', 'restoreTasks: 恢复任务失败', error: e, stackTrace: stackTrace);
-    }
   }
   
   Future<String> _generateTaskId(String path, TransferType type) async {
@@ -289,152 +249,37 @@ class TransferManager extends ChangeNotifier {
     return hash.substring(0, 8);
   }
   
-  Future<TransferTask> createUploadTask({
-    required String path,
-    required File file,
-    String? fileName,
-  }) async {
-    final stat = await file.stat();
-    final totalSize = stat.size;
-    final totalChunks = (totalSize / _defaultChunkSize).ceil();
-    
-    final task = TransferTask(
-      id: await _generateTaskId(path, TransferType.upload),
-      path: path,
-      fileName: fileName ?? file.path.split('/').last,
-      totalSize: totalSize,
-      type: TransferType.upload,
-      totalChunks: totalChunks,
-      createdAt: DateTime.now(),
-    );
-    
-    await _loadProgress(task);
-    
-    _pendingQueue.add(task);
-    await _saveTask(task);
-    notifyListeners();
-    _processQueue();
-    
-    return task;
-  }
-  
-  Future<TransferTask> createDownloadTask({
-    required String path,
-    required int totalSize,
-    String? fileName,
-  }) async {
-    final totalChunks = (totalSize / _defaultChunkSize).ceil();
-    
-    final task = TransferTask(
-      id: await _generateTaskId(path, TransferType.download),
-      path: path,
-      fileName: fileName ?? path.split('/').last,
-      totalSize: totalSize,
-      type: TransferType.download,
-      totalChunks: totalChunks,
-      createdAt: DateTime.now(),
-    );
-    
-    await _loadProgress(task);
-    
-    _pendingQueue.add(task);
-    await _saveTask(task);
-    notifyListeners();
-    _processQueue();
-    
-    return task;
-  }
-  
-  Future<void> _loadProgress(TransferTask task) async {
-    try {
-      final progressFile = await _getProgressFile(task.id);
-      if (await progressFile.exists()) {
-        final content = await progressFile.readAsString();
-        final data = jsonDecode(content) as Map<String, dynamic>;
-        final uploadedChunks = Set<int>.from(data['uploadedChunks'] as List);
-        
-        task = task.copyWith(
-          uploadedChunks: uploadedChunks,
-          completedChunks: uploadedChunks.length,
-          transferredSize: uploadedChunks.length * _defaultChunkSize,
-        );
-      }
-    } catch (e) {
-      appLogger.wWithPackage('transfer', '_loadProgress: 加载进度失败: $e');
-    }
-  }
-  
-  Future<File> _getProgressFile(String taskId) async {
-    final dir = await getApplicationDocumentsDirectory();
-    return File('${dir.path}/transfer_progress_$taskId.json');
-  }
-  
-  Future<void> _saveProgress(TransferTask task) async {
-    try {
-      final progressFile = await _getProgressFile(task.id);
-      final data = {
-        'id': task.id,
-        'path': task.path,
-        'uploadedChunks': task.uploadedChunks.toList(),
-        'completedChunks': task.completedChunks,
-        'transferredSize': task.transferredSize,
-      };
-      await progressFile.writeAsString(jsonEncode(data));
-    } catch (e) {
-      appLogger.wWithPackage('transfer', '_saveProgress: 保存进度失败: $e');
-    }
-  }
-  
   void _processQueue() {
     while (_activeTasks.length < _maxConcurrent && _pendingQueue.isNotEmpty) {
       final task = _pendingQueue.removeFirst();
-      _startTask(task);
+      _startUploadTask(task);
     }
   }
   
-  Future<void> _startTask(TransferTask task) async {
+  Future<void> _startUploadTask(TransferTask task) async {
     task = task.copyWith(
       status: TransferStatus.running,
       startedAt: DateTime.now(),
     );
     _activeTasks[task.id] = task;
-    await _saveTask(task);
     notifyListeners();
     
     try {
-      if (task.type == TransferType.upload) {
-        await _executeUpload(task);
-      } else {
-        await _executeDownload(task);
-      }
+      await _executeUpload(task);
       
       task = task.copyWith(
         status: TransferStatus.completed,
         completedAt: DateTime.now(),
       );
       _activeTasks.remove(task.id);
-      _completedTasks[task.id] = task;
-      
-      final progressFile = await _getProgressFile(task.id);
-      if (await progressFile.exists()) {
-        await progressFile.delete();
-      }
-      
-      // 保存到历史记录而非删除
-      await _saveToHistory(task);
-      await _deleteTask(task.id);
-      
       onTaskCompleted?.call(task);
     } catch (e, stackTrace) {
-      appLogger.eWithPackage('transfer', '_startTask: 传输失败', error: e, stackTrace: stackTrace);
+      appLogger.eWithPackage('transfer', '_startUploadTask: 上传失败', error: e, stackTrace: stackTrace);
       task = task.copyWith(
         status: TransferStatus.failed,
         error: e.toString(),
       );
       _activeTasks.remove(task.id);
-      _completedTasks[task.id] = task;
-      await _saveToHistory(task);
-      await _deleteTask(task.id);
       onTaskFailed?.call(task);
     }
     
@@ -482,183 +327,117 @@ class TransferManager extends ChangeNotifier {
       
       if (response.data?.success == true) {
         uploadedChunks.add(i);
-        final transferredSize = uploadedChunks.length * _defaultChunkSize;
         
         task = task.copyWith(
           uploadedChunks: uploadedChunks,
           completedChunks: uploadedChunks.length,
-          transferredSize: transferredSize > task.totalSize
-              ? task.totalSize
-              : transferredSize,
+          transferredSize: uploadedChunks.length * _defaultChunkSize,
         );
         _activeTasks[task.id] = task;
-        await _saveProgress(task);
         notifyListeners();
       }
     }
   }
   
-  Future<void> _executeDownload(TransferTask task) async {
-    if (_api == null) throw Exception('API not initialized');
+  Future<TransferTask> createUploadTask({
+    required String path,
+    required File file,
+    String? fileName,
+  }) async {
+    final stat = await file.stat();
+    final totalSize = stat.size;
+    final totalChunks = (totalSize / _defaultChunkSize).ceil();
     
-    final totalChunks = task.totalChunks;
-    final downloadedChunks = Set<int>.from(task.uploadedChunks);
-    final chunks = <int, Uint8List>{};
-    
-    for (var i = 0; i < totalChunks; i++) {
-      if (downloadedChunks.contains(i)) continue;
-      
-      final activeTask = _activeTasks[task.id];
-      if (activeTask?.status == TransferStatus.paused ||
-          activeTask?.status == TransferStatus.cancelled) {
-        throw Exception('Transfer ${activeTask?.status}');
-      }
-      
-      final response = await _api!.chunkDownload(FileChunkDownload(
-        path: task.path,
-        chunkSize: _defaultChunkSize,
-        chunkNumber: i + 1,
-      ));
-      
-      if (response.data?.data != null) {
-        final bytes = base64Decode(response.data!.data!);
-        chunks[i] = bytes;
-        downloadedChunks.add(i);
-        
-        final transferredSize = downloadedChunks.length * _defaultChunkSize;
-        
-        task = task.copyWith(
-          uploadedChunks: downloadedChunks,
-          completedChunks: downloadedChunks.length,
-          transferredSize: transferredSize > task.totalSize
-              ? task.totalSize
-              : transferredSize,
-        );
-        _activeTasks[task.id] = task;
-        await _saveProgress(task);
-        await _saveTask(task);
-        notifyListeners();
-      }
-      
-      if (response.data?.isLastChunk == true) break;
-    }
-    
-    final bytesBuilder = BytesBuilder();
-    for (var i = 0; i < totalChunks; i++) {
-      if (chunks.containsKey(i)) {
-        bytesBuilder.add(chunks[i]!);
-      }
-    }
-    final fileBytes = bytesBuilder.takeBytes();
-    
-    final saveResult = await _fileSaveService.saveFile(
-      fileName: task.fileName ?? 'download_file',
-      bytes: fileBytes,
+    final task = TransferTask(
+      id: await _generateTaskId(path, TransferType.upload),
+      path: path,
+      fileName: fileName ?? file.path.split('/').last,
+      totalSize: totalSize,
+      type: TransferType.upload,
+      totalChunks: totalChunks,
+      createdAt: DateTime.now(),
     );
     
-    if (saveResult.success && saveResult.filePath != null) {
-      task = task.copyWith(localPath: saveResult.filePath);
-      _activeTasks[task.id] = task;
-      appLogger.iWithPackage('transfer', '_executeDownload: 文件已保存到 ${saveResult.filePath}');
-    } else {
-      appLogger.wWithPackage('transfer', '_executeDownload: 保存文件失败: ${saveResult.errorMessage}');
-    }
+    _pendingQueue.add(task);
+    notifyListeners();
+    _processQueue();
+    
+    return task;
   }
   
   void pauseTask(String taskId) {
     final task = _activeTasks[taskId];
     if (task != null) {
-      final pausedTask = task.copyWith(status: TransferStatus.paused);
-      _activeTasks[taskId] = pausedTask;
-      _saveTask(pausedTask);
+      _activeTasks[taskId] = task.copyWith(status: TransferStatus.paused);
       notifyListeners();
     }
   }
   
   void resumeTask(String taskId) {
-    TransferTask? task = _activeTasks[taskId] ?? _completedTasks[taskId];
-    if (task != null && task.isResumable) {
-      _activeTasks.remove(taskId);
-      _completedTasks.remove(taskId);
-      
-      final resumedTask = task.copyWith(status: TransferStatus.pending);
-      _pendingQueue.add(resumedTask);
-      _saveTask(resumedTask);
+    TransferTask? task = _activeTasks[taskId];
+    if (task != null && task.status == TransferStatus.paused) {
+      _activeTasks[taskId] = task.copyWith(status: TransferStatus.running);
       notifyListeners();
       _processQueue();
     }
   }
   
-  void cancelTask(String taskId) async {
-    // 先尝试取消 flutter_downloader 任务
-    try {
-      await FlutterDownloader.cancel(taskId: taskId);
-      appLogger.iWithPackage('transfer', 'cancelTask: 已取消 flutter_downloader 任务 $taskId');
-    } catch (e) {
-      appLogger.wWithPackage('transfer', 'cancelTask: 取消 flutter_downloader 任务失败 $e');
+  void cancelUploadTask(String taskId) {
+    TransferTask? task = _activeTasks[taskId];
+    if (task != null) {
+      _activeTasks[taskId] = task.copyWith(status: TransferStatus.cancelled);
+      _activeTasks.remove(taskId);
+      notifyListeners();
+      _processQueue();
+    }
+  }
+  
+  /// 统一取消任务（自动判断是下载还是上传）
+  Future<void> cancelTask(String taskId) async {
+    // 先检查是否是上传任务
+    if (_activeTasks.containsKey(taskId)) {
+      cancelUploadTask(taskId);
+      return;
     }
     
-    // 同时更新内存中的任务状态
-    TransferTask? task = _activeTasks[taskId];
-    task ??= _pendingQueue.firstWhere(
-      (t) => t.id == taskId,
-      orElse: () => throw Exception('Task not found'),
-    );
-    
-    _activeTasks.remove(taskId);
-    _pendingQueue.removeWhere((t) => t.id == taskId);
-    
-    final cancelledTask = task.copyWith(
-      status: TransferStatus.cancelled,
-      completedAt: DateTime.now(),
-    );
-    _completedTasks[taskId] = cancelledTask;
-    _deleteTask(taskId);
-    notifyListeners();
-    _processQueue();
+    // 否则作为下载任务处理
+    await cancelDownloadTask(taskId);
   }
   
-  void clearCompleted() {
-    _completedTasks.clear();
-    _historyBox?.clear();
+  /// 清除已完成任务（上传和下载）
+  Future<void> clearCompleted() async {
+    // 清除已完成的下载任务
+    await clearCompletedDownloads();
+    
+    // 清除已完成的上传任务（从内存中移除）
+    _activeTasks.removeWhere((key, task) => 
+        task.status == TransferStatus.completed || 
+        task.status == TransferStatus.cancelled);
+    
     notifyListeners();
   }
   
-  void clearHistory() {
-    _completedTasks.clear();
-    _historyBox?.clear();
-    notifyListeners();
+  /// 获取所有任务（合并上传和下载）
+  /// 注意：此方法返回 Future，UI 层需要使用 FutureBuilder
+  Future<List<dynamic>> getAllTasks() async {
+    final downloadTasks = await getAllDownloadTasks();
+    final uploadTasks = [..._activeTasks.values, ..._pendingQueue];
+    return [...downloadTasks, ...uploadTasks];
   }
   
-  /// 从外部添加已完成的下载任务（用于 FilesProvider 直接下载）
-  Future<void> addCompletedTaskFromDownload({
-    required String fileName,
-    required String remotePath,
-    required String localPath,
-    required int fileSize,
-  }) async {
-    final task = TransferTask(
-      id: DateTime.now().millisecondsSinceEpoch.toRadixString(16),
-      path: remotePath,
-      fileName: fileName,
-      totalSize: fileSize,
-      type: TransferType.download,
-      status: TransferStatus.completed,
-      localPath: localPath,
-      createdAt: DateTime.now(),
-      completedAt: DateTime.now(),
-    );
-    
-    _completedTasks[task.id] = task;
-    await _saveToHistory(task);
-    notifyListeners();
+  /// 获取已完成的任务
+  Future<List<dynamic>> getCompletedTasks() async {
+    final downloadTasks = await getCompletedDownloaderTasks() ?? [];
+    final uploadTasks = _activeTasks.values
+        .where((t) => t.status == TransferStatus.completed)
+        .toList();
+    return [...downloadTasks, ...uploadTasks];
   }
   
   @override
   void dispose() {
     _pendingQueue.clear();
     _activeTasks.clear();
-    _completedTasks.clear();
     super.dispose();
   }
 }
