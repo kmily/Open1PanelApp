@@ -157,7 +157,11 @@ class AppV2Api {
       ApiConstants.buildApiPath('/apps/search'),
       data: request.toJson(),
     );
-    final data = response.data as Map<String, dynamic>;
+    final data = response.data;
+    if (data is! Map<String, dynamic>) {
+      // Return empty result instead of crashing
+      return AppSearchResponse(items: [], total: 0);
+    }
     return _parseAppSearchResponse(data['data']);
   }
 
@@ -254,7 +258,14 @@ class AppV2Api {
       data: request.toJson(),
     );
     final data = response.data as Map<String, dynamic>;
-    return AppInstalledCheckResponse.fromJson(data['data'] as Map<String, dynamic>);
+    final innerData = Map<String, dynamic>.from(data['data'] as Map<String, dynamic>);
+    
+    // Ensure exist is boolean, default to false if null
+    if (innerData['exist'] == null) {
+      innerData['exist'] = false;
+    }
+    
+    return AppInstalledCheckResponse.fromJson(innerData);
   }
 
   /// 获取应用安装配置（旧版/默认配置）

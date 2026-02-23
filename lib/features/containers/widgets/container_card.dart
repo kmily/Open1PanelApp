@@ -114,8 +114,8 @@ class ContainerCard extends StatelessWidget {
           .map((p) => '${p.hostPort}:${p.containerPort}')
           .join(', ');
     }
-    if (container.ports != null) {
-      return container.ports.toString();
+    if (container.ports != null && container.ports!.isNotEmpty) {
+      return container.ports!.join(', ');
     }
     return '';
   }

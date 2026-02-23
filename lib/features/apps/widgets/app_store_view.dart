@@ -18,6 +18,7 @@ class AppStoreView extends StatefulWidget {
 
 class _AppStoreViewState extends State<AppStoreView> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   final Set<String> _selectedTags = {};
   // Common tags/categories found in typical app stores
   final List<String> _availableTags = [
@@ -34,14 +35,23 @@ class _AppStoreViewState extends State<AppStoreView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadApps();
+      _loadApps(refresh: true);
     });
+    _scrollController.addListener(_onScroll);
   }
 
-  Future<void> _loadApps() async {
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _loadApps(refresh: false);
+    }
+  }
+
+  Future<void> _loadApps({bool refresh = false}) async {
     if (!mounted) return;
     final provider = context.read<AppStoreProvider>();
     await provider.loadApps(
+      refresh: refresh,
       name: _searchController.text.isEmpty ? null : _searchController.text,
       tags: _selectedTags.isEmpty ? null : _selectedTags.toList(),
     );
@@ -55,7 +65,7 @@ class _AppStoreViewState extends State<AppStoreView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.appStoreSyncSuccess)),
         );
-        _loadApps();
+        _loadApps(refresh: true);
       }
     } catch (e) {
       if (mounted) {
@@ -69,6 +79,7 @@ class _AppStoreViewState extends State<AppStoreView> {
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -94,7 +105,7 @@ class _AppStoreViewState extends State<AppStoreView> {
                     onPressed: _syncApps,
                   ),
                 ],
-                onSubmitted: (_) => _loadApps(),
+                onSubmitted: (_) => _loadApps(refresh: true),
               ),
               const SizedBox(height: 12),
               SingleChildScrollView(
@@ -115,7 +126,7 @@ class _AppStoreViewState extends State<AppStoreView> {
                               _selectedTags.remove(tag);
                             }
                           });
-                          _loadApps();
+                          _loadApps(refresh: true);
                         },
                       ),
                     );
@@ -144,7 +155,7 @@ class _AppStoreViewState extends State<AppStoreView> {
                       Text(provider.error!),
                       const SizedBox(height: 16),
                       FilledButton(
-                        onPressed: _loadApps,
+                        onPressed: () => _loadApps(refresh: true),
                         child: Text(l10n.commonRetry),
                       ),
                     ],
@@ -158,9 +169,10 @@ class _AppStoreViewState extends State<AppStoreView> {
 
               return RefreshIndicator(
                 onRefresh: () async {
-                  await _syncApps();
+                  await _loadApps(refresh: true);
                 },
                 child: GridView.builder(
+                  controller: _scrollController,
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 400,
@@ -168,8 +180,16 @@ class _AppStoreViewState extends State<AppStoreView> {
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
                   ),
-                  itemCount: provider.apps.length,
+                  itemCount: provider.apps.length + (provider.hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
+                    if (index == provider.apps.length) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
                     final app = provider.apps[index];
                     return _buildAppCard(context, app, l10n);
                   },
@@ -247,7 +267,7 @@ class _AppStoreViewState extends State<AppStoreView> {
     );
 
     if (result == true && mounted) {
-      _loadApps();
+      _loadApps(refresh: true);
     }
   }
 }

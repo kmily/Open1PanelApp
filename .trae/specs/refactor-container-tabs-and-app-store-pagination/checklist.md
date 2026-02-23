@@ -1,0 +1,4 @@
+- [x] Container Management page has 9 scrollable tabs
+- [x] "Orchestration", "Images", "Networks", "Volumes" tabs load correctly in Container Management
+- [x] App Store loads more apps when scrolling to the bottom
+- [x] App Store handles empty/malformed API responses without crashing

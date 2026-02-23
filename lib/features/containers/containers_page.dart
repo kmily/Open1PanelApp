@@ -6,6 +6,10 @@ import 'package:onepanelapp_app/features/containers/widgets/container_card.dart'
 import '../../shared/widgets/app_card.dart';
 import '../../widgets/main_layout.dart';
 import 'containers_provider.dart';
+import 'package:onepanelapp_app/features/orchestration/compose_page.dart';
+import 'package:onepanelapp_app/features/orchestration/image_page.dart';
+import 'package:onepanelapp_app/features/orchestration/network_page.dart';
+import 'package:onepanelapp_app/features/orchestration/volume_page.dart';
 
 class ContainersPage extends StatefulWidget {
   const ContainersPage({super.key});
@@ -21,7 +25,7 @@ class _ContainersPageState extends State<ContainersPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 9, vsync: this);
     // 页面加载时获取数据
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ContainersProvider>().loadAll();
@@ -59,37 +63,42 @@ class _ContainersPageState extends State<ContainersPage>
           ],
           bottom: TabBar(
             controller: _tabController,
+            isScrollable: true,
             tabs: const [
+              Tab(text: '概览'),
               Tab(text: '容器'),
+              Tab(text: '编排'),
               Tab(text: '镜像'),
+              Tab(text: '网络'),
+              Tab(text: '存储卷'),
+              Tab(text: '仓库'),
+              Tab(text: '编排模板'),
+              Tab(text: '配置'),
             ],
             indicatorColor: colorScheme.primary,
             labelColor: colorScheme.primary,
             unselectedLabelColor: colorScheme.onSurfaceVariant,
           ),
         ),
-        body: Consumer<ContainersProvider>(
-          builder: (context, provider, child) {
-            final data = provider.data;
-
-            // 显示错误
-            if (data.error != null) {
-              return _ErrorView(
-                error: data.error!,
-                onRetry: () => provider.loadAll(),
-              );
-            }
-
-            // 显示加载状态
-            if (data.isLoading && data.containers.isEmpty) {
-              return const _LoadingView();
-            }
-
-            return TabBarView(
-              controller: _tabController,
-              children: [
-                // 容器标签页
-                _ContainersTab(
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            // 概览
+            const _PlaceholderTab(title: '概览', icon: Icons.dashboard),
+            // 容器标签页 (保留原有实现)
+            Consumer<ContainersProvider>(
+              builder: (context, provider, child) {
+                final data = provider.data;
+                if (data.error != null) {
+                  return _ErrorView(
+                    error: data.error!,
+                    onRetry: () => provider.loadAll(),
+                  );
+                }
+                if (data.isLoading && data.containers.isEmpty) {
+                  return const _LoadingView();
+                }
+                return _ContainersTab(
                   containers: data.containers,
                   stats: data.containerStats,
                   isLoading: data.isLoading,
@@ -98,18 +107,24 @@ class _ContainersPageState extends State<ContainersPage>
                   onStop: (id) => provider.stopContainer(id),
                   onRestart: (id) => provider.restartContainer(id),
                   onDelete: (id) => _showDeleteContainerDialog(context, id, provider),
-                ),
-                // 镜像标签页
-                _ImagesTab(
-                  images: data.images,
-                  stats: data.imageStats,
-                  isLoading: data.isLoading,
-                  onRefresh: () => provider.refresh(),
-                  onDelete: (id) => _showDeleteImageDialog(context, id, provider),
-                ),
-              ],
-            );
-          },
+                );
+              },
+            ),
+            // 编排
+            const ComposePage(),
+            // 镜像
+            const ImagePage(),
+            // 网络
+            const NetworkPage(),
+            // 存储卷
+            const VolumePage(),
+            // 仓库
+            const _PlaceholderTab(title: '仓库', icon: Icons.store),
+            // 编排模板
+            const _PlaceholderTab(title: '编排模板', icon: Icons.description),
+            // 配置
+            const _PlaceholderTab(title: '配置', icon: Icons.settings),
+          ],
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
@@ -159,39 +174,32 @@ class _ContainersPageState extends State<ContainersPage>
       ),
     );
   }
+}
 
-  void _showDeleteImageDialog(
-    BuildContext context,
-    String imageId,
-    ContainersProvider provider,
-  ) {
-    final parentContext = context;
-    showDialog(
-      context: parentContext,
-      builder: (dialogContext) => AlertDialog(
-        icon: const Icon(Icons.delete_outline, color: Colors.red),
-        title: const Text('删除镜像'),
-        content: const Text('确定要删除这个镜像吗？此操作不可撤销。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.pop(dialogContext);
-              final success = await provider.deleteImage(imageId);
-              if (!parentContext.mounted) return;
-              if (success) {
-                ScaffoldMessenger.of(parentContext).showSnackBar(
-                  const SnackBar(content: Text('镜像已删除')),
-                );
-              }
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
+/// 占位标签页
+class _PlaceholderTab extends StatelessWidget {
+  final String title;
+  final IconData icon;
+
+  const _PlaceholderTab({
+    required this.title,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 64, color: colorScheme.outline),
+          const SizedBox(height: 16),
+          Text(
+            '$title 功能开发中',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
-            child: const Text('删除'),
           ),
         ],
       ),
@@ -343,10 +351,10 @@ class _ContainersTab extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 12),
                   child: ContainerCard(
                     container: containerInfo,
-                    onStart: () => onStart(containerInfo.id),
-                    onStop: () => onStop(containerInfo.id),
-                    onRestart: () => onRestart(containerInfo.id),
-                    onDelete: () => onDelete(containerInfo.id),
+                    onStart: () => onStart(containerInfo.name),
+                    onStop: () => onStop(containerInfo.name),
+                    onRestart: () => onRestart(containerInfo.name),
+                    onDelete: () => onDelete(containerInfo.name),
                     onTap: () {
                       Navigator.pushNamed(
                         context,
@@ -368,84 +376,6 @@ class _ContainersTab extends StatelessWidget {
                         arguments: containerInfo,
                       );
                     },
-                  ),
-                );
-              }),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// 镜像标签页
-class _ImagesTab extends StatelessWidget {
-  final List<dynamic> images;
-  final ImageStats stats;
-  final bool isLoading;
-  final Future<void> Function() onRefresh;
-  final void Function(String) onDelete;
-
-  const _ImagesTab({
-    required this.images,
-    required this.stats,
-    required this.isLoading,
-    required this.onRefresh,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
-    return RefreshIndicator(
-      onRefresh: onRefresh,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 镜像统计卡片
-            _StatsCard(
-              title: '镜像统计',
-              stats: [
-                _StatItem(
-                  title: '总数',
-                  value: stats.total.toString(),
-                  color: colorScheme.primary,
-                  icon: Icons.image,
-                ),
-                _StatItem(
-                  title: '已使用',
-                  value: stats.used.toString(),
-                  color: Colors.green,
-                  icon: Icons.check_circle,
-                ),
-                _StatItem(
-                  title: '未使用',
-                  value: stats.unused.toString(),
-                  color: Colors.grey,
-                  icon: Icons.hide_image,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            
-            // 镜像列表
-            if (images.isEmpty && !isLoading)
-              const _EmptyView(
-                icon: Icons.image_outlined,
-                title: '暂无镜像',
-                subtitle: '拉取或构建镜像后将显示在这里',
-              )
-            else
-              ...images.map((image) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _ImageCard(
-                    image: image,
-                    onDelete: () => onDelete(image.id ?? ''),
                   ),
                 );
               }),
@@ -564,99 +494,5 @@ class _EmptyView extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-/// 镜像卡片
-class _ImageCard extends StatelessWidget {
-  final dynamic image;
-  final VoidCallback onDelete;
-
-  const _ImageCard({
-    required this.image,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final repoTags = image.repoTags ?? [];
-    final name = repoTags.isNotEmpty ? repoTags.first : '未命名镜像';
-    
-    return AppCard(
-      title: name,
-      trailing: IconButton(
-        icon: const Icon(Icons.delete_outline),
-        color: Colors.red,
-        onPressed: onDelete,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '大小: ${_formatSize(image.size ?? 0)}',
-            style: TextStyle(
-              color: colorScheme.onSurfaceVariant,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '创建时间: ${_formatTime(_parseTimestamp(image.created))}',
-            style: TextStyle(
-              color: colorScheme.onSurfaceVariant,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              FilledButton.tonal(
-                onPressed: () {
-                  // TODO: 创建容器
-                },
-                child: const Text('创建容器'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatSize(int bytes) {
-    if (bytes < 1024) return '${bytes}B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)}KB';
-    if (bytes < 1024 * 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)}MB';
-    }
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)}GB';
-  }
-
-  int _parseTimestamp(dynamic created) {
-    if (created == null) return 0;
-    if (created is int) return created;
-    if (created is DateTime) return created.millisecondsSinceEpoch ~/ 1000;
-    if (created is String) {
-      final parsedInt = int.tryParse(created);
-      if (parsedInt != null) return parsedInt;
-      final parsedDate = DateTime.tryParse(created);
-      if (parsedDate != null) {
-        return parsedDate.millisecondsSinceEpoch ~/ 1000;
-      }
-    }
-    return 0;
-  }
-
-  String _formatTime(int timestamp) {
-    final date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
-    final now = DateTime.now();
-    final diff = now.difference(date);
-    
-    if (diff.inDays > 0) return '${diff.inDays}天前';
-    if (diff.inHours > 0) return '${diff.inHours}小时前';
-    if (diff.inMinutes > 0) return '${diff.inMinutes}分钟前';
-    return '刚刚';
   }
 }

@@ -517,7 +517,7 @@ class PageContainer extends Equatable {
     this.orderBy = 'createdAt',
     this.page = 1,
     this.pageSize = 10,
-    this.state,
+    this.state = 'all',
   });
 
   factory PageContainer.fromJson(Map<String, dynamic> json) {
@@ -529,7 +529,7 @@ class PageContainer extends Equatable {
       orderBy: json['orderBy'] as String? ?? 'createdAt',
       page: json['page'] as int? ?? 1,
       pageSize: json['pageSize'] as int? ?? 10,
-      state: json['state'] as String?,
+      state: json['state'] as String? ?? 'all',
     );
   }
 
@@ -542,7 +542,7 @@ class PageContainer extends Equatable {
       'orderBy': orderBy,
       'page': page,
       'pageSize': pageSize,
-      if (state != null) 'state': state,
+      'state': state ?? 'all',
     };
   }
 
@@ -569,7 +569,7 @@ class ContainerInfo extends Equatable {
   final String image;
   final String status;
   final String state;
-  final int? ports;
+  final List<String>? ports;
   final String? createTime;
   final String? ipAddress;
   final String? network;
@@ -598,15 +598,17 @@ class ContainerInfo extends Equatable {
 
   factory ContainerInfo.fromJson(Map<String, dynamic> json) {
     return ContainerInfo(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      image: json['image'] as String,
-      status: json['status'] as String,
-      state: json['state'] as String,
-      ports: json['ports'] as int?,
+      id: (json['id'] ?? json['containerID']) as String? ?? '',
+      name: json['name'] as String? ?? '',
+      image: (json['image'] ?? json['imageName']) as String? ?? '',
+      status: (json['status'] ?? json['runTime']) as String? ?? '',
+      state: json['state'] as String? ?? '',
+      ports: (json['ports'] is List) ? (json['ports'] as List).cast<String>() : null,
       createTime: json['createTime'] as String?,
       ipAddress: json['ipAddress'] as String?,
-      network: json['network'] as String?,
+      network: (json['network'] is List) 
+          ? (json['network'] as List).join(', ') 
+          : json['network'] as String?,
       cpuUsage: json['cpuUsage'] as String?,
       memoryUsage: json['memoryUsage'] as String?,
       labels: (json['labels'] as List?)?.cast<String>(),

@@ -29,11 +29,10 @@ class AppService extends BaseComponent {
     return _api!;
   }
 
-  Future<List<AppItem>> searchApps(AppSearchRequest request) {
+  Future<AppSearchResponse> searchApps(AppSearchRequest request) {
     return runGuarded(() async {
       final api = await _ensureApi();
-      final response = await api.searchApps(request);
-      return response.items;
+      return api.searchApps(request);
     });
   }
 

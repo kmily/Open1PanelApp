@@ -24,8 +24,12 @@ class ContainerService extends BaseComponent {
   Future<List<ContainerInfo>> listContainers() {
     return runGuarded(() async {
       final api = await _ensureApi();
-      final response = await api.listContainers();
-      return response.data ?? [];
+      final response = await api.searchContainers(PageContainer(
+        page: 1,
+        pageSize: 100,
+        state: 'all',
+      ));
+      return response.data?.items ?? [];
     });
   }
 
