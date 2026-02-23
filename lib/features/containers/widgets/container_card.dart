@@ -1,112 +1,104 @@
 import 'package:flutter/material.dart';
-import '../../../data/models/app_models.dart';
-import '../../../shared/widgets/app_card.dart';
-import 'app_icon.dart';
+import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
+import 'package:onepanelapp_app/data/models/container_models.dart' hide Container;
+import 'package:onepanelapp_app/shared/widgets/app_card.dart';
 
-/// 已安装应用卡片
-class InstalledAppCard extends StatelessWidget {
-  final AppInstallInfo app;
-  final VoidCallback onStart;
-  final VoidCallback onStop;
-  final VoidCallback onRestart;
-  final VoidCallback onUninstall;
+class ContainerCard extends StatelessWidget {
+  final ContainerInfo container;
+  final VoidCallback? onStart;
+  final VoidCallback? onStop;
+  final VoidCallback? onRestart;
+  final VoidCallback? onDelete;
+  final VoidCallback? onLogs;
+  final VoidCallback? onTerminal;
+  final VoidCallback? onTap;
 
-  const InstalledAppCard({
+  const ContainerCard({
     super.key,
-    required this.app,
-    required this.onStart,
-    required this.onStop,
-    required this.onRestart,
-    required this.onUninstall,
+    required this.container,
+    this.onStart,
+    this.onStop,
+    this.onRestart,
+    this.onDelete,
+    this.onLogs,
+    this.onTerminal,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isRunning = app.status?.toLowerCase() == 'running';
+    final l10n = context.l10n;
+    final isRunning = container.state.toLowerCase() == 'running';
     final statusColor = isRunning ? Colors.green : Colors.orange;
 
     return AppCard(
-      leading: AppIcon(
-        appId: app.appId,
-        appKey: app.appKey,
-        iconUrl: app.icon,
-        size: 48,
-      ),
-      title: app.appName ?? app.name ?? '未命名应用',
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (app.name != null && app.name != app.appName)
-            Text(
-              app.name!,
-              style: TextStyle(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: 13,
-              ),
-            ),
-          Text(app.version ?? '未知版本'),
-        ],
-      ),
+      title: container.name,
+      subtitle: Text(container.image),
       trailing: _StatusChip(
-        status: isRunning ? '运行中' : '已停止',
+        status: isRunning ? l10n.containerStatusRunning : l10n.containerStatusStopped,
         color: statusColor,
       ),
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          '/app-detail',
-          arguments: {
-            'appId': app.appId?.toString(),
-            'key': app.appKey,
-            'version': app.version,
-            'type': app.appType,
-          },
-        );
-      },
+      onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (app.version != null)
-            Text(
-              '版本: ${app.version}',
-              style: TextStyle(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: 14,
+          if (container.ports != null || (container.portBindings != null && container.portBindings!.isNotEmpty))
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Text(
+                '${l10n.containerInfoPorts}: ${_formatPorts(container)}',
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 14,
+                ),
               ),
             ),
-          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               if (isRunning) ...[
                 _ActionButton(
                   icon: Icons.stop,
-                  label: '停止',
+                  label: l10n.containerActionStop,
                   color: Colors.orange,
                   onTap: onStop,
                 ),
                 const SizedBox(width: 8),
                 _ActionButton(
                   icon: Icons.restart_alt,
-                  label: '重启',
+                  label: l10n.containerActionRestart,
                   color: colorScheme.primary,
                   onTap: onRestart,
                 ),
               ] else ...[
                 _ActionButton(
                   icon: Icons.play_arrow,
-                  label: '启动',
+                  label: l10n.containerActionStart,
                   color: Colors.green,
                   onTap: onStart,
                 ),
               ],
               const SizedBox(width: 8),
               _ActionButton(
+                icon: Icons.terminal,
+                label: l10n.containerActionTerminal,
+                color: colorScheme.secondary,
+                onTap: onTerminal,
+              ),
+              const SizedBox(width: 8),
+              _ActionButton(
+                icon: Icons.description_outlined,
+                label: l10n.containerActionLogs,
+                color: colorScheme.tertiary,
+                onTap: onLogs,
+              ),
+              const SizedBox(width: 8),
+              _ActionButton(
                 icon: Icons.delete_outline,
-                label: '卸载',
-                color: Colors.red,
-                onTap: onUninstall,
+                label: l10n.containerActionDelete,
+                color: colorScheme.error,
+                onTap: onDelete,
               ),
             ],
           ),
@@ -114,9 +106,21 @@ class InstalledAppCard extends StatelessWidget {
       ),
     );
   }
+
+  String _formatPorts(ContainerInfo container) {
+    if (container.portBindings != null && container.portBindings!.isNotEmpty) {
+      return container.portBindings!
+          .take(3)
+          .map((p) => '${p.hostPort}:${p.containerPort}')
+          .join(', ');
+    }
+    if (container.ports != null) {
+      return container.ports.toString();
+    }
+    return '';
+  }
 }
 
-/// 状态标签
 class _StatusChip extends StatelessWidget {
   final String status;
   final Color color;
@@ -146,18 +150,17 @@ class _StatusChip extends StatelessWidget {
   }
 }
 
-/// 操作按钮
 class _ActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const _ActionButton({
     required this.icon,
     required this.label,
     required this.color,
-    required this.onTap,
+    this.onTap,
   });
 
   @override

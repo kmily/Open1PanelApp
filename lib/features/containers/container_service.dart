@@ -47,10 +47,17 @@ class ContainerService extends BaseComponent {
     });
   }
 
-  Future<void> stopContainer(String containerId) {
+  Future<void> stopContainer(String containerId, {bool force = false}) {
     return runGuarded(() async {
       final api = await _ensureApi();
-      await api.stopContainer([containerId]);
+      await api.stopContainer([containerId], force: force);
+    });
+  }
+
+  Future<void> killContainer(String containerId) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      await api.killContainer([containerId]);
     });
   }
 
@@ -72,6 +79,32 @@ class ContainerService extends BaseComponent {
     return runGuarded(() async {
       final api = await _ensureApi();
       await api.removeImage(BatchDelete(ids: [imageId]));
+    });
+  }
+
+  Future<ContainerStats> getContainerStats(String containerId) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      final response = await api.getContainerStats(containerId);
+      return response.data!;
+    });
+  }
+
+  Future<String> getContainerLogs(String containerId, {String? since, String? tail}) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      // Using downloadContainerLog for now as it returns string content
+      // Or we can use getContainerLogs if we want structured logs
+      final response = await api.downloadContainerLog(containerId);
+      return response.data ?? '';
+    });
+  }
+
+  Future<String> inspectContainer(String containerName) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      final response = await api.inspectContainer(InspectReq(name: containerName));
+      return response.data ?? '';
     });
   }
 }

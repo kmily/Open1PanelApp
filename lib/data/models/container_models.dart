@@ -559,6 +559,9 @@ class PageContainer extends Equatable {
       ];
 }
 
+/// 容器信息模型 (对应 Docker Container)
+typedef Container = ContainerInfo;
+
 /// 容器信息模型
 class ContainerInfo extends Equatable {
   final String id;

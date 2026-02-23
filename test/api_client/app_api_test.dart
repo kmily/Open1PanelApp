@@ -474,4 +474,40 @@ void main() {
       }
     });
   });
+
+  // 7. Edge Cases & Error Handling
+  group('Edge Cases', () {
+    test('Get App Icon - Invalid ID (404/500)', () async {
+      try {
+        await api.getAppIcon('999999');
+      } catch (e) {
+        debugPrint('Expected error for invalid icon ID: $e');
+        expect(e, isA<DioException>());
+      }
+    });
+
+    test('Get App Detail - Invalid ID', () async {
+      try {
+        await api.getAppDetail('999999', 'latest', 'unknown');
+        fail('Should throw exception');
+      } catch (e) {
+        expect(e, isA<DioException>());
+        logResponse('getAppDetail_Error', e.toString());
+      }
+    });
+
+    test('Install App - Missing Required Fields', () async {
+      try {
+        // Sending empty name which should be required
+        await api.installApp(AppInstallCreateRequest(
+          name: '',
+          appDetailId: 0,
+          // params missing
+        ));
+        fail('Should throw exception');
+      } catch (e) {
+        debugPrint('Expected error for missing fields: $e');
+      }
+    });
+  });
 }

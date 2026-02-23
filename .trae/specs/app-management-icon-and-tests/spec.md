@@ -1,41 +1,44 @@
-# App Management Icons and Comprehensive Testing
+# App Management API Fixes and Consistency Refactor
 
 ## Why
-Users reported missing app icons and incomplete test coverage for the App Management module. The current implementation uses `appId` for icon fetching which fails for some apps (should use `appKey`), and the `AppCard` widget lacks icon support. Additionally, `AppDetailPage` fails completely when backend returns a "docker-compose" error, preventing users from seeing any info.
+Users reported API parsing exceptions (e.g., "unexpected end of JSON input", "NetworkException") and mismatches between the App Management module and the API definition (`app_api_analysis.json`). The current implementation lacks robustness against backend errors and may have field/type inconsistencies.
 
 ## What Changes
-- **App Icons**: Implement `AppIcon` widget that handles fetching icons by `key` (primary) or `id` (fallback) and caches them.
-- **App Store UI**: Update `AppCard` and `AppStoreView` to display app icons.
-- **App Detail Page**:
-  - Update to use `AppIcon`.
-  - Handle `getAppDetail` failures gracefully (show partial info from list item if detailed fetch fails).
-- **Testing**: Expand `app_api_test.dart` to strictly follow the "Module Adaptation Workflow":
-  - Cover all 32 endpoints.
-  - Print full request/response bodies.
-  - Test parameter boundaries.
-  - Verify `getAppIcon` with both ID and Key.
+- **Refactor `AppV2Api`**: Ensure strict alignment with `app_api_analysis.json` paths and parameters. Fix duplicate parameter naming in `getAppDetail`.
+- **Refactor Models**: Review `AppItem`, `AppInstall`, `AppInstallCreateRequest` for consistency.
+- **Update UI**: Enhance `AppDetailPage`, `AppIcon`, `AppStoreView`, `AppCard` to strictly use the defined models and handle null/error states gracefully.
+- **Enhanced Testing**:
+  - Update `test/api_client/app_api_test.dart` and `test/verify_icon_endpoint.dart`.
+  - Add edge cases: Empty URL, 404, Large File, Timeout, Missing Fields, Invalid JSON.
+  - Map failed tests to code fixes.
 
 ## Impact
-- **Affected Specs**: `app-management-implementation`
+- **Affected Specs**: `app-management-icon-and-tests`
 - **Affected Code**:
-  - `lib/features/apps/widgets/app_icon.dart` (New)
-  - `lib/shared/widgets/app_card.dart`
-  - `lib/features/apps/widgets/app_store_view.dart`
+  - `lib/api/v2/app_v2.dart`
+  - `lib/data/models/app_models.dart`
   - `lib/features/apps/app_detail_page.dart`
+  - `lib/features/apps/widgets/app_icon.dart`
+  - `lib/features/apps/widgets/app_store_view.dart`
+  - `lib/shared/widgets/app_card.dart`
   - `test/api_client/app_api_test.dart`
+  - `test/verify_icon_endpoint.dart`
 
 ## ADDED Requirements
-### Requirement: App Icon Display
-- **WHEN** user views the App Store or App Detail page
-- **THEN** the app icon SHALL be displayed using the app's `key` (e.g., "openresty").
-- **THEN** if the icon fetch fails, a default placeholder icon SHALL be shown.
+### Requirement: API Consistency
+- **WHEN** calling any App API endpoint
+- **THEN** the request parameters and response parsing SHALL strictly match `app_api_analysis.json` (correcting for obvious typos like duplicate `version`).
 
-### Requirement: Resilient Detail Loading
-- **WHEN** `getAppDetail` fails (e.g., backend error)
-- **THEN** the App Detail page SHALL display the available information from the list item (name, description, tags).
-- **THEN** a warning/error message SHALL be displayed, but the page should NOT be empty or broken.
+### Requirement: Robust Error Handling
+- **WHEN** the backend returns 500, 404, or malformed JSON (e.g., "unexpected end of JSON input")
+- **THEN** the app SHALL NOT crash.
+- **THEN** the UI SHALL display a user-friendly error or partial data.
+
+### Requirement: Comprehensive Boundary Testing
+- **WHEN** running tests
+- **THEN** scenarios including 404, timeout, invalid JSON, and missing fields MUST be covered and pass.
 
 ## MODIFIED Requirements
-### Requirement: Comprehensive API Testing
-- All 32 App Management endpoints MUST be covered in `app_api_test.dart`.
-- Tests MUST log request/response bodies for verification.
+### Requirement: App Icon Logic
+- **WHEN** fetching app icon
+- **THEN** the system SHALL try `appKey` first (based on practical usage) and fallback to `appId` if `app_api_analysis.json` implies strict `appId`. (Actually, `app_api_analysis.json` says `appId` but we will support both for robustness as confirmed by user intent for "fixing" issues).

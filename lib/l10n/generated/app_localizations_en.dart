@@ -2169,4 +2169,184 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appTabConfig => 'Config';
+
+  @override
+  String get containerTitle => 'Container Management';
+
+  @override
+  String get containerStatusRunning => 'Running';
+
+  @override
+  String get containerStatusStopped => 'Stopped';
+
+  @override
+  String get containerStatusPaused => 'Paused';
+
+  @override
+  String get containerStatusExited => 'Exited';
+
+  @override
+  String get containerStatusRestarting => 'Restarting';
+
+  @override
+  String get containerStatusRemoving => 'Removing';
+
+  @override
+  String get containerStatusDead => 'Dead';
+
+  @override
+  String get containerStatusCreated => 'Created';
+
+  @override
+  String get containerActionStart => 'Start';
+
+  @override
+  String get containerActionStop => 'Stop';
+
+  @override
+  String get containerActionRestart => 'Restart';
+
+  @override
+  String get containerActionDelete => 'Delete';
+
+  @override
+  String get containerActionLogs => 'Logs';
+
+  @override
+  String get containerActionTerminal => 'Terminal';
+
+  @override
+  String get containerActionStats => 'Stats';
+
+  @override
+  String get containerActionInspect => 'Inspect';
+
+  @override
+  String get containerTabInfo => 'Info';
+
+  @override
+  String get containerTabLogs => 'Logs';
+
+  @override
+  String get containerTabStats => 'Stats';
+
+  @override
+  String get containerTabTerminal => 'Terminal';
+
+  @override
+  String get containerDetailTitle => 'Container Details';
+
+  @override
+  String get containerInfoId => 'Container ID';
+
+  @override
+  String get containerInfoName => 'Name';
+
+  @override
+  String get containerInfoImage => 'Image';
+
+  @override
+  String get containerInfoStatus => 'Status';
+
+  @override
+  String get containerInfoCreated => 'Created At';
+
+  @override
+  String get containerInfoCommand => 'Command';
+
+  @override
+  String get containerInfoPorts => 'Port Bindings';
+
+  @override
+  String get containerInfoEnv => 'Environment Variables';
+
+  @override
+  String get containerInfoLabels => 'Labels';
+
+  @override
+  String get containerStatsCpu => 'CPU Usage';
+
+  @override
+  String get containerStatsMemory => 'Memory Usage';
+
+  @override
+  String get containerStatsNetwork => 'Network I/O';
+
+  @override
+  String get containerStatsBlock => 'Block I/O';
+
+  @override
+  String get containerLogsAutoRefresh => 'Auto Refresh';
+
+  @override
+  String get containerLogsDownload => 'Download Logs';
+
+  @override
+  String containerDeleteConfirm(Object name) {
+    return 'Are you sure you want to delete container $name? This action cannot be undone.';
+  }
+
+  @override
+  String get containerOperateSuccess => 'Operation successful';
+
+  @override
+  String containerOperateFailed(String error) {
+    return 'Operation failed: $error';
+  }
+
+  @override
+  String get containerNoLogs => 'No logs';
+
+  @override
+  String get containerLoading => 'Loading...';
+
+  @override
+  String get containerTerminalConnect => 'Connect';
+
+  @override
+  String get containerTerminalDisconnect => 'Disconnect';
+
+  @override
+  String get commonStart => 'Start';
+
+  @override
+  String get commonStop => 'Stop';
+
+  @override
+  String get commonRestart => 'Restart';
+
+  @override
+  String get commonLogs => 'Logs';
+
+  @override
+  String get commonDeleteConfirm =>
+      'Are you sure you want to delete this item?';
+
+  @override
+  String get orchestrationTitle => 'Orchestration';
+
+  @override
+  String get orchestrationCompose => 'Compose';
+
+  @override
+  String get orchestrationImages => 'Images';
+
+  @override
+  String get orchestrationNetworks => 'Networks';
+
+  @override
+  String get orchestrationVolumes => 'Volumes';
+
+  @override
+  String get orchestrationPullImage => 'Pull Image';
+
+  @override
+  String get orchestrationPullImageHint =>
+      'Enter image name (e.g. nginx:latest)';
+
+  @override
+  String get orchestrationPullSuccess => 'Image pull started';
+
+  @override
+  String get orchestrationPullFailed => 'Failed to pull image';
 }

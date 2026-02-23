@@ -4201,6 +4201,354 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Config'**
   String get appTabConfig;
+
+  /// No description provided for @containerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Container Management'**
+  String get containerTitle;
+
+  /// No description provided for @containerStatusRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get containerStatusRunning;
+
+  /// No description provided for @containerStatusStopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped'**
+  String get containerStatusStopped;
+
+  /// No description provided for @containerStatusPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get containerStatusPaused;
+
+  /// No description provided for @containerStatusExited.
+  ///
+  /// In en, this message translates to:
+  /// **'Exited'**
+  String get containerStatusExited;
+
+  /// No description provided for @containerStatusRestarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Restarting'**
+  String get containerStatusRestarting;
+
+  /// No description provided for @containerStatusRemoving.
+  ///
+  /// In en, this message translates to:
+  /// **'Removing'**
+  String get containerStatusRemoving;
+
+  /// No description provided for @containerStatusDead.
+  ///
+  /// In en, this message translates to:
+  /// **'Dead'**
+  String get containerStatusDead;
+
+  /// No description provided for @containerStatusCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get containerStatusCreated;
+
+  /// No description provided for @containerActionStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get containerActionStart;
+
+  /// No description provided for @containerActionStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get containerActionStop;
+
+  /// No description provided for @containerActionRestart.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get containerActionRestart;
+
+  /// No description provided for @containerActionDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get containerActionDelete;
+
+  /// No description provided for @containerActionLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Logs'**
+  String get containerActionLogs;
+
+  /// No description provided for @containerActionTerminal.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal'**
+  String get containerActionTerminal;
+
+  /// No description provided for @containerActionStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats'**
+  String get containerActionStats;
+
+  /// No description provided for @containerActionInspect.
+  ///
+  /// In en, this message translates to:
+  /// **'Inspect'**
+  String get containerActionInspect;
+
+  /// No description provided for @containerTabInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get containerTabInfo;
+
+  /// No description provided for @containerTabLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Logs'**
+  String get containerTabLogs;
+
+  /// No description provided for @containerTabStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats'**
+  String get containerTabStats;
+
+  /// No description provided for @containerTabTerminal.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal'**
+  String get containerTabTerminal;
+
+  /// No description provided for @containerDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Container Details'**
+  String get containerDetailTitle;
+
+  /// No description provided for @containerInfoId.
+  ///
+  /// In en, this message translates to:
+  /// **'Container ID'**
+  String get containerInfoId;
+
+  /// No description provided for @containerInfoName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get containerInfoName;
+
+  /// No description provided for @containerInfoImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get containerInfoImage;
+
+  /// No description provided for @containerInfoStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get containerInfoStatus;
+
+  /// No description provided for @containerInfoCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created At'**
+  String get containerInfoCreated;
+
+  /// No description provided for @containerInfoCommand.
+  ///
+  /// In en, this message translates to:
+  /// **'Command'**
+  String get containerInfoCommand;
+
+  /// No description provided for @containerInfoPorts.
+  ///
+  /// In en, this message translates to:
+  /// **'Port Bindings'**
+  String get containerInfoPorts;
+
+  /// No description provided for @containerInfoEnv.
+  ///
+  /// In en, this message translates to:
+  /// **'Environment Variables'**
+  String get containerInfoEnv;
+
+  /// No description provided for @containerInfoLabels.
+  ///
+  /// In en, this message translates to:
+  /// **'Labels'**
+  String get containerInfoLabels;
+
+  /// No description provided for @containerStatsCpu.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU Usage'**
+  String get containerStatsCpu;
+
+  /// No description provided for @containerStatsMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory Usage'**
+  String get containerStatsMemory;
+
+  /// No description provided for @containerStatsNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Network I/O'**
+  String get containerStatsNetwork;
+
+  /// No description provided for @containerStatsBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Block I/O'**
+  String get containerStatsBlock;
+
+  /// No description provided for @containerLogsAutoRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto Refresh'**
+  String get containerLogsAutoRefresh;
+
+  /// No description provided for @containerLogsDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Logs'**
+  String get containerLogsDownload;
+
+  /// No description provided for @containerDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete container {name}? This action cannot be undone.'**
+  String containerDeleteConfirm(Object name);
+
+  /// No description provided for @containerOperateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation successful'**
+  String get containerOperateSuccess;
+
+  /// No description provided for @containerOperateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation failed: {error}'**
+  String containerOperateFailed(String error);
+
+  /// No description provided for @containerNoLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'No logs'**
+  String get containerNoLogs;
+
+  /// No description provided for @containerLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get containerLoading;
+
+  /// No description provided for @containerTerminalConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get containerTerminalConnect;
+
+  /// No description provided for @containerTerminalDisconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get containerTerminalDisconnect;
+
+  /// No description provided for @commonStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get commonStart;
+
+  /// No description provided for @commonStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get commonStop;
+
+  /// No description provided for @commonRestart.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get commonRestart;
+
+  /// No description provided for @commonLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Logs'**
+  String get commonLogs;
+
+  /// No description provided for @commonDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this item?'**
+  String get commonDeleteConfirm;
+
+  /// No description provided for @orchestrationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Orchestration'**
+  String get orchestrationTitle;
+
+  /// No description provided for @orchestrationCompose.
+  ///
+  /// In en, this message translates to:
+  /// **'Compose'**
+  String get orchestrationCompose;
+
+  /// No description provided for @orchestrationImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get orchestrationImages;
+
+  /// No description provided for @orchestrationNetworks.
+  ///
+  /// In en, this message translates to:
+  /// **'Networks'**
+  String get orchestrationNetworks;
+
+  /// No description provided for @orchestrationVolumes.
+  ///
+  /// In en, this message translates to:
+  /// **'Volumes'**
+  String get orchestrationVolumes;
+
+  /// No description provided for @orchestrationPullImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull Image'**
+  String get orchestrationPullImage;
+
+  /// No description provided for @orchestrationPullImageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter image name (e.g. nginx:latest)'**
+  String get orchestrationPullImageHint;
+
+  /// No description provided for @orchestrationPullSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Image pull started'**
+  String get orchestrationPullSuccess;
+
+  /// No description provided for @orchestrationPullFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pull image'**
+  String get orchestrationPullFailed;
 }
 
 class _AppLocalizationsDelegate

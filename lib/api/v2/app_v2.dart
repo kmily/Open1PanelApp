@@ -52,31 +52,74 @@ class AppV2Api {
 
   /// 安装应用
   Future<AppInstallInfo> installApp(AppInstallCreateRequest request) async {
-    final response = await _client.post<dynamic>(
-      ApiConstants.buildApiPath('/apps/install'),
-      data: request.toJson(),
-    );
-    final data = response.data as Map<String, dynamic>;
-    final innerData = data['data'];
-    
-    if (innerData is Map<String, dynamic>) {
-      return AppInstallInfo.fromJson(innerData);
-    }
-    
-    // Handle case where it returns just an ID (int or String)
-    if (innerData is int || innerData is String) {
+    try {
+      final response = await _client.post<dynamic>(
+        ApiConstants.buildApiPath('/apps/install'),
+        data: request.toJson(),
+      );
+      
+      // Check for empty response
+      if (response.data == null || response.data.toString().isEmpty) {
+         // Assuming success if 200 OK but empty (though unlikely for install)
+         return AppInstallInfo(
+           name: request.name,
+           status: 'Installing',
+           message: 'Installation started',
+           id: 0, // Unknown ID
+           createdAt: DateTime.now().toIso8601String(),
+           version: 'latest',
+           appDetailId: request.appDetailId,
+           appId: 0,
+           appKey: request.name, // Assuming name is key or close enough for placeholder
+           appType: request.type ?? 'unknown',
+         );
+      }
+
+      final data = response.data as Map<String, dynamic>;
+      final innerData = data['data'];
+      
+      if (innerData is Map<String, dynamic>) {
+        return AppInstallInfo.fromJson(innerData);
+      }
+      
+      // Handle case where it returns just an ID (int or String)
+      if (innerData is int || innerData is String) {
+        return AppInstallInfo(
+          id: int.tryParse(innerData.toString()),
+          name: request.name,
+          status: 'Installing',
+          createdAt: DateTime.now().toIso8601String(),
+          version: 'latest',
+          appDetailId: request.appDetailId,
+          appId: 0,
+          appKey: request.name,
+          appType: request.type ?? 'unknown',
+        );
+      }
+
       return AppInstallInfo(
-        id: int.tryParse(innerData.toString()),
+        id: 0,
         name: request.name,
         status: 'Installing',
+        message: 'Installation response format unexpected: $innerData',
+        createdAt: DateTime.now().toIso8601String(),
+        version: 'latest',
+        appDetailId: request.appDetailId,
+        appId: 0,
+        appKey: request.name,
+        appType: request.type ?? 'unknown',
+      );
+    } catch (e) {
+      if (e is DioException && e.type == DioExceptionType.badResponse) {
+         // Handle 500 or 404
+         rethrow;
+      }
+      // For parsing errors (unexpected end of JSON), wrap or rethrow
+      throw DioException(
+        requestOptions: RequestOptions(path: '/apps/install'),
+        error: 'Install failed: $e',
       );
     }
-
-    // If we can't parse it, throw or return empty
-    throw DioException(
-      requestOptions: response.requestOptions,
-      error: 'Unexpected response format for installApp: $innerData',
-    );
   }
 
   /// 卸载应用

@@ -43,5 +43,25 @@ void main() {
     } catch (e) {
       print('Icon by Key failed: $e');
     }
+    // 4. Edge Cases
+    print('\n--- Edge Cases ---');
+    
+    // 4.1 Empty/Invalid ID
+    try {
+      print('Trying icon by Invalid ID: 999999');
+      await api.getAppIcon('999999');
+      print('WARNING: Invalid ID did not throw (might be 200 OK empty?)');
+    } catch (e) {
+      print('Invalid ID failed as expected: $e');
+    }
+
+    // 4.2 Empty Key (if applicable)
+    try {
+      print('Trying icon by Empty Key');
+      await api.getAppIcon('');
+      print('WARNING: Empty Key did not throw');
+    } catch (e) {
+      print('Empty Key failed as expected: $e');
+    }
   });
 }

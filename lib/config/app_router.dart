@@ -21,6 +21,10 @@ import 'package:onepanelapp_app/features/apps/app_detail_page.dart';
 import 'package:onepanelapp_app/features/apps/installed_app_detail_page.dart';
 import 'package:onepanelapp_app/data/models/app_models.dart';
 
+import 'package:onepanelapp_app/features/containers/container_detail_page.dart';
+import 'package:onepanelapp_app/data/models/container_models.dart';
+import 'package:onepanelapp_app/features/orchestration/orchestration_page.dart';
+
 class AppRoutes {
   static const String splash = '/';
   static const String onboarding = '/onboarding';
@@ -41,6 +45,8 @@ class AppRoutes {
   static const String appStore = '/app-store';
   static const String appDetail = '/app-detail';
   static const String installedAppDetail = '/installed-app-detail';
+  static const String containerDetail = '/container-detail';
+  static const String orchestration = '/orchestration';
 }
 
 class AppRouter {
@@ -97,6 +103,14 @@ class AppRouter {
         final arg = settings.arguments;
         if (arg is AppItem) {
           return MaterialPageRoute(builder: (_) => AppDetailPage(app: arg));
+        } else if (arg is Map<String, dynamic>) {
+          final appItem = AppItem(
+            id: int.tryParse(arg['appId']?.toString() ?? ''),
+            key: arg['key'] as String?,
+            versions: arg['version'] != null ? [arg['version'] as String] : null,
+            type: arg['type'] as String?,
+          );
+          return MaterialPageRoute(builder: (_) => AppDetailPage(app: appItem));
         }
         return MaterialPageRoute(builder: (_) => const NotFoundPage());
 
@@ -108,6 +122,17 @@ class AppRouter {
                   InstalledAppDetailPage(appId: arg['appId'] as String));
         }
         return MaterialPageRoute(builder: (_) => const NotFoundPage());
+
+      case AppRoutes.containerDetail:
+        final arg = settings.arguments;
+        if (arg is ContainerInfo) {
+          return MaterialPageRoute(
+              builder: (_) => ContainerDetailPage(container: arg));
+        }
+        return MaterialPageRoute(builder: (_) => const NotFoundPage());
+
+      case AppRoutes.orchestration:
+        return MaterialPageRoute(builder: (_) => const OrchestrationPage());
 
       case '/apps':
         return MaterialPageRoute(builder: (_) => const AppsPage());

@@ -70,12 +70,41 @@ class _InstalledAppsViewState extends State<InstalledAppsView> {
   }
 
   Future<void> _handleOperate(String id, String operation) async {
+    String opName;
+    switch (operation) {
+      case 'start':
+        opName = '启动';
+        break;
+      case 'stop':
+        opName = '停止';
+        break;
+      case 'restart':
+        opName = '重启';
+        break;
+      default:
+        opName = '操作';
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('正在$opName...'),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    }
+
     try {
       await context.read<InstalledAppsProvider>().operateApp(id, operation);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$opName成功')),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('操作失败: $e')),
+          SnackBar(content: Text('$opName失败: $e')),
         );
       }
     }

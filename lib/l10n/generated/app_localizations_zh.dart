@@ -2127,4 +2127,182 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get appTabConfig => '配置';
+
+  @override
+  String get containerTitle => '容器管理';
+
+  @override
+  String get containerStatusRunning => '运行中';
+
+  @override
+  String get containerStatusStopped => '已停止';
+
+  @override
+  String get containerStatusPaused => '已暂停';
+
+  @override
+  String get containerStatusExited => '已退出';
+
+  @override
+  String get containerStatusRestarting => '重启中';
+
+  @override
+  String get containerStatusRemoving => '删除中';
+
+  @override
+  String get containerStatusDead => '已死亡';
+
+  @override
+  String get containerStatusCreated => '已创建';
+
+  @override
+  String get containerActionStart => '启动';
+
+  @override
+  String get containerActionStop => '停止';
+
+  @override
+  String get containerActionRestart => '重启';
+
+  @override
+  String get containerActionDelete => '删除';
+
+  @override
+  String get containerActionLogs => '日志';
+
+  @override
+  String get containerActionTerminal => '终端';
+
+  @override
+  String get containerActionStats => '监控';
+
+  @override
+  String get containerActionInspect => '详情';
+
+  @override
+  String get containerTabInfo => '信息';
+
+  @override
+  String get containerTabLogs => '日志';
+
+  @override
+  String get containerTabStats => '监控';
+
+  @override
+  String get containerTabTerminal => '终端';
+
+  @override
+  String get containerDetailTitle => '容器详情';
+
+  @override
+  String get containerInfoId => '容器ID';
+
+  @override
+  String get containerInfoName => '名称';
+
+  @override
+  String get containerInfoImage => '镜像';
+
+  @override
+  String get containerInfoStatus => '状态';
+
+  @override
+  String get containerInfoCreated => '创建时间';
+
+  @override
+  String get containerInfoCommand => '命令';
+
+  @override
+  String get containerInfoPorts => '端口映射';
+
+  @override
+  String get containerInfoEnv => '环境变量';
+
+  @override
+  String get containerInfoLabels => '标签';
+
+  @override
+  String get containerStatsCpu => 'CPU使用率';
+
+  @override
+  String get containerStatsMemory => '内存使用';
+
+  @override
+  String get containerStatsNetwork => '网络I/O';
+
+  @override
+  String get containerStatsBlock => '磁盘I/O';
+
+  @override
+  String get containerLogsAutoRefresh => '自动刷新';
+
+  @override
+  String get containerLogsDownload => '下载日志';
+
+  @override
+  String containerDeleteConfirm(Object name) {
+    return '确定要删除容器 $name 吗？此操作不可恢复。';
+  }
+
+  @override
+  String get containerOperateSuccess => '操作成功';
+
+  @override
+  String containerOperateFailed(String error) {
+    return '操作失败：$error';
+  }
+
+  @override
+  String get containerNoLogs => '暂无日志';
+
+  @override
+  String get containerLoading => '加载中...';
+
+  @override
+  String get containerTerminalConnect => '连接';
+
+  @override
+  String get containerTerminalDisconnect => '断开';
+
+  @override
+  String get commonStart => '启动';
+
+  @override
+  String get commonStop => '停止';
+
+  @override
+  String get commonRestart => '重启';
+
+  @override
+  String get commonLogs => '日志';
+
+  @override
+  String get commonDeleteConfirm => '确定要删除此项吗？';
+
+  @override
+  String get orchestrationTitle => '编排';
+
+  @override
+  String get orchestrationCompose => '编排';
+
+  @override
+  String get orchestrationImages => '镜像';
+
+  @override
+  String get orchestrationNetworks => '网络';
+
+  @override
+  String get orchestrationVolumes => '卷';
+
+  @override
+  String get orchestrationPullImage => '拉取镜像';
+
+  @override
+  String get orchestrationPullImageHint => '输入镜像名称 (如 nginx:latest)';
+
+  @override
+  String get orchestrationPullSuccess => '已开始拉取镜像';
+
+  @override
+  String get orchestrationPullFailed => '拉取镜像失败';
 }

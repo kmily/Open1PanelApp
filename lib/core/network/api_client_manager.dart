@@ -14,6 +14,8 @@ import '../../api/v2/setting_v2.dart';
 import '../../api/v2/terminal_v2.dart';
 import '../../api/v2/update_v2.dart';
 import '../../api/v2/website_v2.dart';
+import '../../api/v2/docker_v2.dart';
+import '../../api/v2/compose_v2.dart';
 
 /// API客户端管理器
 /// 用于管理多个服务器配置的API客户端实例
@@ -129,6 +131,16 @@ class ApiClientManager {
   Future<FileV2Api> getFileApi() async {
     final client = await getCurrentClient();
     return FileV2Api(client);
+  }
+
+  Future<DockerV2Api> getDockerApi() async {
+    final client = await getCurrentClient();
+    return DockerV2Api(client);
+  }
+
+  Future<ComposeV2Api> getComposeApi() async {
+    final client = await getCurrentClient();
+    return ComposeV2Api(client);
   }
 
   /// 移除指定服务器的API客户端

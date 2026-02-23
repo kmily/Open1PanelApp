@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:onepanelapp_app/config/app_router.dart';
+import 'package:onepanelapp_app/data/models/container_models.dart' hide Container, ContainerStats;
+import 'package:onepanelapp_app/features/containers/widgets/container_card.dart';
 import '../../shared/widgets/app_card.dart';
 import '../../widgets/main_layout.dart';
 import 'containers_provider.dart';
@@ -335,14 +338,36 @@ class _ContainersTab extends StatelessWidget {
               )
             else
               ...containers.map((container) {
+                final containerInfo = container as ContainerInfo;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: _ContainerCard(
-                    container: container,
-                    onStart: () => onStart(container.id ?? ''),
-                    onStop: () => onStop(container.id ?? ''),
-                    onRestart: () => onRestart(container.id ?? ''),
-                    onDelete: () => onDelete(container.id ?? ''),
+                  child: ContainerCard(
+                    container: containerInfo,
+                    onStart: () => onStart(containerInfo.id),
+                    onStop: () => onStop(containerInfo.id),
+                    onRestart: () => onRestart(containerInfo.id),
+                    onDelete: () => onDelete(containerInfo.id),
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.containerDetail,
+                        arguments: containerInfo,
+                      );
+                    },
+                    onLogs: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.containerDetail,
+                        arguments: containerInfo,
+                      );
+                    },
+                    onTerminal: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.containerDetail,
+                        arguments: containerInfo,
+                      );
+                    },
                   ),
                 );
               }),
@@ -542,94 +567,6 @@ class _EmptyView extends StatelessWidget {
   }
 }
 
-/// 容器卡片
-class _ContainerCard extends StatelessWidget {
-  final dynamic container;
-  final VoidCallback onStart;
-  final VoidCallback onStop;
-  final VoidCallback onRestart;
-  final VoidCallback onDelete;
-
-  const _ContainerCard({
-    required this.container,
-    required this.onStart,
-    required this.onStop,
-    required this.onRestart,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isRunning = container.state?.toLowerCase() == 'running';
-    final statusColor = isRunning ? Colors.green : Colors.orange;
-    
-    return AppCard(
-      title: container.name ?? '未命名容器',
-      subtitle: Text(container.image ?? '未知镜像'),
-      trailing: _StatusChip(
-        status: isRunning ? '运行中' : '已停止',
-        color: statusColor,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (container.ports != null && container.ports.isNotEmpty)
-            Text(
-              '端口: ${_formatPorts(container.ports)}',
-              style: TextStyle(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: 14,
-              ),
-            ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              if (isRunning) ...[
-                _ActionButton(
-                  icon: Icons.stop,
-                  label: '停止',
-                  color: Colors.orange,
-                  onTap: onStop,
-                ),
-                const SizedBox(width: 8),
-                _ActionButton(
-                  icon: Icons.restart_alt,
-                  label: '重启',
-                  color: colorScheme.primary,
-                  onTap: onRestart,
-                ),
-              ] else ...[
-                _ActionButton(
-                  icon: Icons.play_arrow,
-                  label: '启动',
-                  color: Colors.green,
-                  onTap: onStart,
-                ),
-              ],
-              const SizedBox(width: 8),
-              _ActionButton(
-                icon: Icons.delete_outline,
-                label: '删除',
-                color: Colors.red,
-                onTap: onDelete,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatPorts(dynamic ports) {
-    if (ports is List) {
-      return ports.take(3).join(', ');
-    }
-    return ports.toString();
-  }
-}
-
 /// 镜像卡片
 class _ImageCard extends StatelessWidget {
   final dynamic image;
@@ -721,80 +658,5 @@ class _ImageCard extends StatelessWidget {
     if (diff.inHours > 0) return '${diff.inHours}小时前';
     if (diff.inMinutes > 0) return '${diff.inMinutes}分钟前';
     return '刚刚';
-  }
-}
-
-/// 状态标签
-class _StatusChip extends StatelessWidget {
-  final String status;
-  final Color color;
-
-  const _StatusChip({
-    required this.status,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Text(
-        status,
-        style: TextStyle(
-          color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-}
-
-/// 操作按钮
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _ActionButton({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 18),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

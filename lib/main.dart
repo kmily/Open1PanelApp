@@ -18,6 +18,10 @@ import 'features/apps/providers/app_store_provider.dart';
 import 'features/websites/websites_provider.dart';
 import 'features/server/server_provider.dart';
 import 'features/monitoring/monitoring_provider.dart';
+import 'features/orchestration/providers/compose_provider.dart';
+import 'features/orchestration/providers/image_provider.dart';
+import 'features/orchestration/providers/network_provider.dart';
+import 'features/orchestration/providers/volume_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,6 +71,11 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => MonitoringProvider(),
         ),
+        // Orchestration
+        ChangeNotifierProvider(create: (_) => ComposeProvider()),
+        ChangeNotifierProvider(create: (_) => DockerImageProvider()),
+        ChangeNotifierProvider(create: (_) => NetworkProvider()),
+        ChangeNotifierProvider(create: (_) => VolumeProvider()),
         // Transfer Manager
         ChangeNotifierProvider(
           create: (_) => TransferManager()..init(),

@@ -213,6 +213,20 @@ class ContainersProvider extends ChangeNotifier {
     }
   }
 
+  /// 强制停止容器 (Kill)
+  Future<bool> killContainer(String containerId) async {
+    try {
+      await _ensureService();
+      await _service!.killContainer(containerId);
+      await loadContainers(); // 刷新列表
+      return true;
+    } catch (e) {
+      _data = _data.copyWith(error: '强制停止容器失败: $e');
+      notifyListeners();
+      return false;
+    }
+  }
+
   /// 重启容器
   Future<bool> restartContainer(String containerId) async {
     try {

@@ -1,0 +1,213 @@
+{
+  "module": "compose",
+  "generatedAt": "2026-02-23T20:50:14.087540",
+  "summary": {
+    "endpointCount": 7,
+    "methodCount": 7
+  },
+  "endpoints": [
+    {
+      "path": "/containers/compose",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Create compose",
+          "description": "",
+          "tags": [
+            "Container Compose"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/containers/compose/clean/log",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Clean compose log",
+          "description": "",
+          "tags": [
+            "Container"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/containers/compose/operate",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Operate compose",
+          "description": "",
+          "tags": [
+            "Container Compose"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/containers/compose/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Page composes",
+          "description": "",
+          "tags": [
+            "Container Compose"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/containers/compose/test",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Test compose",
+          "description": "",
+          "tags": [
+            "Container Compose"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/containers/compose/update",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update compose",
+          "description": "",
+          "tags": [
+            "Container Compose"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/websites/exec/composer",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Exec Composer",
+          "description": "",
+          "tags": [
+            "Website"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    }
+  ]
+}

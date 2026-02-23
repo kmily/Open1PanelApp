@@ -28,6 +28,14 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.layers_outlined),
+            title: Text(l10n.orchestrationTitle),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/orchestration');
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.settings_outlined),
             title: Text(l10n.navSettings),
             onTap: () {

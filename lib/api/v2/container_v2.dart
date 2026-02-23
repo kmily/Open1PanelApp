@@ -104,6 +104,11 @@ class ContainerV2Api {
     ));
   }
 
+  /// 强制停止容器 (Kill)
+  Future<Response> killContainer(List<String> names) async {
+    return await stopContainer(names, force: true);
+  }
+
   /// 重启容器
   Future<Response> restartContainer(List<String> names) async {
     return await operateContainer(ContainerOperation(

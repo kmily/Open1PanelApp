@@ -7,12 +7,18 @@ import '../../../data/models/app_models.dart';
 import '../app_service.dart';
 
 class AppIcon extends StatefulWidget {
-  final AppItem app;
+  final AppItem? app;
+  final int? appId;
+  final String? appKey;
+  final String? iconUrl;
   final double size;
 
   const AppIcon({
     super.key,
-    required this.app,
+    this.app,
+    this.appId,
+    this.appKey,
+    this.iconUrl,
     this.size = 40,
   });
 
@@ -34,14 +40,17 @@ class _AppIconState extends State<AppIcon> with AutomaticKeepAliveClientMixin {
   @override
   void didUpdateWidget(covariant AppIcon oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.app.key != widget.app.key || oldWidget.app.id != widget.app.id) {
+    if (_getKey(oldWidget) != _getKey(widget) || _getId(oldWidget) != _getId(widget)) {
       _loadIcon();
     }
   }
 
+  String? _getKey(AppIcon widget) => widget.app?.key ?? widget.appKey;
+  String? _getId(AppIcon widget) => widget.app?.id?.toString() ?? widget.appId?.toString();
+
   Future<void> _loadIcon() async {
-    final key = widget.app.key;
-    final id = widget.app.id?.toString();
+    final key = _getKey(widget);
+    final id = _getId(widget);
 
     if (key == null && id == null) {
       return;
@@ -157,7 +166,7 @@ class _AppIconState extends State<AppIcon> with AutomaticKeepAliveClientMixin {
   }
 
   Widget _buildDefaultIcon() {
-    final name = widget.app.name ?? '?';
+    final name = widget.app?.name ?? widget.appKey ?? '?';
     final letter = name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?';
 
     return Container(

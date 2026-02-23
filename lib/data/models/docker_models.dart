@@ -1,196 +1,213 @@
 import 'package:equatable/equatable.dart';
+import 'container_models.dart';
 
-/// Docker status model
-class DockerStatus extends Equatable {
-  final bool isRunning;
-  final String? version;
-  final String? apiVersion;
-  final String? os;
-  final String? architecture;
-  final int? containers;
-  final int? containersRunning;
-  final int? containersPaused;
-  final int? containersStopped;
-  final int? images;
-  final String? storageDriver;
-  final String? loggingDriver;
-  final String? cgroupDriver;
-  final String? cgroupVersion;
-  final bool? liveRestoreEnabled;
-  final bool? swarm;
+/// Docker 镜像模型
+class DockerImage extends Equatable {
+  final String id;
+  final List<String> tags;
+  final int size;
+  final String created;
+  final String? digest;
 
-  const DockerStatus({
-    required this.isRunning,
-    this.version,
-    this.apiVersion,
-    this.os,
-    this.architecture,
-    this.containers,
-    this.containersRunning,
-    this.containersPaused,
-    this.containersStopped,
-    this.images,
-    this.storageDriver,
-    this.loggingDriver,
-    this.cgroupDriver,
-    this.cgroupVersion,
-    this.liveRestoreEnabled,
-    this.swarm,
+  const DockerImage({
+    required this.id,
+    required this.tags,
+    required this.size,
+    required this.created,
+    this.digest,
   });
 
-  factory DockerStatus.fromJson(Map<String, dynamic> json) {
-    return DockerStatus(
-      isRunning: json['isRunning'] as bool? ?? false,
-      version: json['version'] as String?,
-      apiVersion: json['apiVersion'] as String?,
-      os: json['os'] as String?,
-      architecture: json['architecture'] as String?,
-      containers: json['containers'] as int?,
-      containersRunning: json['containersRunning'] as int?,
-      containersPaused: json['containersPaused'] as int?,
-      containersStopped: json['containersStopped'] as int?,
-      images: json['images'] as int?,
-      storageDriver: json['storageDriver'] as String?,
-      loggingDriver: json['loggingDriver'] as String?,
-      cgroupDriver: json['cgroupDriver'] as String?,
-      cgroupVersion: json['cgroupVersion'] as String?,
-      liveRestoreEnabled: json['liveRestoreEnabled'] as bool?,
-      swarm: json['swarm'] as bool?,
+  factory DockerImage.fromJson(Map<String, dynamic> json) {
+    return DockerImage(
+      id: json['id'] as String? ?? '',
+      tags: (json['tags'] as List?)?.cast<String>() ?? [],
+      size: json['size'] as int? ?? 0,
+      created: json['created'] as String? ?? '',
+      digest: json['digest'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'isRunning': isRunning,
-      'version': version,
-      'apiVersion': apiVersion,
-      'os': os,
-      'architecture': architecture,
-      'containers': containers,
-      'containersRunning': containersRunning,
-      'containersPaused': containersPaused,
-      'containersStopped': containersStopped,
-      'images': images,
-      'storageDriver': storageDriver,
-      'loggingDriver': loggingDriver,
-      'cgroupDriver': cgroupDriver,
-      'cgroupVersion': cgroupVersion,
-      'liveRestoreEnabled': liveRestoreEnabled,
-      'swarm': swarm,
+      'id': id,
+      'tags': tags,
+      'size': size,
+      'created': created,
+      'digest': digest,
     };
   }
 
   @override
-  List<Object?> get props => [
-        isRunning,
-        version,
-        apiVersion,
-        os,
-        architecture,
-        containers,
-        containersRunning,
-        containersPaused,
-        containersStopped,
-        images,
-        storageDriver,
-        loggingDriver,
-        cgroupDriver,
-        cgroupVersion,
-        liveRestoreEnabled,
-        swarm,
-      ];
+  List<Object?> get props => [id, tags, size, created, digest];
 }
 
-/// Docker configuration model
-class DockerConfig extends Equatable {
-  final String? registryMirrors;
-  final String? insecureRegistries;
-  final String? dns;
-  final String? logDriver;
-  final String? logOpts;
-  final String? storageDriver;
-  final String? execOpts;
-  final bool? liveRestore;
-  final String? dataRoot;
+/// Docker 网络模型
+class DockerNetwork extends Equatable {
+  final String id;
+  final String name;
+  final String driver;
+  final String? scope;
+  final bool? internal;
+  final bool? attachable;
+  final String? subnet;
+  final String? gateway;
 
-  const DockerConfig({
-    this.registryMirrors,
-    this.insecureRegistries,
-    this.dns,
-    this.logDriver,
-    this.logOpts,
-    this.storageDriver,
-    this.execOpts,
-    this.liveRestore,
-    this.dataRoot,
+  const DockerNetwork({
+    required this.id,
+    required this.name,
+    required this.driver,
+    this.scope,
+    this.internal,
+    this.attachable,
+    this.subnet,
+    this.gateway,
   });
 
-  factory DockerConfig.fromJson(Map<String, dynamic> json) {
-    return DockerConfig(
-      registryMirrors: json['registryMirrors'] as String?,
-      insecureRegistries: json['insecureRegistries'] as String?,
-      dns: json['dns'] as String?,
-      logDriver: json['logDriver'] as String?,
-      logOpts: json['logOpts'] as String?,
-      storageDriver: json['storageDriver'] as String?,
-      execOpts: json['execOpts'] as String?,
-      liveRestore: json['liveRestore'] as bool?,
-      dataRoot: json['dataRoot'] as String?,
+  factory DockerNetwork.fromJson(Map<String, dynamic> json) {
+    return DockerNetwork(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      driver: json['driver'] as String? ?? '',
+      scope: json['scope'] as String?,
+      internal: json['internal'] as bool?,
+      attachable: json['attachable'] as bool?,
+      subnet: json['subnet'] as String?,
+      gateway: json['gateway'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'registryMirrors': registryMirrors,
-      'insecureRegistries': insecureRegistries,
-      'dns': dns,
-      'logDriver': logDriver,
-      'logOpts': logOpts,
-      'storageDriver': storageDriver,
-      'execOpts': execOpts,
-      'liveRestore': liveRestore,
-      'dataRoot': dataRoot,
+      'id': id,
+      'name': name,
+      'driver': driver,
+      'scope': scope,
+      'internal': internal,
+      'attachable': attachable,
+      'subnet': subnet,
+      'gateway': gateway,
     };
   }
 
   @override
   List<Object?> get props => [
-        registryMirrors,
-        insecureRegistries,
-        dns,
-        logDriver,
-        logOpts,
-        storageDriver,
-        execOpts,
-        liveRestore,
-        dataRoot,
+        id,
+        name,
+        driver,
+        scope,
+        internal,
+        attachable,
+        subnet,
+        gateway,
       ];
 }
 
-/// Docker operation request model
-class DockerOperation extends Equatable {
-  final String operation;
-  final Map<String, dynamic>? options;
+/// Docker 卷模型
+class DockerVolume extends Equatable {
+  final String name;
+  final String driver;
+  final String? mountpoint;
+  final Map<String, String>? labels;
+  final Map<String, String>? options;
 
-  const DockerOperation({
-    required this.operation,
+  const DockerVolume({
+    required this.name,
+    required this.driver,
+    this.mountpoint,
+    this.labels,
     this.options,
   });
 
-  factory DockerOperation.fromJson(Map<String, dynamic> json) {
-    return DockerOperation(
-      operation: json['operation'] as String,
-      options: json['options'] as Map<String, dynamic>?,
+  factory DockerVolume.fromJson(Map<String, dynamic> json) {
+    return DockerVolume(
+      name: json['name'] as String? ?? '',
+      driver: json['driver'] as String? ?? '',
+      mountpoint: json['mountpoint'] as String?,
+      labels: (json['labels'] as Map<String, dynamic>?)?.cast<String, String>(),
+      options:
+          (json['options'] as Map<String, dynamic>?)?.cast<String, String>(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'operation': operation,
+      'name': name,
+      'driver': driver,
+      'mountpoint': mountpoint,
+      'labels': labels,
       'options': options,
     };
   }
 
   @override
-  List<Object?> get props => [operation, options];
+  List<Object?> get props => [name, driver, mountpoint, labels, options];
+}
+
+/// Compose 项目模型 (复用 ContainerCompose)
+typedef ComposeProject = ContainerCompose;
+
+/// Compose 模板模型
+class ComposeTemplate extends Equatable {
+  final String id;
+  final String name;
+  final String content;
+  final String? description;
+  final String? createTime;
+  final String? updateTime;
+
+  const ComposeTemplate({
+    required this.id,
+    required this.name,
+    required this.content,
+    this.description,
+    this.createTime,
+    this.updateTime,
+  });
+
+  factory ComposeTemplate.fromJson(Map<String, dynamic> json) {
+    return ComposeTemplate(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      content: json['content'] as String? ?? '',
+      description: json['description'] as String?,
+      createTime: json['createTime'] as String?,
+      updateTime: json['updateTime'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'content': content,
+      'description': description,
+      'createTime': createTime,
+      'updateTime': updateTime,
+    };
+  }
+
+  @override
+  List<Object?> get props =>
+      [id, name, content, description, createTime, updateTime];
+}
+
+/// Container Compose 日志搜索请求模型
+class ContainerComposeLogSearch extends Equatable {
+  final int composeId;
+  final int lines;
+
+  const ContainerComposeLogSearch({
+    required this.composeId,
+    this.lines = 100,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'composeId': composeId,
+      'lines': lines,
+    };
+  }
+
+  @override
+  List<Object?> get props => [composeId, lines];
 }

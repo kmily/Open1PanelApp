@@ -1,0 +1,8 @@
+- [x] App Management: Installed Apps list displays icons correctly
+- [x] App Management: Clicking an installed app navigates to details
+- [x] App Management: Start/Stop/Restart actions show Toasts
+- [x] Container Management: Can list containers
+- [x] Container Management: Can start/stop containers
+- [x] Container Management: Can view container logs
+- [x] Container Orchestration: Can list Compose projects
+- [x] Container Orchestration: Can list Images/Networks/Volumes
