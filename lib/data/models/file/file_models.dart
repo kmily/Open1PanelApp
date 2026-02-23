@@ -9,7 +9,6 @@ export 'file_wget.dart';
 export 'file_check.dart';
 export 'file_size.dart';
 export 'file_tree.dart';
-export 'file_properties.dart';
 export 'file_encoding.dart';
 export 'file_create.dart';
 export 'file_mount.dart';

@@ -75,7 +75,7 @@ class FileListItem extends StatelessWidget {
 
   List<PopupMenuEntry<String>> _buildMenuItems(
     BuildContext context,
-    dynamic l10n,
+    AppLocalizations l10n,
     ColorScheme colorScheme,
     bool isDir,
   ) {

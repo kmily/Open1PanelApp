@@ -116,12 +116,12 @@ void main() {
       
       try {
         final request = FileSearch(
-          path: '/opt/1panel',
+          path: '/tmp',
           page: 1,
           pageSize: 10,
         );
         
-        debugPrint('📤 请求参数: path=/opt/1panel');
+        debugPrint('📤 请求参数: path=/tmp');
         
         final response = await api.searchFiles(request);
         
@@ -155,9 +155,9 @@ void main() {
       debugPrint('========================================');
       
       try {
-        final request = FileCheck(path: '/opt/1panel');
+        final request = FileCheck(path: '/tmp');
         
-        debugPrint('📤 请求参数: path=/opt/1panel');
+        debugPrint('📤 请求参数: path=/tmp');
         
         final response = await api.checkFile(request);
         
@@ -235,11 +235,11 @@ void main() {
       
       try {
         final request = FileSizeRequest(
-          path: '/opt/1panel',
+          path: '/tmp',
           recursive: true,
         );
         
-        debugPrint('📤 请求参数: path=/opt/1panel, recursive=true');
+        debugPrint('📤 请求参数: path=/tmp, recursive=true');
         
         final response = await api.getFileSize(request);
         
@@ -555,8 +555,8 @@ void main() {
       
       try {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final testDir = '/tmp/test_rename_$timestamp';
-        final renamedDir = '/tmp/test_renamed_$timestamp';
+        final testDir = '/opt/1panel/test_rename_$timestamp';
+        final renamedDir = '/opt/1panel/test_renamed_$timestamp';
         
         await api.createFile(FileCreate(path: testDir, isDir: true));
         debugPrint('📤 创建测试目录: $testDir');
@@ -597,12 +597,13 @@ void main() {
       
       try {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final srcDir = '/tmp/test_move_src_$timestamp';
-        final dstDir = '/tmp/test_move_dst_$timestamp';
+        final srcDir = '/opt/1panel/test_move_src_$timestamp';
+        final dstDir = '/opt/1panel/test_move_dst_$timestamp';
         final testFile = '$srcDir/test.txt';
         
         await api.createFile(FileCreate(path: srcDir, isDir: true));
         await api.createFile(FileCreate(path: dstDir, isDir: true));
+        await api.createFile(FileCreate(path: testFile, isDir: false));
         await api.saveFile(FileSave(path: testFile, content: 'test content'));
         
         debugPrint('📤 创建测试文件: $testFile');
@@ -643,7 +644,7 @@ void main() {
       debugPrint('========================================');
       
       try {
-        final testDir = '/tmp/test_delete_${DateTime.now().millisecondsSinceEpoch}';
+        final testDir = '/opt/1panel/test_delete_${DateTime.now().millisecondsSinceEpoch}';
         
         await api.createFile(FileCreate(path: testDir, isDir: true));
         debugPrint('📤 创建测试目录: $testDir');
@@ -679,22 +680,30 @@ void main() {
       
       try {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final testDir = '/tmp/test_compress_$timestamp';
-        final testFile = '$testDir/test.txt';
-        final zipFile = '/tmp/test_compress_$timestamp.zip';
+        final dstDir = '/tmp/test_compress_dst_$timestamp';
+        // Use a simpler path for source file to avoid potential directory creation issues
+        final testFile = '/tmp/test_compress_src_$timestamp.txt';
+        final zipFile = '$dstDir/test_compress_$timestamp.zip';
         
-        await api.createFile(FileCreate(path: testDir, isDir: true));
+        // 1. Create destination directory as requested
+        await api.createFile(FileCreate(path: dstDir, isDir: true));
+        
+        // 2. Create source file directly in /tmp
+        await api.createFile(FileCreate(path: testFile, isDir: false));
         await api.saveFile(FileSave(path: testFile, content: 'test content'));
         
         debugPrint('📤 创建测试文件: $testFile');
+        debugPrint('📤 创建目标目录: $dstDir');
         debugPrint('📤 压缩目标: $zipFile');
         
         final request = FileCompress(
           files: [testFile],
-          dst: '/tmp',
+          dst: dstDir,
           name: 'test_compress_$timestamp',
           type: 'zip',
         );
+        
+        debugPrint('Compressing files with request: ${request.toJson()}');
         final response = await api.compressFiles(request);
         
         debugPrint('📥 响应状态码: ${response.statusCode}');
@@ -704,7 +713,7 @@ void main() {
         debugPrint('✅ 测试成功!');
         
         try {
-          await api.deleteFiles(FileBatchDelete(paths: [testDir, zipFile]));
+          await api.deleteFiles(FileBatchDelete(paths: [testFile, zipFile, dstDir]));
           debugPrint('🧹 清理测试文件');
         } catch (e) {
           debugPrint('⚠️ 清理失败: $e');
@@ -780,9 +789,10 @@ void main() {
       
       try {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final testFile = '/tmp/test_preview_$timestamp.txt';
+        final testFile = '/opt/1panel/test_preview_$timestamp.txt';
         
         final content = List.generate(20, (i) => '这是第 ${i + 1} 行内容').join('\n');
+        await api.createFile(FileCreate(path: testFile, isDir: false));
         await api.saveFile(FileSave(path: testFile, content: content));
         debugPrint('📤 创建测试文件: $testFile');
         
@@ -884,22 +894,22 @@ void main() {
       debugPrint('========================================');
       
       try {
-        final testDir = '/tmp';
+        final testDir = '/opt/1panel';
         
         final checkResponse = await api.checkFile(FileCheck(path: testDir));
         if (checkResponse.data?.exists != true) {
-          debugPrint('⚠️ /tmp 目录不存在，跳过测试');
-          resultCollector.addSkipped(testName, '/tmp 目录不存在');
+          debugPrint('⚠️ /opt/1panel 目录不存在，跳过测试');
+          resultCollector.addSkipped(testName, '/opt/1panel 目录不存在');
           return;
         }
         
         final request = FileModeChange(
           path: testDir,
-          mode: '1777',
-          recursive: false,
+          mode: 755,
+          sub: false,
         );
         
-        debugPrint('📤 请求参数: path=$testDir, mode=1777');
+        debugPrint('📤 请求参数: path=$testDir, mode=755');
         
         final response = await api.changeFileMode(request);
         
@@ -958,7 +968,7 @@ void main() {
           path: testFile,
           user: testUser,
           group: testGroup,
-          recursive: false,
+          sub: false,
         );
         
         debugPrint('📤 请求参数: path=$testFile, user=$testUser, group=$testGroup');
@@ -996,6 +1006,7 @@ void main() {
         final testFile = '/tmp/test_recycle_$timestamp.txt';
         final testContent = 'test content for recycle bin restore';
         
+        await api.createFile(FileCreate(path: testFile, isDir: false));
         await api.saveFile(FileSave(path: testFile, content: testContent));
         debugPrint('📤 创建测试文件: $testFile');
         
@@ -1101,120 +1112,6 @@ void main() {
     });
   });
 
-  group('文件编码转换 API 测试', () {
-    test('POST /files/convert - 转换文件编码', () async {
-      final testName = 'POST /files/convert - 转换文件编码';
-      
-      if (!hasApiKey) {
-        resultCollector.addSkipped(testName, 'API密钥未配置');
-        return;
-      }
-
-      debugPrint('\n========================================');
-      debugPrint('测试: $testName');
-      debugPrint('========================================');
-      
-      try {
-        final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final testFile = '/tmp/test_convert_$timestamp.txt';
-        
-        await api.saveFile(FileSave(path: testFile, content: '测试编码转换内容 Test encoding convert'));
-        debugPrint('📤 创建测试文件: $testFile');
-        
-        final request = FileConvertRequest(
-          path: testFile,
-          fromEncoding: 'UTF-8',
-          toEncoding: 'GBK',
-        );
-        
-        debugPrint('📤 请求参数:');
-        debugPrint('  path: ${request.path}');
-        debugPrint('  fromEncoding: ${request.fromEncoding}');
-        debugPrint('  toEncoding: ${request.toEncoding}');
-        
-        final response = await api.convertFile(request);
-        
-        debugPrint('📥 响应状态码: ${response.statusCode}');
-        debugPrint('📥 编码转换结果: 成功');
-        
-        resultCollector.addSuccess(testName, Duration.zero);
-        debugPrint('✅ 测试成功!');
-        
-        try {
-          await api.deleteFiles(FileBatchDelete(paths: [testFile]));
-          debugPrint('🧹 清理测试文件: $testFile');
-        } catch (e) {
-          debugPrint('⚠️ 清理失败: $e');
-        }
-      } catch (e) {
-        resultCollector.addFailure(testName, e.toString(), Duration.zero);
-        debugPrint('❌ 测试失败: $e');
-      }
-      debugPrint('========================================\n');
-    });
-
-    test('POST /files/convert/log - 获取转换日志', () async {
-      final testName = 'POST /files/convert/log - 获取转换日志';
-      
-      if (!hasApiKey) {
-        resultCollector.addSkipped(testName, 'API密钥未配置');
-        return;
-      }
-
-      debugPrint('\n========================================');
-      debugPrint('测试: $testName');
-      debugPrint('========================================');
-      
-      try {
-        final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final testFile = '/tmp/test_convert_log_$timestamp.txt';
-        
-        await api.saveFile(FileSave(path: testFile, content: '测试转换日志内容'));
-        debugPrint('📤 创建测试文件: $testFile');
-        
-        try {
-          await api.convertFile(FileConvertRequest(
-            path: testFile,
-            fromEncoding: 'UTF-8',
-            toEncoding: 'GBK',
-          ));
-          debugPrint('📤 执行编码转换');
-        } catch (e) {
-          debugPrint('⚠️ 编码转换可能失败: $e');
-        }
-        
-        final request = FileConvertLogRequest(path: testFile);
-        
-        debugPrint('📤 请求参数:');
-        debugPrint('  path: ${request.path}');
-        
-        final response = await api.convertFileLog(request);
-        
-        debugPrint('📥 响应状态码: ${response.statusCode}');
-        debugPrint('📥 日志内容长度: ${response.data?.length ?? 0}');
-        if (response.data != null && response.data!.isNotEmpty) {
-          final logPreview = response.data!.length > 500 
-              ? '${response.data!.substring(0, 500)}...' 
-              : response.data!;
-          debugPrint('📥 日志内容:\n$logPreview');
-        }
-        
-        resultCollector.addSuccess(testName, Duration.zero);
-        debugPrint('✅ 测试成功!');
-        
-        try {
-          await api.deleteFiles(FileBatchDelete(paths: [testFile]));
-          debugPrint('🧹 清理测试文件: $testFile');
-        } catch (e) {
-          debugPrint('⚠️ 清理失败: $e');
-        }
-      } catch (e) {
-        resultCollector.addFailure(testName, e.toString(), Duration.zero);
-        debugPrint('❌ 测试失败: $e');
-      }
-      debugPrint('========================================\n');
-    });
-  });
 
   group('文件高级功能 API 测试', () {
 
@@ -1233,12 +1130,12 @@ void main() {
       
       try {
         final request = FileSearch(
-          path: '',
+          path: '/',
           page: 1,
           pageSize: 10,
         );
         
-        debugPrint('📤 请求参数: page=1');
+        debugPrint('📤 请求参数: path=/, page=1');
         
         final response = await api.searchUploadedFiles(request);
         
@@ -1253,6 +1150,95 @@ void main() {
       }
       debugPrint('========================================\n');
     });
+
+    test('POST /files/mount - 获取挂载信息', () async {
+      final testName = 'POST /files/mount - 获取挂载信息';
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        return;
+      }
+
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      try {
+        final response = await api.getMountInfo();
+        
+        debugPrint('📥 响应状态码: ${response.statusCode}');
+        debugPrint('📥 挂载点数量: ${response.data?.length ?? 0}');
+        
+        if (response.data != null && response.data!.isNotEmpty) {
+          debugPrint('📁 前3个挂载点:');
+          for (var i = 0; i < (response.data!.length > 3 ? 3 : response.data!.length); i++) {
+            final mount = response.data![i];
+            debugPrint('  [$i] ${mount.mountPoint} (${mount.fsType})');
+            debugPrint('      设备: ${mount.device}');
+            debugPrint('      总大小: ${_formatBytes(mount.total)}');
+            debugPrint('      已用: ${_formatBytes(mount.used)}');
+            debugPrint('      可用: ${_formatBytes(mount.available)}');
+          }
+        }
+        
+        resultCollector.addSuccess(testName, Duration.zero);
+        debugPrint('✅ 测试成功!');
+      } catch (e) {
+        resultCollector.addFailure(testName, e.toString(), Duration.zero);
+        debugPrint('❌ 测试失败: $e');
+      }
+      debugPrint('========================================\n');
+    });
+
+    test('POST /files/link/create - 创建链接', () async {
+      final testName = 'POST /files/link/create - 创建链接';
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        return;
+      }
+
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      try {
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final sourceFile = '/tmp/test_link_src_$timestamp.txt';
+        final linkFile = '/tmp/test_link_dst_$timestamp.link';
+        
+        await api.createFile(FileCreate(path: sourceFile, content: 'source content', isDir: false));
+        debugPrint('📤 创建源文件: $sourceFile');
+        
+        final request = FileLinkCreate(
+          sourcePath: sourceFile,
+          linkPath: linkFile,
+          linkType: 'symbolic', // 或 'hard'
+          overwrite: true,
+        );
+        
+        debugPrint('📤 创建链接请求: $sourceFile -> $linkFile');
+        
+        final response = await api.createFileLink(request);
+        
+        debugPrint('📥 响应状态码: ${response.statusCode}');
+        
+        resultCollector.addSuccess(testName, Duration.zero);
+        debugPrint('✅ 测试成功!');
+        
+        try {
+          await api.deleteFiles(FileBatchDelete(paths: [sourceFile, linkFile]));
+          debugPrint('🧹 清理测试文件');
+        } catch (e) {
+          debugPrint('⚠️ 清理失败: $e');
+        }
+      } catch (e) {
+        resultCollector.addFailure(testName, e.toString(), Duration.zero);
+        debugPrint('❌ 测试失败: $e');
+      }
+      debugPrint('========================================\n');
+    });
+
   });
 }
 

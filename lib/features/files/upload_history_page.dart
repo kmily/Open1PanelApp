@@ -110,7 +110,10 @@ class _UploadHistoryPageState extends State<UploadHistoryPage> {
               decoration: InputDecoration(
                 hintText: l10n.filesSearchHint,
                 prefixIcon: const Icon(Icons.search),
-                border: const OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: BorderSide.none,
+                ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                 filled: true,
                 fillColor: theme.colorScheme.surfaceContainerHighest,
@@ -124,7 +127,7 @@ class _UploadHistoryPageState extends State<UploadHistoryPage> {
     );
   }
 
-  Widget _buildBody(BuildContext context, dynamic l10n, ThemeData theme) {
+  Widget _buildBody(BuildContext context, AppLocalizations l10n, ThemeData theme) {
     if (_files.isEmpty && !_isLoading) {
       if (_error != null) {
         return Center(
@@ -158,11 +161,21 @@ class _UploadHistoryPageState extends State<UploadHistoryPage> {
         final file = _files[index];
         return ListTile(
           leading: const Icon(Icons.insert_drive_file_outlined),
-          title: Text(file.name),
-          subtitle: Text(file.path),
+          title: Text(
+            file.name,
+            style: theme.textTheme.titleMedium,
+          ),
+          subtitle: Text(
+            file.path,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
           trailing: Text(
             _formatSize(file.size),
-            style: theme.textTheme.bodySmall,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         );
       },

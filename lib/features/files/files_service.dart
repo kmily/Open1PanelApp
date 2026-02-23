@@ -420,49 +420,6 @@ class FilesService {
     return response.data!;
   }
 
-  Future<void> convertFile({
-    required String path,
-    required String fromEncoding,
-    required String toEncoding,
-  }) async {
-    appLogger.dWithPackage('files', 'convertFile: path=$path, from=$fromEncoding, to=$toEncoding');
-    final api = await _getApi();
-    await api.convertFile(FileConvertRequest(
-      path: path,
-      fromEncoding: fromEncoding,
-      toEncoding: toEncoding,
-    ));
-  }
-
-  Future<String> convertFileLog(String path) async {
-    appLogger.dWithPackage('files', 'convertFileLog: path=$path');
-    final api = await _getApi();
-    final response = await api.convertFileLog(FileConvertLogRequest(path: path));
-    return response.data ?? '';
-  }
-
-  Future<FileEncodingResult> convertFileEncoding({
-    required String path,
-    required String fromEncoding,
-    required String toEncoding,
-    bool? backup,
-  }) async {
-    appLogger.dWithPackage(
-      'files',
-      'convertFileEncoding: path=$path, from=$fromEncoding, to=$toEncoding, backup=$backup',
-    );
-    final api = await _getApi();
-    final response = await api.convertFileEncoding(
-      FileEncodingConvert(
-        path: path,
-        fromEncoding: fromEncoding,
-        toEncoding: toEncoding,
-        backup: backup,
-      ),
-    );
-    return response.data!;
-  }
-
   Future<FileDepthSizeInfo> getDepthSize(List<String> paths) async {
     appLogger.dWithPackage('files', 'getDepthSize: paths=$paths');
     final api = await _getApi();
@@ -474,13 +431,6 @@ class FilesService {
     appLogger.dWithPackage('files', 'getMountInfo');
     final api = await _getApi();
     final response = await api.getMountInfo();
-    return response.data!;
-  }
-
-  Future<FileProperties> getFileProperties(String path) async {
-    appLogger.dWithPackage('files', 'getFileProperties: path=$path');
-    final api = await _getApi();
-    final response = await api.getFileProperties(FilePropertiesRequest(path: path));
     return response.data!;
   }
 

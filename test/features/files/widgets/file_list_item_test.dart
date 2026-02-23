@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:onepanelapp_app/l10n/generated/app_localizations.dart';
 import 'package:onepanelapp_app/data/models/file_models.dart';
 import 'package:onepanelapp_app/features/files/widgets/file_list_item.dart';
 
@@ -29,6 +31,13 @@ void main() {
 
     Widget createTestWidget(FileListItem item) {
       return MaterialApp(
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
@@ -71,7 +80,7 @@ void main() {
         FileListItem(file: testFile),
       ));
 
-      final iconFinder = find.byIcon(Icons.insert_drive_file_outlined);
+      final iconFinder = find.byIcon(Icons.description_outlined);
       expect(iconFinder, findsOneWidget);
     });
 
@@ -154,7 +163,7 @@ void main() {
       await tester.tap(find.byType(PopupMenuButton<String>));
       await tester.pumpAndSettle();
 
-      expect(find.text('extract'), findsWidgets);
+      expect(find.text('Extract'), findsWidgets);
     });
   });
 

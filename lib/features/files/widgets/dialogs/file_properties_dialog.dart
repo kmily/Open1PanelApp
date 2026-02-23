@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/data/models/file_models.dart';
-import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
 import 'package:onepanelapp_app/features/files/files_provider.dart';
 
 class FilePropertiesDialog extends StatefulWidget {
@@ -21,36 +20,6 @@ class FilePropertiesDialog extends StatefulWidget {
 }
 
 class _FilePropertiesDialogState extends State<FilePropertiesDialog> {
-  FileProperties? _properties;
-  bool _isLoading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProperties();
-  }
-
-  Future<void> _loadProperties() async {
-    try {
-      final properties = await widget.provider.getFileProperties(widget.file.path);
-      if (mounted) {
-        setState(() {
-          _properties = properties;
-          _isLoading = false;
-        });
-      }
-    } catch (e, stackTrace) {
-      appLogger.eWithPackage('file_properties', '加载属性失败', error: e, stackTrace: stackTrace);
-      if (mounted) {
-        setState(() {
-          _error = e.toString();
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -72,45 +41,7 @@ class _FilePropertiesDialogState extends State<FilePropertiesDialog> {
   }
 
   Widget _buildContent(BuildContext context, dynamic l10n, ThemeData theme) {
-    if (_isLoading) {
-      return const Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircularProgressIndicator(),
-          SizedBox(height: 16),
-          Text('Loading...'),
-        ],
-      );
-    }
-
-    if (_error != null) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.error_outline, color: theme.colorScheme.error, size: 48),
-          const SizedBox(height: 16),
-          Text(_error!),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: () {
-              setState(() {
-                _isLoading = true;
-                _error = null;
-              });
-              _loadProperties();
-            },
-            icon: const Icon(Icons.refresh),
-            label: Text(l10n.commonRetry),
-          ),
-        ],
-      );
-    }
-
-    if (_properties == null) {
-      return const SizedBox();
-    }
-
-    final props = _properties!;
+    final props = widget.file;
     final dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
 
     return SingleChildScrollView(
@@ -125,17 +56,18 @@ class _FilePropertiesDialogState extends State<FilePropertiesDialog> {
           if (props.mimeType != null)
             _buildPropertyItem(context, 'MIME Type', props.mimeType!),
           const Divider(),
-          _buildPropertyItem(context, l10n.filesPermissionTitle, '${props.permission} (${props.owner}:${props.group})'),
+          if (props.permission != null)
+            _buildPropertyItem(
+              context,
+              l10n.filesPermissionTitle,
+              props.user != null && props.group != null
+                  ? '${props.permission} (${props.user}:${props.group})'
+                  : props.permission!,
+            ),
           if (props.createdAt != null)
             _buildPropertyItem(context, l10n.filesCreatedLabel, dateFormat.format(props.createdAt!)),
           if (props.modifiedAt != null)
             _buildPropertyItem(context, l10n.filesModifiedLabel, dateFormat.format(props.modifiedAt!)),
-          if (props.accessedAt != null)
-            _buildPropertyItem(context, l10n.filesAccessedLabel, dateFormat.format(props.accessedAt!)),
-          if (props.checksum != null) ...[
-            const Divider(),
-            _buildPropertyItem(context, 'Checksum', props.checksum!, copyable: true),
-          ],
         ],
       ),
     );

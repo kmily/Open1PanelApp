@@ -9,6 +9,8 @@ import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/core/services/transfer/transfer_task.dart';
 import 'package:onepanelapp_app/core/services/transfer/transfer_manager.dart';
 import 'package:onepanelapp_app/core/services/file_save_service.dart';
+import 'package:onepanelapp_app/features/files/files_provider.dart';
+import 'package:onepanelapp_app/features/files/upload_history_page.dart';
 
 enum TransferChannel { downloads, uploads }
 
@@ -63,6 +65,20 @@ class _TransferManagerPageState extends State<TransferManagerPage> {
       appBar: AppBar(
         title: Text(l10n.transferManagerTitle),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ChangeNotifierProvider.value(
+                    value: context.read<FilesProvider>(),
+                    child: const UploadHistoryPage(),
+                  ),
+                ),
+              );
+            },
+            tooltip: l10n.filesUploadHistory,
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadTasks,

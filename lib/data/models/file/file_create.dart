@@ -23,12 +23,22 @@ class FileCreate extends Equatable {
   final String? content;
   final bool? isDir;
   final String? permission;
+  final bool? isLink;
+  final String? linkPath;
+  final bool? isSymlink;
+  final bool? sub;
+  final int? mode;
 
   const FileCreate({
     required this.path,
     this.content,
     this.isDir,
     this.permission,
+    this.isLink,
+    this.linkPath,
+    this.isSymlink,
+    this.sub,
+    this.mode,
   });
 
   factory FileCreate.fromJson(Map<String, dynamic> json) {
@@ -37,6 +47,11 @@ class FileCreate extends Equatable {
       content: json['content'] as String?,
       isDir: json['isDir'] as bool?,
       permission: json['permission'] as String?,
+      isLink: json['isLink'] as bool?,
+      linkPath: json['linkPath'] as String?,
+      isSymlink: json['isSymlink'] as bool?,
+      sub: json['sub'] as bool?,
+      mode: json['mode'] as int?,
     );
   }
 
@@ -46,11 +61,26 @@ class FileCreate extends Equatable {
       'content': content,
       'isDir': isDir,
       'permission': permission,
+      'isLink': isLink,
+      'linkPath': linkPath,
+      'isSymlink': isSymlink,
+      'sub': sub,
+      'mode': mode,
     };
   }
 
   @override
-  List<Object?> get props => [path, content, isDir, permission];
+  List<Object?> get props => [
+        path,
+        content,
+        isDir,
+        permission,
+        isLink,
+        linkPath,
+        isSymlink,
+        sub,
+        mode,
+      ];
 }
 
 class FileRead extends Equatable {
@@ -121,4 +151,70 @@ class FileSave extends Equatable {
 
   @override
   List<Object?> get props => [path, content, encoding, createDir];
+}
+
+class FileLinkCreate extends Equatable {
+  final String sourcePath;
+  final String linkPath;
+  final String linkType;
+  final bool? overwrite;
+
+  const FileLinkCreate({
+    required this.sourcePath,
+    required this.linkPath,
+    required this.linkType,
+    this.overwrite,
+  });
+
+  factory FileLinkCreate.fromJson(Map<String, dynamic> json) {
+    return FileLinkCreate(
+      sourcePath: json['sourcePath'] as String,
+      linkPath: json['linkPath'] as String,
+      linkType: json['linkType'] as String,
+      overwrite: json['overwrite'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sourcePath': sourcePath,
+      'linkPath': linkPath,
+      'linkType': linkType,
+      'overwrite': overwrite,
+    };
+  }
+
+  @override
+  List<Object?> get props => [sourcePath, linkPath, linkType, overwrite];
+}
+
+class FileLinkResult extends Equatable {
+  final bool success;
+  final String? linkPath;
+  final String? error;
+
+  const FileLinkResult({
+    required this.success,
+    this.linkPath,
+    this.error,
+  });
+
+  factory FileLinkResult.fromJson(Map<String, dynamic> json) {
+    return FileLinkResult(
+      success: json['success'] as bool? ?? false,
+      linkPath: json['linkPath'] as String?,
+      error: json['error'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'linkPath': linkPath,
+      'error': error,
+    };
+  }
+
+  @override
+  List<Object?> get props => [success, linkPath, error];
 }

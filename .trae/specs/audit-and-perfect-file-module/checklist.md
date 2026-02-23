@@ -1,0 +1,6 @@
+- [x] `file_list_item_test.dart` passes
+- [x] `UploadHistoryPage` uses MD3 Search styling
+- [x] `UploadHistoryPage` uses strong typing
+- [x] `file_api_test.dart` passes (no 500 errors on paths)
+- [x] Integration tests cover `mount`, `batch`, `properties`, `link`
+- [x] All file module tests pass

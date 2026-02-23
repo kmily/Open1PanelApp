@@ -101,17 +101,6 @@ class _FakeFileDepthSizeInfo_6 extends _i1.SmartFake
         );
 }
 
-class _FakeFileProperties_7 extends _i1.SmartFake
-    implements _i2.FileProperties {
-  _FakeFileProperties_7(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
 class _FakeFileUserGroupResponse_8 extends _i1.SmartFake
     implements _i2.FileUserGroupResponse {
   _FakeFileUserGroupResponse_8(
@@ -814,22 +803,6 @@ class MockFilesService extends _i1.Mock implements _i3.FilesService {
         returnValue:
             _i4.Future<List<_i2.FileMountInfo>>.value(<_i2.FileMountInfo>[]),
       ) as _i4.Future<List<_i2.FileMountInfo>>);
-
-  @override
-  _i4.Future<_i2.FileProperties> getFileProperties(String? path) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getFileProperties,
-          [path],
-        ),
-        returnValue: _i4.Future<_i2.FileProperties>.value(_FakeFileProperties_7(
-          this,
-          Invocation.method(
-            #getFileProperties,
-            [path],
-          ),
-        )),
-      ) as _i4.Future<_i2.FileProperties>);
 
   @override
   _i4.Future<void> createFileLink({

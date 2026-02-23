@@ -82,7 +82,7 @@ class FileV2Api {
   /// @return 删除结果
   Future<Response> deleteFiles(FileBatchDelete request) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/files/del'),
+      ApiConstants.buildApiPath('/files/batch/del'),
       data: request.toJson(),
     );
   }
@@ -588,8 +588,22 @@ class FileV2Api {
     if (data is List) {
       files = data.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList();
     } else if (data is Map<String, dynamic>) {
-      final items = data['items'] as List? ?? data['data'] as List?;
-      files = items?.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList() ?? [];
+      var itemsRaw = data['items'];
+      if (itemsRaw == null) {
+        itemsRaw = data['data'];
+      }
+      
+      if (itemsRaw is List) {
+        files = itemsRaw.map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList();
+      } else if (itemsRaw is Map<String, dynamic>) {
+         // Handle case where items might be wrapped in another object or pagination
+         // Try to find a list inside
+         if (itemsRaw['items'] is List) {
+           files = (itemsRaw['items'] as List).map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList();
+         } else if (itemsRaw['data'] is List) {
+           files = (itemsRaw['data'] as List).map((item) => FileInfo.fromJson(item as Map<String, dynamic>)).toList();
+         }
+      }
     }
     return Response(
       data: files,
@@ -617,87 +631,20 @@ class FileV2Api {
     );
   }
 
-  /// 批量操作文件
-  ///
-  /// 批量执行文件操作
-  /// @param request 批量操作请求
-  /// @return 操作结果
-  Future<Response<FileBatchResult>> batchOperateFiles(FileBatchOperate request) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/files/batch/operate'),
-      data: request.toJson(),
-    );
-    return Response(
-      data: FileBatchResult.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 获取文件属性
-  ///
-  /// 获取文件或目录的详细属性
-  /// @param request 属性查询请求
-  /// @return 文件属性
-  Future<Response<FileProperties>> getFileProperties(FilePropertiesRequest request) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/files/properties'),
-      data: request.toJson(),
-    );
-    return Response(
-      data: FileProperties.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
   /// 创建文件链接
   ///
   /// 创建文件或目录的符号链接
   /// @param request 链接创建请求
   /// @return 创建结果
-  Future<Response<FileLinkResult>> createFileLink(FileLinkCreate request) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/files/link/create'),
-      data: request.toJson(),
-    );
-    return Response(
-      data: FileLinkResult.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 转换文件编码
-  ///
-  /// 转换文件内容的字符编码
-  /// @param request 编码转换请求
-  /// @return 转换结果
-  Future<Response<FileEncodingResult>> convertFileEncoding(FileEncodingConvert request) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/files/encoding/convert'),
-      data: request.toJson(),
-    );
-    return Response(
-      data: FileEncodingResult.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
-  /// 转换文件
-  ///
-  /// 转换文件编码
-  /// @param request 转换请求
-  /// @return 转换结果
-  Future<Response> convertFile(FileConvertRequest request) async {
+  Future<Response> createFileLink(FileLinkCreate request) async {
     return await _client.post(
-      ApiConstants.buildApiPath('/files/convert'),
-      data: request.toJson(),
+      ApiConstants.buildApiPath('/files'),
+      data: FileCreate(
+        path: request.linkPath,
+        linkPath: request.sourcePath,
+        isLink: true,
+        isSymlink: request.linkType == 'symbolic',
+      ).toJson(),
     );
   }
 

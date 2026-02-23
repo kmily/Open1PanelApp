@@ -69,17 +69,6 @@ class _FakeFileUserGroupResponse_3 extends _i1.SmartFake
         );
 }
 
-class _FakeFileProperties_4 extends _i1.SmartFake
-    implements _i3.FileProperties {
-  _FakeFileProperties_4(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
 /// A class which mocks [FilesProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
@@ -755,22 +744,6 @@ class MockFilesProvider extends _i1.Mock implements _i4.FilesProvider {
         ),
         returnValue: _i5.Future<String?>.value(),
       ) as _i5.Future<String?>);
-
-  @override
-  _i5.Future<_i3.FileProperties> getFileProperties(String? path) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getFileProperties,
-          [path],
-        ),
-        returnValue: _i5.Future<_i3.FileProperties>.value(_FakeFileProperties_4(
-          this,
-          Invocation.method(
-            #getFileProperties,
-            [path],
-          ),
-        )),
-      ) as _i5.Future<_i3.FileProperties>);
 
   @override
   _i5.Future<void> createFileLink({

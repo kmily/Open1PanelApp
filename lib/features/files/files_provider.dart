@@ -782,18 +782,6 @@ class FilesProvider extends ChangeNotifier {
     return digest.toString();
   }
 
-  Future<FileProperties> getFileProperties(String path) async {
-    appLogger.dWithPackage('files_provider', 'getFileProperties: path=$path');
-    try {
-      final properties = await _service.getFileProperties(path);
-      appLogger.iWithPackage('files_provider', 'getFileProperties: 成功获取文件属性');
-      return properties;
-    } catch (e, stackTrace) {
-      appLogger.eWithPackage('files_provider', 'getFileProperties: 获取文件属性失败', error: e, stackTrace: stackTrace);
-      rethrow;
-    }
-  }
-
   Future<void> createFileLink({
     required String sourcePath,
     required String linkPath,
