@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:onepanelapp_app/core/config/api_config.dart';
 import 'package:onepanelapp_app/core/config/api_constants.dart';
 import 'files_service.dart';
@@ -13,8 +14,10 @@ import '../../core/network/api_client_manager.dart';
 import '../../core/services/logger/logger_service.dart';
 
 class FilesProvider extends ChangeNotifier {
-  final FilesService _service = FilesService();
+  final FilesService _service;
   FilesData _data = const FilesData();
+
+  FilesProvider({FilesService? service}) : _service = service ?? FilesService();
 
   static const int _chunkDownloadThreshold = 50 * 1024 * 1024;
 
@@ -36,6 +39,17 @@ class FilesProvider extends ChangeNotifier {
     _data = _data.copyWith(currentServer: server);
     appLogger.iWithPackage('files_provider', 'loadServer: 服务器配置加载完成, serverId=${server?.id}');
     notifyListeners();
+  }
+
+  Future<List<FileInfo>> fetchFiles(String path) async {
+    appLogger.dWithPackage('files_provider', 'fetchFiles: path=$path');
+    try {
+      final files = await _service.getFiles(path: path);
+      return files;
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'fetchFiles: 加载失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> loadFiles({String? path}) async {
@@ -596,6 +610,74 @@ class FilesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<List<FileInfo>> searchUploadedFiles({int page = 1, int pageSize = 20, String? search}) async {
+    appLogger.dWithPackage('files_provider', 'searchUploadedFiles: page=$page');
+    try {
+      final result = await _service.searchUploadedFiles(page: page, pageSize: pageSize, search: search);
+      return result;
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'searchUploadedFiles: 获取上传记录失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> batchChangeFileRole({
+    required List<String> paths,
+    int? mode,
+    String? user,
+    String? group,
+    bool? sub,
+  }) async {
+    appLogger.dWithPackage('files_provider', 'batchChangeFileRole: paths=$paths');
+    try {
+      await _service.batchChangeFileRole(
+        paths: paths,
+        mode: mode,
+        user: user,
+        group: group,
+        sub: sub,
+      );
+      appLogger.iWithPackage('files_provider', 'batchChangeFileRole: 成功');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'batchChangeFileRole: 失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<List<FileMountInfo>> getMountInfo() async {
+    appLogger.dWithPackage('files_provider', 'getMountInfo');
+    return await _service.getMountInfo();
+  }
+
+  Future<FileBatchCheckResult> batchCheckFiles(List<String> paths) async {
+    appLogger.dWithPackage('files_provider', 'batchCheckFiles: paths=$paths');
+    return await _service.batchCheckFiles(paths);
+  }
+
+  Future<FileSearchResult> searchInFiles({
+    required String pattern,
+    bool? caseSensitive,
+    bool? wholeWord,
+    bool? regex,
+  }) async {
+    appLogger.dWithPackage('files_provider', 'searchInFiles: pattern=$pattern, path=${_data.currentPath}');
+    try {
+      final result = await _service.searchInFiles(
+        path: _data.currentPath,
+        pattern: pattern,
+        caseSensitive: caseSensitive,
+        wholeWord: wholeWord,
+        regex: regex,
+      );
+      appLogger.iWithPackage('files_provider', 'searchInFiles: 搜索完成, 匹配数=${result.totalMatches}');
+      return result;
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'searchInFiles: 搜索失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
   Future<void> changeFileMode(String path, int mode, {bool? sub}) async {
     appLogger.dWithPackage('files_provider', 'changeFileMode: path=$path, mode=$mode, sub=$sub');
     try {
@@ -656,9 +738,16 @@ class FilesProvider extends ChangeNotifier {
         throw StateError('No server configured');
       }
 
-      // 使用外部存储目录 /storage/emulated/0/Download
-      // 这样用户可以直接在文件管理器中找到下载的文件
-      final downloadDir = Directory('/storage/emulated/0/Download');
+      // 获取下载目录
+      String downloadPath;
+      if (Platform.isAndroid) {
+        downloadPath = '/storage/emulated/0/Download';
+      } else {
+        final directory = await getApplicationDocumentsDirectory();
+        downloadPath = directory.path;
+      }
+      
+      final downloadDir = Directory(downloadPath);
       if (!await downloadDir.exists()) {
         await downloadDir.create(recursive: true);
       }
@@ -714,6 +803,40 @@ class FilesProvider extends ChangeNotifier {
     final bytes = utf8.encode(authString);
     final digest = md5.convert(bytes);
     return digest.toString();
+  }
+
+  Future<FileProperties> getFileProperties(String path) async {
+    appLogger.dWithPackage('files_provider', 'getFileProperties: path=$path');
+    try {
+      final properties = await _service.getFileProperties(path);
+      appLogger.iWithPackage('files_provider', 'getFileProperties: 成功获取文件属性');
+      return properties;
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'getFileProperties: 获取文件属性失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> createFileLink({
+    required String sourcePath,
+    required String linkPath,
+    required String linkType,
+    bool? overwrite,
+  }) async {
+    appLogger.dWithPackage('files_provider', 'createFileLink: source=$sourcePath, link=$linkPath');
+    try {
+      await _service.createFileLink(
+        sourcePath: sourcePath,
+        linkPath: linkPath,
+        linkType: linkType,
+        overwrite: overwrite,
+      );
+      appLogger.iWithPackage('files_provider', 'createFileLink: 成功创建链接');
+      await refresh();
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('files_provider', 'createFileLink: 创建链接失败', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   Future<bool> isStoragePermissionPermanentlyDenied() async {

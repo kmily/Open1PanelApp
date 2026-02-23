@@ -1,161 +1,106 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:onepanelapp_app/features/files/models/models.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 import 'package:onepanelapp_app/data/models/file_models.dart';
+import 'package:onepanelapp_app/features/files/files_provider.dart';
+import 'package:onepanelapp_app/features/files/files_service.dart';
+
+@GenerateMocks([FilesService])
+import 'files_provider_test.mocks.dart';
 
 void main() {
-  group('FilesData 模型测试', () {
-    group('FilesData 初始化', () {
-      test('初始状态应该正确', () {
-        const data = FilesData();
-        
-        expect(data.files, isEmpty);
-        expect(data.currentPath, equals('/'));
-        expect(data.isLoading, isFalse);
-        expect(data.error, isNull);
-        expect(data.selectedFiles, isEmpty);
-        expect(data.searchQuery, isNull);
-      });
-    });
+  late FilesProvider provider;
+  late MockFilesService mockService;
 
-    group('FilesData copyWith', () {
-      test('应该正确更新文件列表', () {
-        final files = <FileInfo>[
-          FileInfo(
-            name: 'test.txt',
-            path: '/test.txt',
-            type: 'file',
-            size: 1024,
-          ),
-        ];
-
-        final data = const FilesData().copyWith(files: files);
-        
-        expect(data.files.length, equals(1));
-        expect(data.files.first.name, equals('test.txt'));
-      });
-
-      test('应该正确更新当前路径', () {
-        final data = const FilesData().copyWith(currentPath: '/opt/1panel');
-        
-        expect(data.currentPath, equals('/opt/1panel'));
-      });
-
-      test('应该正确更新加载状态', () {
-        final data = const FilesData().copyWith(isLoading: true);
-        
-        expect(data.isLoading, isTrue);
-      });
-
-      test('应该正确更新错误信息', () {
-        final data = const FilesData().copyWith(error: '测试错误');
-        
-        expect(data.error, equals('测试错误'));
-      });
-
-      test('应该正确更新搜索关键词', () {
-        final data = const FilesData().copyWith(searchQuery: 'test');
-        
-        expect(data.searchQuery, equals('test'));
-      });
-
-      test('应该正确更新选中文件', () {
-        final data = const FilesData().copyWith(selectedFiles: {'/test.txt'});
-        
-        expect(data.selectedFiles.length, equals(1));
-        expect(data.selectedFiles.contains('/test.txt'), isTrue);
-      });
-    });
-
-    group('FilesData 路径历史', () {
-      test('应该正确更新路径历史', () {
-        final history = ['/', '/opt', '/opt/1panel'];
-        final data = const FilesData().copyWith(pathHistory: history);
-        
-        expect(data.pathHistory.length, equals(3));
-        expect(data.pathHistory, equals(history));
-      });
-    });
-
-    group('FilesData 排序', () {
-      test('应该正确更新排序字段', () {
-        final data = const FilesData().copyWith(sortBy: 'name');
-        
-        expect(data.sortBy, equals('name'));
-      });
-
-      test('应该正确更新排序顺序', () {
-        final data = const FilesData().copyWith(sortOrder: 'desc');
-        
-        expect(data.sortOrder, equals('desc'));
-      });
-    });
+  setUp(() {
+    mockService = MockFilesService();
+    provider = FilesProvider(service: mockService);
   });
 
-  group('FileInfo 模型测试', () {
-    test('应该正确创建文件信息', () {
-      final file = FileInfo(
-        name: 'test.txt',
-        path: '/test.txt',
-        type: 'file',
-        size: 1024,
-      );
-
-      expect(file.name, equals('test.txt'));
-      expect(file.path, equals('/test.txt'));
-      expect(file.size, equals(1024));
-      expect(file.type, equals('file'));
-      expect(file.isDir, isFalse);
-    });
-
-    test('应该正确创建目录信息', () {
-      final dir = FileInfo(
-        name: 'testdir',
-        path: '/testdir',
-        type: 'dir',
-        size: 0,
+  group('FilesProvider Tests', () {
+    final testFiles = [
+      FileInfo(
+        name: 'folder1',
+        path: '/folder1',
         isDir: true,
-      );
-
-      expect(dir.name, equals('testdir'));
-      expect(dir.isDir, isTrue);
-      expect(dir.type, equals('dir'));
-    });
-
-    test('应该正确从 JSON 解析', () {
-      final json = {
-        'name': 'test.txt',
-        'path': '/test.txt',
-        'size': 1024,
-        'isDir': false,
-        'type': 'file',
-      };
-
-      final file = FileInfo.fromJson(json);
-
-      expect(file.name, equals('test.txt'));
-      expect(file.path, equals('/test.txt'));
-      expect(file.size, equals(1024));
-      expect(file.isDir, isFalse);
-    });
-  });
-
-  group('RecycleBinItem 模型测试', () {
-    test('应该正确创建回收站项目', () {
-      final item = RecycleBinItem(
-        sourcePath: '/original/path/file.txt',
-        name: 'file.txt',
-        size: 1024,
+        size: 0,
+        modifiedAt: DateTime(2023, 1, 1),
+        mode: '0755',
+        type: 'dir',
+        user: 'root',
+        group: 'root',
+        permission: 'rwxr-xr-x',
+      ),
+      FileInfo(
+        name: 'file1.txt',
+        path: '/file1.txt',
         isDir: false,
-        rName: 'r_file.txt',
-        from: '/original/path',
-      );
+        size: 1024,
+        modifiedAt: DateTime(2023, 1, 1),
+        mode: '0644',
+        type: 'file',
+        user: 'root',
+        group: 'root',
+        permission: 'rw-r--r--',
+      ),
+    ];
 
-      expect(item.sourcePath, equals('/original/path/file.txt'));
-      expect(item.name, equals('file.txt'));
-      expect(item.size, equals(1024));
-      expect(item.isDir, isFalse);
-      expect(item.rName, equals('r_file.txt'));
-      expect(item.from, equals('/original/path'));
+    test('loadFiles should update state with files', () async {
+      // Arrange
+      when(mockService.getFiles(path: anyNamed('path'), search: anyNamed('search')))
+          .thenAnswer((_) async => testFiles);
+
+      // Act
+      await provider.loadFiles(path: '/');
+
+      // Assert
+      expect(provider.data.files, testFiles);
+      expect(provider.data.isLoading, false);
+      expect(provider.data.currentPath, '/');
+      verify(mockService.getFiles(path: '/', search: null)).called(1);
+    });
+
+    test('fetchFiles should return files without updating state', () async {
+      // Arrange
+      when(mockService.getFiles(path: anyNamed('path')))
+          .thenAnswer((_) async => testFiles);
+
+      // Act
+      final result = await provider.fetchFiles('/test');
+
+      // Assert
+      expect(result, testFiles);
+      // State should not change (assuming initial state is empty/default)
+      expect(provider.data.files, isEmpty); 
+      verify(mockService.getFiles(path: '/test')).called(1);
+    });
+
+    test('createDirectory should call service and refresh', () async {
+      // Arrange
+      when(mockService.createDirectory(any)).thenAnswer((_) async {});
+      when(mockService.getFiles(path: anyNamed('path'), search: anyNamed('search')))
+          .thenAnswer((_) async => []);
+
+      // Act
+      await provider.createDirectory('new_folder');
+
+      // Assert
+      verify(mockService.createDirectory('/new_folder')).called(1);
+      // Refresh calls loadFiles
+      verify(mockService.getFiles(path: anyNamed('path'), search: anyNamed('search'))).called(1);
+    });
+    
+    test('navigateTo should update path and load files', () async {
+      // Arrange
+      when(mockService.getFiles(path: anyNamed('path'), search: anyNamed('search')))
+          .thenAnswer((_) async => []);
+          
+      // Act
+      await provider.navigateTo('/new/path');
+      
+      // Assert
+      expect(provider.data.currentPath, '/new/path');
+      verify(mockService.getFiles(path: '/new/path', search: null)).called(1);
     });
   });
 }

@@ -27,6 +27,7 @@ class _FileEditorPageState extends State<FileEditorPage> {
   bool _hasChanges = false;
   String? _error;
   String _encoding = 'utf-8';
+  String _originalContent = '';
   FilesService? _service;
 
   static const List<String> _availableEncodings = [
@@ -51,7 +52,8 @@ class _FileEditorPageState extends State<FileEditorPage> {
     await _service!.getCurrentServer();
     
     if (widget.initialContent != null) {
-      _controller.text = widget.initialContent!;
+      _originalContent = widget.initialContent!;
+      _controller.text = _originalContent;
       setState(() {
         _isLoading = false;
       });
@@ -68,7 +70,7 @@ class _FileEditorPageState extends State<FileEditorPage> {
   }
 
   void _onTextChanged() {
-    final hasChanges = _controller.text != widget.initialContent;
+    final hasChanges = _controller.text != _originalContent;
     if (hasChanges != _hasChanges) {
       setState(() {
         _hasChanges = hasChanges;
@@ -88,10 +90,11 @@ class _FileEditorPageState extends State<FileEditorPage> {
         _service = FilesService();
         await _service!.getCurrentServer();
       }
-      final content = await _service!.getFileContent(widget.filePath);
+      final content = await _service!.readFile(widget.filePath, encoding: _encoding);
       appLogger.iWithPackage('file_editor', '_loadContent: 成功加载, 长度=${content.length}');
       if (mounted) {
-        _controller.text = content;
+        _originalContent = content;
+        _controller.text = _originalContent;
         setState(() {
           _isLoading = false;
           _hasChanges = false;
@@ -121,12 +124,13 @@ class _FileEditorPageState extends State<FileEditorPage> {
         _service = FilesService();
         await _service!.getCurrentServer();
       }
-      await _service!.updateFileContent(widget.filePath, _controller.text);
+      await _service!.saveFile(widget.filePath, _controller.text, encoding: _encoding);
       appLogger.iWithPackage('file_editor', '_saveContent: 保存成功');
       if (mounted) {
         setState(() {
           _isSaving = false;
           _hasChanges = false;
+          _originalContent = _controller.text;
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -213,6 +217,7 @@ class _FileEditorPageState extends State<FileEditorPage> {
           ),
           actions: [
             _buildEncodingSelector(theme, l10n),
+            _buildMoreActions(theme, l10n),
             IconButton(
               icon: _isSaving
                   ? const SizedBox(
@@ -236,9 +241,7 @@ class _FileEditorPageState extends State<FileEditorPage> {
       tooltip: l10n.filesEditorEncoding,
       icon: const Icon(Icons.text_fields),
       onSelected: (value) {
-        setState(() {
-          _encoding = value;
-        });
+        _onEncodingSelected(value);
       },
       itemBuilder: (context) => _availableEncodings.map((encoding) {
         return PopupMenuItem<String>(
@@ -366,5 +369,217 @@ class _FileEditorPageState extends State<FileEditorPage> {
         ],
       ),
     );
+  }
+
+  Future<void> _onEncodingSelected(String value) async {
+    if (value == _encoding) return;
+    if (_hasChanges) {
+      final l10n = context.l10n;
+      final proceed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.filesEditorEncoding),
+          content: Text(l10n.filesEditorReloadConfirm),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.commonCancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.commonConfirm),
+            ),
+          ],
+        ),
+      );
+      if (proceed != true) return;
+    }
+
+    setState(() {
+      _encoding = value;
+      _hasChanges = false;
+    });
+    await _loadContent();
+  }
+
+  Widget _buildMoreActions(ThemeData theme, dynamic l10n) {
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.more_vert),
+      onSelected: (value) {
+        switch (value) {
+          case 'reload':
+            _loadContent();
+            break;
+          case 'convert':
+            _showConvertEncodingDialog();
+            break;
+          case 'log':
+            _showConvertLog();
+            break;
+        }
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem<String>(
+          value: 'reload',
+          child: Text(l10n.filesReload),
+        ),
+        PopupMenuItem<String>(
+          value: 'convert',
+          child: Text(l10n.filesEncodingConvert),
+        ),
+        PopupMenuItem<String>(
+          value: 'log',
+          child: Text(l10n.filesEncodingLog),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showConvertEncodingDialog() async {
+    final l10n = context.l10n;
+    var from = _encoding;
+    var to = _encoding == 'utf-8' ? 'gbk' : 'utf-8';
+    var backup = true;
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text(l10n.filesEncodingConvert),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField<String>(
+                    initialValue: from,
+                    decoration: InputDecoration(labelText: l10n.filesEncodingFrom),
+                    items: _availableEncodings
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e.toUpperCase())))
+                        .toList(),
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setDialogState(() => from = value);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    initialValue: to,
+                    decoration: InputDecoration(labelText: l10n.filesEncodingTo),
+                    items: _availableEncodings
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e.toUpperCase())))
+                        .toList(),
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setDialogState(() => to = value);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    value: backup,
+                    onChanged: (value) {
+                      setDialogState(() => backup = value ?? true);
+                    },
+                    title: Text(l10n.filesEncodingBackup),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(l10n.commonCancel),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text(l10n.commonConfirm),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (result != true) return;
+    if (_service == null) {
+      _service = FilesService();
+      await _service!.getCurrentServer();
+    }
+
+    try {
+      final response = await _service!.convertFileEncoding(
+        path: widget.filePath,
+        fromEncoding: from,
+        toEncoding: to,
+        backup: backup,
+      );
+
+      if (!mounted) return;
+      if (response.success) {
+        setState(() => _encoding = to);
+        await _loadContent();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.filesEncodingConvertDone)),
+        );
+      } else {
+        DebugErrorDialog.show(
+          context,
+          l10n.filesEncodingConvertFailed,
+          response.error ?? l10n.commonUnknownError,
+        );
+      }
+    } catch (e, stackTrace) {
+      if (!mounted) return;
+      DebugErrorDialog.show(context, l10n.filesEncodingConvertFailed, e, stackTrace: stackTrace);
+    }
+  }
+
+  Future<void> _showConvertLog() async {
+    final l10n = context.l10n;
+    if (_service == null) {
+      _service = FilesService();
+      await _service!.getCurrentServer();
+    }
+
+    try {
+      final log = await _service!.convertFileLog(widget.filePath);
+      if (!mounted) return;
+      await showModalBottomSheet<void>(
+        context: context,
+        showDragHandle: true,
+        builder: (context) {
+          final theme = Theme.of(context);
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.filesEncodingLog,
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      child: SelectableText(
+                        log.isEmpty ? l10n.filesEncodingLogEmpty : log,
+                        style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e, stackTrace) {
+      if (!mounted) return;
+      DebugErrorDialog.show(context, l10n.filesEncodingConvertFailed, e, stackTrace: stackTrace);
+    }
   }
 }

@@ -1,0 +1,6 @@
+- [x] FilesPage navigation to FileContentSearchPage passes provider correctly
+- [x] FilesPage navigation to UploadHistoryPage passes provider correctly
+- [x] FilesPage navigation to MountsPage passes provider correctly
+- [x] FilesPage navigation to FavoritesPage passes provider correctly
+- [x] FilesPage navigation to RecycleBinPage passes provider correctly
+- [x] FilesPage navigation to TransferManagerPage passes provider correctly (if needed)

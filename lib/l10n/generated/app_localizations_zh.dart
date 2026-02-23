@@ -24,6 +24,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get commonConfirm => '确认';
 
   @override
+  String get commonClose => '关闭';
+
+  @override
   String get commonCopy => '复制';
 
   @override
@@ -1693,6 +1696,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String get filesEditorWordWrap => '自动换行';
 
   @override
+  String get filesGoToLine => '跳转行';
+
+  @override
+  String get filesLineNumber => '行号';
+
+  @override
+  String get filesReload => '重新加载';
+
+  @override
+  String get filesEditorReloadConfirm => '切换编码将重新加载文件内容，未保存修改将丢失，是否继续？';
+
+  @override
+  String get filesEncodingConvert => '转换编码';
+
+  @override
+  String get filesEncodingFrom => '源编码';
+
+  @override
+  String get filesEncodingTo => '目标编码';
+
+  @override
+  String get filesEncodingBackup => '备份原文件';
+
+  @override
+  String get filesEncodingConvertDone => '编码转换成功';
+
+  @override
+  String get filesEncodingConvertFailed => '编码转换失败';
+
+  @override
+  String get filesEncodingLog => '转换日志';
+
+  @override
+  String get filesEncodingLogEmpty => '暂无日志';
+
+  @override
+  String get commonUnknownError => '未知错误';
+
+  @override
   String get filesPreviewImage => '图片预览';
 
   @override
@@ -1921,4 +1963,58 @@ class AppLocalizationsZh extends AppLocalizations {
   String fileSaveLocation(String path) {
     return '保存位置: $path';
   }
+
+  @override
+  String get filesPropertiesTitle => '文件属性';
+
+  @override
+  String get filesCreatedLabel => '创建时间';
+
+  @override
+  String get filesModifiedLabel => '修改时间';
+
+  @override
+  String get filesAccessedLabel => '访问时间';
+
+  @override
+  String get filesCreateLinkTitle => '创建链接';
+
+  @override
+  String get filesLinkNameLabel => '链接名称';
+
+  @override
+  String get filesLinkTypeLabel => '链接类型';
+
+  @override
+  String get filesLinkTypeSymbolic => '符号链接';
+
+  @override
+  String get filesLinkTypeHard => '硬链接';
+
+  @override
+  String get filesLinkPath => '目标路径';
+
+  @override
+  String get filesContentSearch => '内容搜索';
+
+  @override
+  String get filesContentSearchHint => '搜索内容';
+
+  @override
+  String get filesUploadHistory => '上传历史';
+
+  @override
+  String get filesMounts => '挂载点';
+
+  @override
+  String get filesActionUp => '返回上级';
+
+  @override
+  String get commonError => '发生错误';
+
+  @override
+  String get commonCreateSuccess => '创建成功';
+
+  @override
+  String get commonCopySuccess => '复制成功';
 }

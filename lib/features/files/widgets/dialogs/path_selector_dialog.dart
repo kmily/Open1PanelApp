@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/data/models/file_models.dart';
 import 'package:onepanelapp_app/features/files/files_provider.dart';
-import 'package:onepanelapp_app/features/files/files_service.dart';
 
 Future<String?> showPathSelectorDialog(
   BuildContext context,
@@ -11,35 +10,82 @@ Future<String?> showPathSelectorDialog(
   AppLocalizations l10n,
 ) async {
   String selectedPath = currentPath;
-  
+
   return showDialog<String>(
     context: context,
     builder: (dialogContext) => StatefulBuilder(
       builder: (context, setDialogState) {
+        final parentPath = _getParentPath(selectedPath);
+
         return AlertDialog(
           title: Text(l10n.filesPathSelectorTitle),
           content: SizedBox(
             width: 300,
             height: 400,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ListTile(
-                  leading: const Icon(Icons.folder),
-                  title: Text(l10n.filesCurrentFolder),
-                  subtitle: Text(selectedPath, style: Theme.of(context).textTheme.bodySmall),
-                  onTap: () {
-                    Navigator.pop(dialogContext, selectedPath);
-                  },
+                // Current path display and navigation
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      if (selectedPath != '/')
+                        IconButton(
+                          icon: const Icon(Icons.arrow_upward),
+                          tooltip: l10n.filesActionUp,
+                          onPressed: () {
+                            setDialogState(() {
+                              selectedPath = parentPath;
+                            });
+                          },
+                        ),
+                      if (selectedPath == '/')
+                        const Padding(
+                          padding: EdgeInsets.all(12.0),
+                          child: Icon(Icons.home),
+                        ),
+                      Expanded(
+                        child: Text(
+                          selectedPath,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const Divider(),
+                const SizedBox(height: 8),
                 Expanded(
                   child: FutureBuilder<List<FileInfo>>(
-                    future: _loadSubfolders(selectedPath),
+                    future: provider.fetchFiles(selectedPath),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }
-                      final folders = snapshot.data ?? [];
+                      if (snapshot.hasError) {
+                         return Center(
+                           child: Column(
+                             mainAxisAlignment: MainAxisAlignment.center,
+                             children: [
+                               Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error),
+                               const SizedBox(height: 8),
+                               Text(l10n.commonError),
+                             ],
+                           ),
+                         );
+                      }
+                      
+                      final allFiles = snapshot.data ?? [];
+                      final folders = allFiles.where((f) => f.isDir).toList();
+                      // Sort folders by name
+                      folders.sort((a, b) => a.name.compareTo(b.name));
+
                       if (folders.isEmpty) {
                         return Center(child: Text(l10n.filesNoSubfolders));
                       }
@@ -48,7 +94,7 @@ Future<String?> showPathSelectorDialog(
                         itemBuilder: (context, index) {
                           final folder = folders[index];
                           return ListTile(
-                            leading: const Icon(Icons.folder_outlined),
+                            leading: const Icon(Icons.folder, color: Colors.amber),
                             title: Text(folder.name),
                             onTap: () {
                               setDialogState(() {
@@ -80,12 +126,11 @@ Future<String?> showPathSelectorDialog(
   );
 }
 
-Future<List<FileInfo>> _loadSubfolders(String path) async {
-  try {
-    final service = FilesService();
-    final files = await service.getFiles(path: path);
-    return files.where((f) => f.isDir).toList();
-  } catch (e) {
-    return [];
-  }
+String _getParentPath(String path) {
+  if (path == '/') return '/';
+  final segments = path.split('/').where((s) => s.isNotEmpty).toList();
+  if (segments.isEmpty) return '/';
+  segments.removeLast();
+  if (segments.isEmpty) return '/';
+  return '/${segments.join('/')}';
 }

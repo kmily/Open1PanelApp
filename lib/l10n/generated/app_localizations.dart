@@ -128,6 +128,12 @@ abstract class AppLocalizations {
   /// **'Confirm'**
   String get commonConfirm;
 
+  /// No description provided for @commonClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get commonClose;
+
   /// No description provided for @commonCopy.
   ///
   /// In en, this message translates to:
@@ -3362,6 +3368,84 @@ abstract class AppLocalizations {
   /// **'Word Wrap'**
   String get filesEditorWordWrap;
 
+  /// No description provided for @filesGoToLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Line'**
+  String get filesGoToLine;
+
+  /// No description provided for @filesLineNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Line number'**
+  String get filesLineNumber;
+
+  /// No description provided for @filesReload.
+  ///
+  /// In en, this message translates to:
+  /// **'Reload'**
+  String get filesReload;
+
+  /// No description provided for @filesEditorReloadConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Switching encoding will reload the file and discard unsaved changes. Continue?'**
+  String get filesEditorReloadConfirm;
+
+  /// No description provided for @filesEncodingConvert.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert Encoding'**
+  String get filesEncodingConvert;
+
+  /// No description provided for @filesEncodingFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From encoding'**
+  String get filesEncodingFrom;
+
+  /// No description provided for @filesEncodingTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To encoding'**
+  String get filesEncodingTo;
+
+  /// No description provided for @filesEncodingBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup original file'**
+  String get filesEncodingBackup;
+
+  /// No description provided for @filesEncodingConvertDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Encoding conversion succeeded'**
+  String get filesEncodingConvertDone;
+
+  /// No description provided for @filesEncodingConvertFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Encoding conversion failed'**
+  String get filesEncodingConvertFailed;
+
+  /// No description provided for @filesEncodingLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversion Log'**
+  String get filesEncodingLog;
+
+  /// No description provided for @filesEncodingLogEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No logs'**
+  String get filesEncodingLogEmpty;
+
+  /// No description provided for @commonUnknownError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown error'**
+  String get commonUnknownError;
+
   /// No description provided for @filesPreviewImage.
   ///
   /// In en, this message translates to:
@@ -3793,6 +3877,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved to: {path}'**
   String fileSaveLocation(String path);
+
+  /// No description provided for @filesPropertiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'File Properties'**
+  String get filesPropertiesTitle;
+
+  /// No description provided for @filesCreatedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get filesCreatedLabel;
+
+  /// No description provided for @filesModifiedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Modified'**
+  String get filesModifiedLabel;
+
+  /// No description provided for @filesAccessedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessed'**
+  String get filesAccessedLabel;
+
+  /// No description provided for @filesCreateLinkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Link'**
+  String get filesCreateLinkTitle;
+
+  /// No description provided for @filesLinkNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Name'**
+  String get filesLinkNameLabel;
+
+  /// No description provided for @filesLinkTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Type'**
+  String get filesLinkTypeLabel;
+
+  /// No description provided for @filesLinkTypeSymbolic.
+  ///
+  /// In en, this message translates to:
+  /// **'Symbolic Link'**
+  String get filesLinkTypeSymbolic;
+
+  /// No description provided for @filesLinkTypeHard.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard Link'**
+  String get filesLinkTypeHard;
+
+  /// No description provided for @filesLinkPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Path'**
+  String get filesLinkPath;
+
+  /// No description provided for @filesContentSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Content Search'**
+  String get filesContentSearch;
+
+  /// No description provided for @filesContentSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Content'**
+  String get filesContentSearchHint;
+
+  /// No description provided for @filesUploadHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload History'**
+  String get filesUploadHistory;
+
+  /// No description provided for @filesMounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Mount Points'**
+  String get filesMounts;
+
+  /// No description provided for @filesActionUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Up'**
+  String get filesActionUp;
+
+  /// No description provided for @commonError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error occurred'**
+  String get commonError;
+
+  /// No description provided for @commonCreateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Created successfully'**
+  String get commonCreateSuccess;
+
+  /// No description provided for @commonCopySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied successfully'**
+  String get commonCopySuccess;
 }
 
 class _AppLocalizationsDelegate

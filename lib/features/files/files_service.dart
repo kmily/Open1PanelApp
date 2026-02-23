@@ -252,6 +252,25 @@ class FilesService {
     ));
   }
 
+  Future<void> batchChangeFileRole({
+    required List<String> paths,
+    int? mode,
+    String? user,
+    String? group,
+    bool? sub,
+  }) async {
+    appLogger.dWithPackage('files', 'batchChangeFileRole: paths=$paths, mode=$mode, user=$user, group=$group');
+    final api = await _getApi();
+    await api.batchChangeFileRole(FileBatchRoleRequest(
+      paths: paths,
+      mode: mode,
+      user: user,
+      group: group,
+      sub: sub,
+    ));
+    appLogger.iWithPackage('files', 'batchChangeFileRole: 成功修改角色');
+  }
+
   Future<FileCheckResult> checkFile(String path) async {
     appLogger.dWithPackage('files', 'checkFile: path=$path');
     final api = await _getApi();
@@ -385,6 +404,45 @@ class FilesService {
     return response.data!;
   }
 
+  Future<List<FileInfo>> searchUploadedFiles({
+    int page = 1,
+    int pageSize = 20,
+    String? search,
+  }) async {
+    appLogger.dWithPackage('files', 'searchUploadedFiles: page=$page, size=$pageSize');
+    final api = await _getApi();
+    final response = await api.searchUploadedFiles(FileSearch(
+      path: '',
+      page: page,
+      pageSize: pageSize,
+      search: search,
+    ));
+    return response.data!;
+  }
+
+  Future<FileSearchResult> searchInFiles({
+    required String path,
+    required String pattern,
+    bool? caseSensitive,
+    bool? wholeWord,
+    bool? regex,
+    List<String>? fileTypes,
+    int? maxResults,
+  }) async {
+    appLogger.dWithPackage('files', 'searchInFiles: path=$path, pattern=$pattern');
+    final api = await _getApi();
+    final response = await api.searchInFiles(FileSearchInRequest(
+      path: path,
+      pattern: pattern,
+      caseSensitive: caseSensitive,
+      wholeWord: wholeWord,
+      regex: regex,
+      fileTypes: fileTypes,
+      maxResults: maxResults,
+    ));
+    return response.data!;
+  }
+
   Future<void> convertFile({
     required String path,
     required String fromEncoding,
@@ -406,6 +464,28 @@ class FilesService {
     return response.data ?? '';
   }
 
+  Future<FileEncodingResult> convertFileEncoding({
+    required String path,
+    required String fromEncoding,
+    required String toEncoding,
+    bool? backup,
+  }) async {
+    appLogger.dWithPackage(
+      'files',
+      'convertFileEncoding: path=$path, from=$fromEncoding, to=$toEncoding, backup=$backup',
+    );
+    final api = await _getApi();
+    final response = await api.convertFileEncoding(
+      FileEncodingConvert(
+        path: path,
+        fromEncoding: fromEncoding,
+        toEncoding: toEncoding,
+        backup: backup,
+      ),
+    );
+    return response.data!;
+  }
+
   Future<FileDepthSizeInfo> getDepthSize(List<String> paths) async {
     appLogger.dWithPackage('files', 'getDepthSize: paths=$paths');
     final api = await _getApi();
@@ -418,6 +498,30 @@ class FilesService {
     final api = await _getApi();
     final response = await api.getMountInfo();
     return response.data!;
+  }
+
+  Future<FileProperties> getFileProperties(String path) async {
+    appLogger.dWithPackage('files', 'getFileProperties: path=$path');
+    final api = await _getApi();
+    final response = await api.getFileProperties(FilePropertiesRequest(path: path));
+    return response.data!;
+  }
+
+  Future<void> createFileLink({
+    required String sourcePath,
+    required String linkPath,
+    required String linkType,
+    bool? overwrite,
+  }) async {
+    appLogger.dWithPackage('files', 'createFileLink: source=$sourcePath, link=$linkPath, type=$linkType');
+    final api = await _getApi();
+    await api.createFileLink(FileLinkCreate(
+      sourcePath: sourcePath,
+      linkPath: linkPath,
+      linkType: linkType,
+      overwrite: overwrite,
+    ));
+    appLogger.iWithPackage('files', 'createFileLink: 成功创建链接');
   }
 
   Future<String> previewFile(String path, {int? line, int? limit}) async {
@@ -680,15 +784,5 @@ class FilesService {
     appLogger.dWithPackage('files', 'uploadFile: path=$path');
     final api = await _getApi();
     await api.uploadFile(path, file);
-  }
-
-  Future<void> batchChangeRole(List<String> paths, String operation, {bool? force}) async {
-    appLogger.dWithPackage('files', 'batchChangeRole: paths=$paths, operation=$operation');
-    final api = await _getApi();
-    await api.batchChangeFileRole(FileBatchOperate(
-      paths: paths,
-      operation: operation,
-      force: force,
-    ));
   }
 }

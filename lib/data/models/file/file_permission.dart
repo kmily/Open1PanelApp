@@ -167,3 +167,32 @@ class FileUserGroupResponse extends Equatable {
   @override
   List<Object?> get props => [users, groups];
 }
+
+class FileBatchRoleRequest extends Equatable {
+  final List<String> paths;
+  final int? mode;
+  final String? user;
+  final String? group;
+  final bool? sub;
+
+  const FileBatchRoleRequest({
+    required this.paths,
+    this.mode,
+    this.user,
+    this.group,
+    this.sub,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'paths': paths,
+      if (mode != null) 'mode': mode,
+      if (user != null) 'user': user,
+      if (group != null) 'group': group,
+      if (sub != null) 'sub': sub,
+    };
+  }
+
+  @override
+  List<Object?> get props => [paths, mode, user, group, sub];
+}

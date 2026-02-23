@@ -24,6 +24,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonConfirm => 'Confirm';
 
   @override
+  String get commonClose => 'Close';
+
+  @override
   String get commonCopy => 'Copy';
 
   @override
@@ -1727,6 +1730,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filesEditorWordWrap => 'Word Wrap';
 
   @override
+  String get filesGoToLine => 'Go to Line';
+
+  @override
+  String get filesLineNumber => 'Line number';
+
+  @override
+  String get filesReload => 'Reload';
+
+  @override
+  String get filesEditorReloadConfirm =>
+      'Switching encoding will reload the file and discard unsaved changes. Continue?';
+
+  @override
+  String get filesEncodingConvert => 'Convert Encoding';
+
+  @override
+  String get filesEncodingFrom => 'From encoding';
+
+  @override
+  String get filesEncodingTo => 'To encoding';
+
+  @override
+  String get filesEncodingBackup => 'Backup original file';
+
+  @override
+  String get filesEncodingConvertDone => 'Encoding conversion succeeded';
+
+  @override
+  String get filesEncodingConvertFailed => 'Encoding conversion failed';
+
+  @override
+  String get filesEncodingLog => 'Conversion Log';
+
+  @override
+  String get filesEncodingLogEmpty => 'No logs';
+
+  @override
+  String get commonUnknownError => 'Unknown error';
+
+  @override
   String get filesPreviewImage => 'Image Preview';
 
   @override
@@ -1961,4 +2004,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String fileSaveLocation(String path) {
     return 'Saved to: $path';
   }
+
+  @override
+  String get filesPropertiesTitle => 'File Properties';
+
+  @override
+  String get filesCreatedLabel => 'Created';
+
+  @override
+  String get filesModifiedLabel => 'Modified';
+
+  @override
+  String get filesAccessedLabel => 'Accessed';
+
+  @override
+  String get filesCreateLinkTitle => 'Create Link';
+
+  @override
+  String get filesLinkNameLabel => 'Link Name';
+
+  @override
+  String get filesLinkTypeLabel => 'Link Type';
+
+  @override
+  String get filesLinkTypeSymbolic => 'Symbolic Link';
+
+  @override
+  String get filesLinkTypeHard => 'Hard Link';
+
+  @override
+  String get filesLinkPath => 'Target Path';
+
+  @override
+  String get filesContentSearch => 'Content Search';
+
+  @override
+  String get filesContentSearchHint => 'Search Content';
+
+  @override
+  String get filesUploadHistory => 'Upload History';
+
+  @override
+  String get filesMounts => 'Mount Points';
+
+  @override
+  String get filesActionUp => 'Up';
+
+  @override
+  String get commonError => 'Error occurred';
+
+  @override
+  String get commonCreateSuccess => 'Created successfully';
+
+  @override
+  String get commonCopySuccess => 'Copied successfully';
 }

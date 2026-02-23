@@ -270,7 +270,7 @@ class FileV2Api {
   /// 批量修改文件或目录的角色
   /// @param request 批量角色修改请求
   /// @return 修改结果
-  Future<Response> batchChangeFileRole(FileBatchOperate request) async {
+  Future<Response> batchChangeFileRole(FileBatchRoleRequest request) async {
     return await _client.post(
       ApiConstants.buildApiPath('/files/batch/role'),
       data: request.toJson(),

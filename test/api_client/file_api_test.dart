@@ -1215,6 +1215,85 @@ void main() {
       debugPrint('========================================\n');
     });
   });
+
+  group('文件高级功能 API 测试', () {
+    test('POST /files/search/in - 内容搜索', () async {
+      final testName = 'POST /files/search/in - 内容搜索';
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        return;
+      }
+      
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      try {
+        final request = FileSearchInRequest(
+          path: '/etc',
+          pattern: 'root',
+          maxResults: 5,
+        );
+        
+        debugPrint('📤 请求参数: path=/etc, pattern=root');
+        
+        final response = await api.searchInFiles(request);
+        
+        debugPrint('📥 响应状态码: ${response.statusCode}');
+        debugPrint('📥 匹配数: ${response.data?.totalMatches ?? 0}');
+        
+        if (response.data?.matches != null && response.data!.matches.isNotEmpty) {
+          debugPrint('📥 匹配项:');
+          for (final match in response.data!.matches.take(3)) {
+            debugPrint('  - ${match.filePath}:${match.lineNumber} -> ${match.line.trim()}');
+          }
+        }
+        
+        resultCollector.addSuccess(testName, Duration.zero);
+        debugPrint('✅ 测试成功!');
+      } catch (e) {
+        resultCollector.addFailure(testName, e.toString(), Duration.zero);
+        debugPrint('❌ 测试失败: $e');
+      }
+      debugPrint('========================================\n');
+    });
+
+    test('POST /files/upload/search - 上传历史', () async {
+      final testName = 'POST /files/upload/search - 上传历史';
+      
+      if (!hasApiKey) {
+        resultCollector.addSkipped(testName, 'API密钥未配置');
+        return;
+      }
+      
+      debugPrint('\n========================================');
+      debugPrint('测试: $testName');
+      debugPrint('========================================');
+      
+      try {
+        final request = FileSearch(
+          path: '',
+          page: 1,
+          pageSize: 10,
+        );
+        
+        debugPrint('📤 请求参数: page=1');
+        
+        final response = await api.searchUploadedFiles(request);
+        
+        debugPrint('📥 响应状态码: ${response.statusCode}');
+        debugPrint('📥 记录数: ${response.data?.length ?? 0}');
+        
+        resultCollector.addSuccess(testName, Duration.zero);
+        debugPrint('✅ 测试成功!');
+      } catch (e) {
+        resultCollector.addFailure(testName, e.toString(), Duration.zero);
+        debugPrint('❌ 测试失败: $e');
+      }
+      debugPrint('========================================\n');
+    });
+  });
 }
 
 String _formatBytes(int bytes) {

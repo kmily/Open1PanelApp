@@ -8,8 +8,11 @@ import 'package:onepanelapp_app/data/models/file_models.dart';
 import 'package:onepanelapp_app/features/files/files_provider.dart';
 import 'package:onepanelapp_app/features/files/file_preview_page.dart';
 import 'package:onepanelapp_app/features/files/file_editor_page.dart';
+import 'package:onepanelapp_app/features/files/file_content_search_page.dart';
 import 'package:onepanelapp_app/features/files/favorites_page.dart';
 import 'package:onepanelapp_app/features/files/recycle_bin_page.dart';
+import 'package:onepanelapp_app/features/files/upload_history_page.dart';
+import 'package:onepanelapp_app/features/files/mounts_page.dart';
 import 'package:onepanelapp_app/features/files/transfer_manager_page.dart';
 import 'package:onepanelapp_app/core/utils/debug_error_dialog.dart';
 import 'package:onepanelapp_app/core/config/api_config.dart';
@@ -30,6 +33,8 @@ import 'package:onepanelapp_app/features/files/widgets/dialogs/upload_dialog.dar
 import 'package:onepanelapp_app/features/files/widgets/dialogs/wget_dialog.dart';
 import 'package:onepanelapp_app/features/files/widgets/dialogs/search_dialog.dart';
 import 'package:onepanelapp_app/features/files/widgets/dialogs/sort_options_dialog.dart';
+import 'package:onepanelapp_app/features/files/widgets/dialogs/file_properties_dialog.dart';
+import 'package:onepanelapp_app/features/files/widgets/dialogs/create_link_dialog.dart';
 
 export 'models/models.dart' show WgetDownloadState;
 
@@ -404,6 +409,8 @@ class _FilesViewState extends State<FilesView> {
               PopupMenuItem(value: 'extract', child: Text(l10n.filesActionExtract)),
             PopupMenuItem(value: 'compress', child: Text(l10n.filesActionCompress)),
             PopupMenuItem(value: 'permission', child: Text(l10n.filesPermissionTitle)),
+            PopupMenuItem(value: 'link', child: Text(l10n.filesCreateLinkTitle)),
+            PopupMenuItem(value: 'properties', child: Text(l10n.filesPropertiesTitle)),
             const PopupMenuDivider(),
             PopupMenuItem(
               value: 'delete',
@@ -629,6 +636,12 @@ class _FilesViewState extends State<FilesView> {
       case 'permission':
         showPermissionDialog(context, provider, file, l10n);
         break;
+      case 'properties':
+        showFilePropertiesDialog(context, provider, file);
+        break;
+      case 'link':
+        showCreateLinkDialog(context, provider, file.path);
+        break;
       case 'delete':
         provider.toggleSelection(file.path);
         showDeleteConfirmDialog(context, provider, l10n);
@@ -643,6 +656,7 @@ class _FilesViewState extends State<FilesView> {
         builder: (context) => FilePreviewPage(
           filePath: file.path,
           fileName: file.name,
+          fileSize: file.size,
         ),
       ),
     );
@@ -930,6 +944,51 @@ class _FilesViewState extends State<FilesView> {
               },
             ),
             ListTile(
+              leading: const Icon(Icons.find_in_page_outlined),
+              title: Text(sheetContext.l10n.filesContentSearch),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ChangeNotifierProvider.value(
+                      value: provider,
+                      child: const FileContentSearchPage(),
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.history),
+              title: Text(sheetContext.l10n.filesUploadHistory),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ChangeNotifierProvider.value(
+                      value: provider,
+                      child: const UploadHistoryPage(),
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.storage_outlined),
+              title: Text(sheetContext.l10n.filesMounts),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ChangeNotifierProvider.value(
+                      value: provider,
+                      child: const MountsPage(),
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.delete_outline),
               title: Text(sheetContext.l10n.filesRecycleBin),
               onTap: () {
@@ -945,9 +1004,13 @@ class _FilesViewState extends State<FilesView> {
 
   void _openTransferManager(BuildContext context) {
     appLogger.dWithPackage('files_page', '_openTransferManager: 打开传输管理器页面');
+    final provider = context.read<FilesProvider>();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const TransferManagerPage(),
+        builder: (context) => ChangeNotifierProvider.value(
+          value: provider,
+          child: const TransferManagerPage(),
+        ),
       ),
     );
   }
@@ -956,7 +1019,10 @@ class _FilesViewState extends State<FilesView> {
     appLogger.dWithPackage('files_page', '_openFavorites: 打开收藏夹页面');
     final result = await Navigator.of(context).push<String>(
       MaterialPageRoute(
-        builder: (context) => const FavoritesPage(),
+        builder: (context) => ChangeNotifierProvider.value(
+          value: provider,
+          child: const FavoritesPage(),
+        ),
       ),
     );
 
@@ -968,9 +1034,13 @@ class _FilesViewState extends State<FilesView> {
 
   void _openRecycleBin(BuildContext context) {
     appLogger.dWithPackage('files_page', '_openRecycleBin: 打开回收站页面');
+    final provider = context.read<FilesProvider>();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const RecycleBinPage(),
+        builder: (context) => ChangeNotifierProvider.value(
+          value: provider,
+          child: const RecycleBinPage(),
+        ),
       ),
     );
   }

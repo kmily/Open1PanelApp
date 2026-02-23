@@ -17,15 +17,22 @@ import 'package:onepanelapp_app/core/services/cache/file_preview_cache_manager.d
 import 'package:onepanelapp_app/core/services/app_settings_controller.dart';
 import 'package:onepanelapp_app/features/files/files_service.dart';
 import 'package:onepanelapp_app/features/files/file_editor_page.dart';
+import 'package:onepanelapp_app/features/files/files_provider.dart';
+import 'package:onepanelapp_app/data/models/file_models.dart';
+import 'package:onepanelapp_app/features/files/widgets/dialogs/file_properties_dialog.dart';
 
 class FilePreviewPage extends StatefulWidget {
   final String filePath;
   final String fileName;
+  final int? fileSize;
+  final int? initialLine;
 
   const FilePreviewPage({
     super.key,
     required this.filePath,
     required this.fileName,
+    this.fileSize,
+    this.initialLine,
   });
 
   @override
@@ -42,6 +49,18 @@ class _FilePreviewPageState extends State<FilePreviewPage> {
   CacheSource? _cacheSource;
   
   final FilePreviewCacheManager _cacheManager = FilePreviewCacheManager();
+
+  final ScrollController _textScrollController = ScrollController();
+  final List<String> _pagedLines = [];
+  bool _usePagedTextPreview = false;
+  bool _isLoadingMore = false;
+  bool _hasMoreLines = true;
+  int _baseLine = 1;
+  int? _highlightLine;
+
+  static const int _largeTextThresholdBytes = 1024 * 1024;
+  static const int _previewPageSize = 200;
+  static const int _previewContextLines = 40;
 
   VideoPlayerController? _videoController;
   ChewieController? _chewieController;
@@ -90,6 +109,7 @@ class _FilePreviewPageState extends State<FilePreviewPage> {
 
   @override
   void dispose() {
+    _textScrollController.dispose();
     _videoController?.dispose();
     _chewieController?.dispose();
     _audioPlayer?.dispose();
@@ -105,11 +125,31 @@ class _FilePreviewPageState extends State<FilePreviewPage> {
         _fileType == FileType.audio) {
       await _downloadAndPreview();
     } else if (_fileType == FileType.text || _fileType == FileType.markdown) {
-      await _loadContent();
+      final forcePaged = widget.initialLine != null;
+      _usePagedTextPreview = forcePaged ||
+          (_fileType == FileType.text &&
+          (widget.fileSize != null && widget.fileSize! >= _largeTextThresholdBytes));
+
+      if (_usePagedTextPreview) {
+        _textScrollController.addListener(_onTextScroll);
+        final initialLine = widget.initialLine ?? 1;
+        await _loadPreviewWindow(initialLine: initialLine);
+      } else {
+        await _loadContent();
+      }
     } else {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  void _onTextScroll() {
+    if (!_usePagedTextPreview || _isLoadingMore || !_hasMoreLines) return;
+    final position = _textScrollController.position;
+    if (!position.hasPixels || !position.hasContentDimensions) return;
+    if (position.pixels >= position.maxScrollExtent - 240) {
+      _loadMorePreviewLines();
     }
   }
 
@@ -334,6 +374,78 @@ class _FilePreviewPageState extends State<FilePreviewPage> {
     }
   }
 
+  Future<void> _loadPreviewWindow({required int initialLine}) async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      if (_service == null) {
+        _service = FilesService();
+        await _service!.getCurrentServer();
+      }
+
+      final startLine = (initialLine - _previewContextLines).clamp(1, 1 << 30);
+      final text = await _service!.previewFile(
+        widget.filePath,
+        line: startLine,
+        limit: _previewPageSize,
+      );
+      final lines = text.split('\n');
+
+      if (!mounted) return;
+      setState(() {
+        _pagedLines
+          ..clear()
+          ..addAll(lines);
+        _baseLine = startLine;
+        _highlightLine = initialLine;
+        _hasMoreLines = lines.length >= _previewPageSize;
+        _isLoading = false;
+      });
+    } catch (e, stackTrace) {
+      appLogger.eWithPackage('file_preview', '_loadPreviewWindow: 加载失败', error: e, stackTrace: stackTrace);
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadMorePreviewLines() async {
+    if (_isLoadingMore || !_hasMoreLines) return;
+    setState(() => _isLoadingMore = true);
+
+    try {
+      if (_service == null) {
+        _service = FilesService();
+        await _service!.getCurrentServer();
+      }
+
+      final nextLine = _baseLine + _pagedLines.length;
+      final text = await _service!.previewFile(
+        widget.filePath,
+        line: nextLine,
+        limit: _previewPageSize,
+      );
+      final lines = text.isEmpty ? <String>[] : text.split('\n');
+
+      if (!mounted) return;
+      setState(() {
+        _pagedLines.addAll(lines);
+        _hasMoreLines = lines.length >= _previewPageSize;
+        _isLoadingMore = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingMore = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -358,16 +470,78 @@ class _FilePreviewPageState extends State<FilePreviewPage> {
           ],
         ),
         actions: [
+          if (_usePagedTextPreview)
+            IconButton(
+              icon: const Icon(Icons.format_list_numbered),
+              tooltip: l10n.filesGoToLine,
+              onPressed: () => _showGoToLineDialog(context),
+            ),
           if (_fileType == FileType.text || _fileType == FileType.markdown)
             IconButton(
               icon: const Icon(Icons.edit_outlined),
               onPressed: () => _openEditor(context),
               tooltip: l10n.filesEditFile,
             ),
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () {
+              final provider = context.read<FilesProvider>();
+              showFilePropertiesDialog(
+                context, 
+                provider, 
+                FileInfo(
+                  name: widget.fileName,
+                  path: widget.filePath,
+                  type: 'file',
+                  size: widget.fileSize ?? 0,
+                )
+              );
+            },
+            tooltip: l10n.filesPropertiesTitle,
+          ),
         ],
       ),
       body: _buildBody(context, l10n, theme),
     );
+  }
+
+  Future<void> _showGoToLineDialog(BuildContext context) async {
+    final l10n = context.l10n;
+    final controller = TextEditingController(text: '${_highlightLine ?? _baseLine}');
+    final line = await showDialog<int>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(l10n.filesGoToLine),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: l10n.filesLineNumber,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.commonCancel),
+            ),
+            FilledButton(
+              onPressed: () {
+                final value = int.tryParse(controller.text.trim());
+                Navigator.pop(context, value);
+              },
+              child: Text(l10n.commonConfirm),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (line == null || line <= 0) return;
+    await _loadPreviewWindow(initialLine: line);
+    if (_textScrollController.hasClients) {
+      _textScrollController.jumpTo(0);
+    }
   }
   
   String _getCacheSourceText() {
@@ -412,7 +586,7 @@ class _FilePreviewPageState extends State<FilePreviewPage> {
       case FileType.audio:
         return _buildAudioPreview(context, theme, l10n);
       case FileType.markdown:
-        return _buildMarkdownPreview(context, theme);
+        return _usePagedTextPreview ? _buildTextPreview(context, theme) : _buildMarkdownPreview(context, theme);
       case FileType.pdf:
         return _buildPdfPreview(context, theme);
       case FileType.text:
@@ -665,6 +839,62 @@ class _FilePreviewPageState extends State<FilePreviewPage> {
   }
 
   Widget _buildTextPreview(BuildContext context, ThemeData theme) {
+    if (_usePagedTextPreview) {
+      return ListView.builder(
+        controller: _textScrollController,
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
+        itemCount: _pagedLines.length + (_isLoadingMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (_isLoadingMore && index == _pagedLines.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          final lineNo = _baseLine + index;
+          final lineText = _pagedLines[index];
+          final highlighted = _highlightLine != null && lineNo == _highlightLine;
+
+          return Container(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            decoration: highlighted
+                ? BoxDecoration(
+                    color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.35),
+                    borderRadius: BorderRadius.circular(8),
+                  )
+                : null,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 64,
+                  child: Text(
+                    '$lineNo',
+                    textAlign: TextAlign.right,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SelectableText(
+                    lineText,
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
     if (_content == null) {
       return const Center(child: CircularProgressIndicator());
     }

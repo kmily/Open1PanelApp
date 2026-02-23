@@ -33,6 +33,21 @@ class _MockFilesProvider extends FilesProvider {
 
   @override
   Future<void> uploadFiles(List<String> filePaths) async {}
+
+  @override
+  Future<List<FileInfo>> fetchFiles(String path) async {
+    return [
+      FileInfo(
+        name: 'test_folder',
+        path: '$path/test_folder',
+        isDir: true,
+        size: 0,
+        modifiedAt: DateTime.now(),
+        mode: '0755',
+        type: 'dir',
+      ),
+    ];
+  }
 }
 
 void main() {

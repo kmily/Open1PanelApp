@@ -146,6 +146,10 @@ Open1PanelApp 的文件管理模块负责服务器文件系统的浏览、操作
 | POST /files/user/group | 获取用户组 | ✅ |
 | POST /files/mount | 获取挂载信息 | ✅ |
 | POST /files/encoding/convert | 编码转换 | ✅ |
+| POST /files/search/in | 内容搜索 | ✅ |
+| POST /files/properties | 文件属性 | ✅ |
+| POST /files/link/create | 创建链接 | ✅ |
+| POST /files/upload/search | 上传历史 | ✅ |
 
 ## 后续规划
 - 文件分享功能实现
