@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
+import 'package:onepanelapp_app/config/app_router.dart';
+import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import 'package:onepanelapp_app/data/models/app_models.dart';
 import 'package:onepanelapp_app/features/apps/app_service.dart';
 import 'package:onepanelapp_app/features/apps/providers/installed_apps_provider.dart';
-import 'package:onepanelapp_app/l10n/generated/app_localizations.dart';
+import 'package:onepanelapp_app/features/apps/widgets/app_icon.dart';
+import 'package:onepanelapp_app/features/containers/container_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InstalledAppDetailPage extends StatefulWidget {
-  final String appId;
+  final AppInstallInfo? appInfo;
+  final String? appId;
 
   const InstalledAppDetailPage({
     super.key,
-    required this.appId,
-  });
+    this.appInfo,
+    this.appId,
+  }) : assert(appInfo != null || appId != null,
+            'Either appInfo or appId must be provided');
 
   @override
   State<InstalledAppDetailPage> createState() => _InstalledAppDetailPageState();
@@ -19,8 +27,10 @@ class InstalledAppDetailPage extends StatefulWidget {
 
 class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
   final AppService _appService = AppService();
-  
+  final ContainerService _containerService = ContainerService();
+
   AppInstallInfo? _appInfo;
+  AppItem? _storeDetail;
   List<AppServiceResponse>? _services;
   Map<String, dynamic>? _appConfig;
   bool _loading = true;
@@ -29,6 +39,9 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
   @override
   void initState() {
     super.initState();
+    if (widget.appInfo != null) {
+      _appInfo = widget.appInfo;
+    }
     _loadData();
   }
 
@@ -39,21 +52,59 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
     });
 
     try {
-      final info = await _appService.getAppInstallInfo(widget.appId);
-      List<AppServiceResponse> services = [];
-      Map<String, dynamic>? config;
+      // 1. Ensure we have AppInstallInfo
+      if (_appInfo == null && widget.appId != null) {
+        _appInfo = await _appService.getAppInstallInfo(widget.appId!);
+      }
 
-      if (info.appKey != null) {
+      if (_appInfo == null) {
+        throw Exception('Failed to load app info');
+      }
+
+      // 2. Fetch Store Detail (for README)
+      // Use appKey (or key) and version. If version is missing, use 'latest'.
+      // Also need 'type' which might be in appType.
+      final appKey = _appInfo!.appKey;
+      final version = _appInfo!.version ?? 'latest';
+      // Default to 'app' type if unknown, but usually it's passed or can be inferred?
+      // AppInstallInfo has appType.
+      final type = _appInfo!.appType ?? 'app';
+
+      if (appKey != null) {
         try {
-          services = await _appService.getAppServices(info.appKey!);
+          // getAppDetail requires appId (string), version, type.
+          // Wait, getAppDetail first argument is 'appId'. Is it the store ID or the key?
+          // Looking at AppService.getAppDetail signature: (String appId, String version, String type).
+          // In AppDetailPage it uses app.id.toString().
+          // AppInstallInfo has appId (int).
+          if (_appInfo!.appId != null) {
+             _storeDetail = await _appService.getAppDetail(
+              _appInfo!.appId!.toString(),
+              version,
+              type,
+            );
+          }
+        } catch (e) {
+          debugPrint('Failed to load store detail: $e');
+        }
+      }
+
+      // 3. Fetch Services
+      List<AppServiceResponse> services = [];
+      if (appKey != null) {
+        try {
+          services = await _appService.getAppServices(appKey);
         } catch (e) {
           debugPrint('Failed to load services: $e');
         }
       }
 
-      if (info.name != null && info.appKey != null) {
+      // 4. Fetch Config
+      Map<String, dynamic>? config;
+      if (_appInfo!.name != null && appKey != null) {
         try {
-          config = await _appService.getAppInstallConfig(info.name!, info.appKey!);
+          config =
+              await _appService.getAppInstallConfig(_appInfo!.name!, appKey);
         } catch (e) {
           debugPrint('Failed to load config: $e');
         }
@@ -61,7 +112,6 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
 
       if (mounted) {
         setState(() {
-          _appInfo = info;
           _services = services;
           _appConfig = config;
           _loading = false;
@@ -78,9 +128,9 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
   }
 
   Future<void> _handleAction(String operation) async {
-    if (_appInfo == null) return;
+    if (_appInfo == null || _appInfo!.id == null) return;
 
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = context.l10n;
     final provider = context.read<InstalledAppsProvider>();
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
@@ -107,7 +157,7 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
 
         if (confirmed != true) return;
 
-        await provider.uninstallApp(widget.appId);
+        await provider.uninstallApp(_appInfo!.id.toString());
         if (mounted) {
           navigator.pop(); // Close detail page
           scaffoldMessenger.showSnackBar(
@@ -115,12 +165,20 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
           );
         }
       } else {
-        await provider.operateApp(widget.appId, operation);
+        await provider.operateApp(_appInfo!.id.toString(), operation);
         scaffoldMessenger.showSnackBar(
           SnackBar(content: Text(l10n.appOperateSuccess)),
         );
-        // Refresh data
-        _loadData();
+        // Refresh data (status might change)
+        // We can just re-fetch app info
+        if (_appInfo?.id != null) {
+           final newInfo = await _appService.getAppInstallInfo(_appInfo!.id.toString());
+           if(mounted) {
+             setState(() {
+               _appInfo = newInfo;
+             });
+           }
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -131,9 +189,86 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
     }
   }
 
+  Future<void> _openWeb() async {
+    if (_appInfo?.webUI == null) return;
+    // webUI might be just "http://IP:PORT" or just port?
+    // Usually it's a full URL or we need to construct it.
+    // Assuming it's a full URL or at least has http prefix.
+    // If not, we might need to prepend http://<server_ip>
+    // But for now let's assume it's usable.
+    
+    // Note: The backend usually returns a partial URL or template.
+    // But let's try to launch it.
+    
+    final urlString = _appInfo!.webUI!;
+    final Uri? url = Uri.tryParse(urlString);
+    
+    if (url != null) {
+       try {
+         if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+            throw 'Could not launch $url';
+         }
+       } catch (e) {
+         if (mounted) {
+           ScaffoldMessenger.of(context).showSnackBar(
+             SnackBar(content: Text('Failed to open web: $e')),
+           );
+         }
+       }
+    }
+  }
+
+  Future<void> _openContainer() async {
+    if (_appInfo?.container == null) return;
+    
+    final l10n = context.l10n;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final containers = await _containerService.listContainers();
+      // Filter by name. _appInfo.container is the name.
+      final containerName = _appInfo!.container!;
+      
+      try {
+        final container = containers.firstWhere((c) => c.name == containerName || c.name == '/$containerName'); // Sometimes names have leading slash
+        
+        if (mounted) {
+          Navigator.pop(context); // Close loading
+          Navigator.pushNamed(
+            context,
+            AppRoutes.containerDetail,
+            arguments: container,
+          );
+        }
+      } catch (e) {
+         if (mounted) {
+          Navigator.pop(context); // Close loading
+          scaffoldMessenger.showSnackBar(
+            SnackBar(content: Text(l10n.notFoundDesc)), // Or "Container not found"
+          );
+        }
+      }
+
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Close loading
+        scaffoldMessenger.showSnackBar(
+          SnackBar(content: Text(l10n.commonLoadFailedTitle)),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = context.l10n;
 
     return DefaultTabController(
       length: 2,
@@ -142,8 +277,8 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
           title: Text(l10n.appDetailTitle),
           bottom: TabBar(
             tabs: [
-              Tab(text: l10n.appTabInfo),
-              Tab(text: l10n.appTabConfig),
+              Tab(text: l10n.appTabInfo), // "概览"
+              Tab(text: l10n.appTabConfig), // "配置"
             ],
           ),
           actions: [
@@ -165,11 +300,11 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
   }
 
   Widget _buildConfigTab(AppLocalizations l10n) {
-    if (_loading) {
+    if (_loading && _appConfig == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_error != null) {
+    if (_error != null && _appConfig == null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -230,11 +365,11 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
   }
 
   Widget _buildBody(AppLocalizations l10n) {
-    if (_loading) {
+    if (_loading && _appInfo == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_error != null) {
+    if (_error != null && _appInfo == null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -265,6 +400,20 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
           const SizedBox(height: 24),
           _buildBasicInfo(l10n),
           const SizedBox(height: 24),
+          if (_storeDetail?.readMe != null && _storeDetail!.readMe!.isNotEmpty) ...[
+             Text(
+              'README', 
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Card(
+              child: Padding(
+                 padding: const EdgeInsets.all(16),
+                 child: MarkdownBody(data: _storeDetail!.readMe!),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
           _buildServicesList(l10n),
         ],
       ),
@@ -289,15 +438,11 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
 
     return Row(
       children: [
-        if (_appInfo!.icon != null)
-          Image.network(
-            _appInfo!.icon!,
-            width: 64,
-            height: 64,
-            errorBuilder: (_, __, ___) => const Icon(Icons.apps, size: 64),
-          )
-        else
-          const Icon(Icons.apps, size: 64),
+        AppIcon(
+          appKey: _appInfo!.appKey,
+          appId: _appInfo!.appId,
+          size: 64,
+        ),
         const SizedBox(width: 16),
         Expanded(
           child: Column(
@@ -321,7 +466,7 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(color: statusColor),
                 ),
@@ -380,7 +525,7 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
             ),
           ),
           Expanded(
-            child: Text(value),
+            child: SelectableText(value),
           ),
         ],
       ),
@@ -440,43 +585,76 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
           color: Theme.of(context).scaffoldBackgroundColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               offset: const Offset(0, -2),
               blurRadius: 8,
             ),
           ],
         ),
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: isRunning
-                  ? OutlinedButton.icon(
-                      onPressed: () => _handleAction('stop'),
-                      icon: const Icon(Icons.stop),
-                      label: Text(l10n.appActionStop),
-                    )
-                  : FilledButton.icon(
-                      onPressed: () => _handleAction('start'),
-                      icon: const Icon(Icons.play_arrow),
-                      label: Text(l10n.appActionStart),
+            Row(
+              children: [
+                 if (_appInfo!.webUI != null && _appInfo!.webUI!.isNotEmpty)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: OutlinedButton.icon(
+                        onPressed: _openWeb,
+                        icon: const Icon(Icons.web),
+                        label: const Text('Web'),
+                      ),
                     ),
+                  ),
+                  
+                if (_appInfo!.container != null && _appInfo!.container!.isNotEmpty)
+                  Expanded(
+                    child: Padding(
+                       padding: const EdgeInsets.only(left: 8),
+                       child: OutlinedButton.icon(
+                        onPressed: _openContainer,
+                        icon: const Icon(Icons.layers),
+                        label: const Text('Container'),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () => _handleAction('restart'),
-                icon: const Icon(Icons.refresh),
-                label: Text(l10n.appActionRestart),
-              ),
-            ),
-            const SizedBox(width: 12),
-            IconButton.filledTonal(
-              onPressed: () => _handleAction('uninstall'),
-              icon: const Icon(Icons.delete),
-              tooltip: l10n.appActionUninstall,
-              style: IconButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-              ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: isRunning
+                      ? OutlinedButton.icon(
+                          onPressed: () => _handleAction('stop'),
+                          icon: const Icon(Icons.stop),
+                          label: Text(l10n.appActionStop),
+                        )
+                      : FilledButton.icon(
+                          onPressed: () => _handleAction('start'),
+                          icon: const Icon(Icons.play_arrow),
+                          label: Text(l10n.appActionStart),
+                        ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _handleAction('restart'),
+                    icon: const Icon(Icons.refresh),
+                    label: Text(l10n.appActionRestart),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                IconButton.filledTonal(
+                  onPressed: () => _handleAction('uninstall'),
+                  icon: const Icon(Icons.delete),
+                  tooltip: l10n.appActionUninstall,
+                  style: IconButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

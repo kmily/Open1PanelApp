@@ -4549,6 +4549,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to pull image'**
   String get orchestrationPullFailed;
+
+  /// No description provided for @appActionWeb.
+  ///
+  /// In en, this message translates to:
+  /// **'Web'**
+  String get appActionWeb;
+
+  /// No description provided for @containerManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Container Management'**
+  String get containerManagement;
+
+  /// No description provided for @orchestration.
+  ///
+  /// In en, this message translates to:
+  /// **'Orchestration'**
+  String get orchestration;
+
+  /// No description provided for @images.
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get images;
+
+  /// No description provided for @networks.
+  ///
+  /// In en, this message translates to:
+  /// **'Networks'**
+  String get networks;
+
+  /// No description provided for @volumes.
+  ///
+  /// In en, this message translates to:
+  /// **'Volumes'**
+  String get volumes;
+
+  /// No description provided for @compose.
+  ///
+  /// In en, this message translates to:
+  /// **'Compose'**
+  String get compose;
+
+  /// No description provided for @ports.
+  ///
+  /// In en, this message translates to:
+  /// **'Ports'**
+  String get ports;
+
+  /// No description provided for @env.
+  ///
+  /// In en, this message translates to:
+  /// **'Environment'**
+  String get env;
+
+  /// No description provided for @viewContainer.
+  ///
+  /// In en, this message translates to:
+  /// **'View Container'**
+  String get viewContainer;
+
+  /// No description provided for @webUI.
+  ///
+  /// In en, this message translates to:
+  /// **'Web UI'**
+  String get webUI;
+
+  /// No description provided for @readme.
+  ///
+  /// In en, this message translates to:
+  /// **'README'**
+  String get readme;
+
+  /// No description provided for @appDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get appDescription;
+
+  /// No description provided for @statusRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get statusRunning;
+
+  /// No description provided for @statusStopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped'**
+  String get statusStopped;
+
+  /// No description provided for @statusRestarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Restarting'**
+  String get statusRestarting;
+
+  /// No description provided for @actionStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get actionStart;
+
+  /// No description provided for @actionStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get actionStop;
+
+  /// No description provided for @actionRestart.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get actionRestart;
+
+  /// No description provided for @actionUninstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Uninstall'**
+  String get actionUninstall;
 }
 
 class _AppLocalizationsDelegate

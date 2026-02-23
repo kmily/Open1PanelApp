@@ -240,35 +240,14 @@ class _AppStoreViewState extends State<AppStoreView> {
     );
   }
 
-  void _showInstallDialog(BuildContext context, AppItem app) {
-    showDialog(
+  Future<void> _showInstallDialog(BuildContext context, AppItem app) async {
+    final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('${context.l10n.appStoreInstall} ${app.name}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-             Text('${context.l10n.commonConfirm} ${context.l10n.appStoreInstall} ${app.name}?'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              // TODO: Call install API via Provider
-              // For now, just close the dialog and show a snackbar or similar
-              Navigator.pop(context);
-              // In a real implementation, you would call:
-              // context.read<AppStoreProvider>().installApp(...);
-            },
-            child: Text(context.l10n.appStoreInstall),
-          ),
-        ],
-      ),
+      builder: (context) => AppInstallDialog(app: app),
     );
+
+    if (result == true && mounted) {
+      _loadApps();
+    }
   }
 }

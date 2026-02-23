@@ -2349,4 +2349,64 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get orchestrationPullFailed => 'Failed to pull image';
+
+  @override
+  String get appActionWeb => 'Web';
+
+  @override
+  String get containerManagement => 'Container Management';
+
+  @override
+  String get orchestration => 'Orchestration';
+
+  @override
+  String get images => 'Images';
+
+  @override
+  String get networks => 'Networks';
+
+  @override
+  String get volumes => 'Volumes';
+
+  @override
+  String get compose => 'Compose';
+
+  @override
+  String get ports => 'Ports';
+
+  @override
+  String get env => 'Environment';
+
+  @override
+  String get viewContainer => 'View Container';
+
+  @override
+  String get webUI => 'Web UI';
+
+  @override
+  String get readme => 'README';
+
+  @override
+  String get appDescription => 'Description';
+
+  @override
+  String get statusRunning => 'Running';
+
+  @override
+  String get statusStopped => 'Stopped';
+
+  @override
+  String get statusRestarting => 'Restarting';
+
+  @override
+  String get actionStart => 'Start';
+
+  @override
+  String get actionStop => 'Stop';
+
+  @override
+  String get actionRestart => 'Restart';
+
+  @override
+  String get actionUninstall => 'Uninstall';
 }

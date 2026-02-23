@@ -2305,4 +2305,64 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get orchestrationPullFailed => '拉取镜像失败';
+
+  @override
+  String get appActionWeb => 'Web';
+
+  @override
+  String get containerManagement => '容器管理';
+
+  @override
+  String get orchestration => '容器编排';
+
+  @override
+  String get images => '镜像';
+
+  @override
+  String get networks => '网络';
+
+  @override
+  String get volumes => '数据卷';
+
+  @override
+  String get compose => 'Compose';
+
+  @override
+  String get ports => '端口';
+
+  @override
+  String get env => '环境变量';
+
+  @override
+  String get viewContainer => '查看容器';
+
+  @override
+  String get webUI => 'Web界面';
+
+  @override
+  String get readme => '说明文档';
+
+  @override
+  String get appDescription => '应用描述';
+
+  @override
+  String get statusRunning => '运行中';
+
+  @override
+  String get statusStopped => '已停止';
+
+  @override
+  String get statusRestarting => '重启中';
+
+  @override
+  String get actionStart => '启动';
+
+  @override
+  String get actionStop => '停止';
+
+  @override
+  String get actionRestart => '重启';
+
+  @override
+  String get actionUninstall => '卸载';
 }

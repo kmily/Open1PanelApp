@@ -116,7 +116,10 @@ class AppRouter {
 
       case AppRoutes.installedAppDetail:
         final arg = settings.arguments;
-        if (arg is Map<String, dynamic> && arg.containsKey('appId')) {
+        if (arg is AppInstallInfo) {
+          return MaterialPageRoute(
+              builder: (_) => InstalledAppDetailPage(appInfo: arg));
+        } else if (arg is Map<String, dynamic> && arg.containsKey('appId')) {
           return MaterialPageRoute(
               builder: (_) =>
                   InstalledAppDetailPage(appId: arg['appId'] as String));
@@ -132,17 +135,16 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const NotFoundPage());
 
       case AppRoutes.orchestration:
+      case '/containers':
         return MaterialPageRoute(builder: (_) => const OrchestrationPage());
 
       case '/apps':
         return MaterialPageRoute(builder: (_) => const AppsPage());
 
       // Legacy routes redirect to the new shell.
-      case '/containers':
       case '/websites':
         return MaterialPageRoute(
             builder: (_) => const AppShellPage(initialIndex: 0));
-      case '/about':
       case '/backups':
       case '/help':
       case '/website-create':

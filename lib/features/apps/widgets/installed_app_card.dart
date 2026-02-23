@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:onepanelapp_app/config/app_router.dart';
+import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
 import '../../../data/models/app_models.dart';
 import '../../../shared/widgets/app_card.dart';
 import 'app_icon.dart';
@@ -22,9 +25,15 @@ class InstalledAppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     final isRunning = app.status?.toLowerCase() == 'running';
     final statusColor = isRunning ? Colors.green : Colors.orange;
+
+    final List<String> ports = [];
+    if (app.httpPort != null && app.httpPort != 0) ports.add('${app.httpPort} (HTTP)');
+    if (app.httpsPort != null && app.httpsPort != 0) ports.add('${app.httpsPort} (HTTPS)');
+    final portsString = ports.join(', ');
 
     return AppCard(
       leading: AppIcon(
@@ -49,54 +58,64 @@ class InstalledAppCard extends StatelessWidget {
         ],
       ),
       trailing: _StatusChip(
-        status: isRunning ? '运行中' : '已停止',
+        status: isRunning ? l10n.appStatusRunning : l10n.appStatusStopped,
         color: statusColor,
       ),
       onTap: () {
         Navigator.pushNamed(
           context,
-          '/app-detail',
-          arguments: {
-            'appId': app.appId?.toString(),
-            'key': app.appKey,
-            'version': app.version,
-            'type': app.appType,
-          },
+          AppRoutes.installedAppDetail,
+          arguments: app,
         );
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (app.version != null)
-            Text(
-              '版本: ${app.version}',
-              style: TextStyle(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: 14,
-              ),
+          if (app.container != null && app.container!.isNotEmpty)
+            _InfoRow(
+              label: l10n.appInstallContainerName,
+              value: app.container!,
+              colorScheme: colorScheme,
             ),
+          if (portsString.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            _InfoRow(
+              label: l10n.appInstallPorts,
+              value: portsString,
+              colorScheme: colorScheme,
+            ),
+          ],
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              if (app.webUI != null && app.webUI!.isNotEmpty) ...[
+                _ActionButton(
+                  icon: Icons.web,
+                  label: l10n.appActionWeb,
+                  color: colorScheme.primary,
+                  onTap: () => _openWeb(context, app.webUI!),
+                ),
+                const SizedBox(width: 8),
+              ],
               if (isRunning) ...[
                 _ActionButton(
                   icon: Icons.stop,
-                  label: '停止',
+                  label: l10n.appActionStop,
                   color: Colors.orange,
                   onTap: onStop,
                 ),
                 const SizedBox(width: 8),
                 _ActionButton(
                   icon: Icons.restart_alt,
-                  label: '重启',
+                  label: l10n.appActionRestart,
                   color: colorScheme.primary,
                   onTap: onRestart,
                 ),
               ] else ...[
                 _ActionButton(
                   icon: Icons.play_arrow,
-                  label: '启动',
+                  label: l10n.appActionStart,
                   color: Colors.green,
                   onTap: onStart,
                 ),
@@ -104,7 +123,7 @@ class InstalledAppCard extends StatelessWidget {
               const SizedBox(width: 8),
               _ActionButton(
                 icon: Icons.delete_outline,
-                label: '卸载',
+                label: l10n.appActionUninstall,
                 color: Colors.red,
                 onTap: onUninstall,
               ),
@@ -113,6 +132,27 @@ class InstalledAppCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _openWeb(BuildContext context, String urlString) async {
+    final Uri? url = Uri.tryParse(urlString);
+    if (url != null) {
+      try {
+        if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Could not launch $url')),
+            );
+          }
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to open web: $e')),
+          );
+        }
+      }
+    }
   }
 }
 
@@ -187,6 +227,48 @@ class _ActionButton extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// 信息行
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final ColorScheme colorScheme;
+
+  const _InfoRow({
+    required this.label,
+    required this.value,
+    required this.colorScheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 70,
+          child: Text(
+            label,
+            style: TextStyle(
+              color: colorScheme.outline,
+              fontSize: 12,
+            ),
+          ),
+        ),
+        Expanded(
+          child: SelectableText(
+            value,
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

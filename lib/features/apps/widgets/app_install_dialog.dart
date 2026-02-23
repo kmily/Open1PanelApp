@@ -155,10 +155,10 @@ class _AppInstallDialogState extends State<AppInstallDialog> {
       await context.read<AppStoreProvider>().installApp(request);
 
       if (mounted) {
-        Navigator.pop(context);
+        Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.appOperateSuccess),
+            content: Text(AppLocalizations.of(context).appOperateSuccess),
           ),
         );
       }
@@ -166,7 +166,7 @@ class _AppInstallDialogState extends State<AppInstallDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.appOperateFailed(e.toString())),
+            content: Text(AppLocalizations.of(context).appOperateFailed(e.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -180,7 +180,7 @@ class _AppInstallDialogState extends State<AppInstallDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
 
     return AlertDialog.adaptive(
       title: Text('${l10n.appStoreInstall} ${widget.app.name}'),
@@ -221,7 +221,7 @@ class _AppInstallDialogState extends State<AppInstallDialog> {
                 ),
               const SizedBox(height: 16),
               SwitchListTile(
-                title: Text(l10n.panelSettingsAdvanced ?? 'Advanced Settings'),
+                title: Text(l10n.panelSettingsAdvanced),
                 value: _showAdvanced,
                 onChanged: (value) {
                   setState(() => _showAdvanced = value);
@@ -233,7 +233,7 @@ class _AppInstallDialogState extends State<AppInstallDialog> {
                 TextFormField(
                   controller: _containerNameController,
                   decoration: InputDecoration(
-                    labelText: l10n.appInstallContainerName ?? 'Container Name',
+                    labelText: l10n.appInstallContainerName,
                     border: const OutlineInputBorder(),
                   ),
                 ),
@@ -244,7 +244,7 @@ class _AppInstallDialogState extends State<AppInstallDialog> {
                       child: TextFormField(
                         controller: _cpuQuotaController,
                         decoration: InputDecoration(
-                          labelText: l10n.appInstallCpuLimit ?? 'CPU Limit',
+                          labelText: l10n.appInstallCpuLimit,
                           border: const OutlineInputBorder(),
                           suffixText: 'Core',
                         ),
@@ -256,7 +256,7 @@ class _AppInstallDialogState extends State<AppInstallDialog> {
                       child: TextFormField(
                         controller: _memoryLimitController,
                         decoration: InputDecoration(
-                          labelText: l10n.appInstallMemoryLimit ?? 'Memory Limit',
+                          labelText: l10n.appInstallMemoryLimit,
                           border: const OutlineInputBorder(),
                           suffixText: 'MB',
                         ),
@@ -267,16 +267,16 @@ class _AppInstallDialogState extends State<AppInstallDialog> {
                 ),
                 const SizedBox(height: 24),
                 _buildMapEditor(
-                  title: l10n.appInstallPorts ?? 'Ports',
-                  keyLabel: l10n.appInstallPortService ?? 'Service', // Or Host Port?
-                  valueLabel: l10n.appInstallPortHost ?? 'Host Port', // Or Container Port?
+                  title: l10n.appInstallPorts,
+                  keyLabel: l10n.appInstallPortService, // Or Host Port?
+                  valueLabel: l10n.appInstallPortHost, // Or Container Port?
                   items: _services,
                 ),
                 const SizedBox(height: 24),
                 _buildMapEditor(
-                  title: l10n.appInstallEnv ?? 'Environment Variables',
-                  keyLabel: l10n.appInstallEnvKey ?? 'Key',
-                  valueLabel: l10n.appInstallEnvValue ?? 'Value',
+                  title: l10n.appInstallEnv,
+                  keyLabel: l10n.appInstallEnvKey,
+                  valueLabel: l10n.appInstallEnvValue,
                   items: _params,
                 ),
               ],
@@ -326,7 +326,7 @@ class _AppInstallDialogState extends State<AppInstallDialog> {
                 });
               },
               icon: const Icon(Icons.add, size: 18),
-              label: Text(AppLocalizations.of(context)!.serverAdd),
+              label: Text(AppLocalizations.of(context).serverAdd),
             ),
           ],
         ),
@@ -334,7 +334,7 @@ class _AppInstallDialogState extends State<AppInstallDialog> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
-              AppLocalizations.of(context)!.commonEmpty,
+              AppLocalizations.of(context).commonEmpty,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.outline,
                   ),
