@@ -3985,6 +3985,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copied successfully'**
   String get commonCopySuccess;
+
+  /// No description provided for @appStoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App Store'**
+  String get appStoreTitle;
+
+  /// No description provided for @appStoreInstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Install'**
+  String get appStoreInstall;
+
+  /// No description provided for @appStoreInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed'**
+  String get appStoreInstalled;
+
+  /// No description provided for @appStoreUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get appStoreUpdate;
+
+  /// No description provided for @appStoreSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search apps'**
+  String get appStoreSearchHint;
+
+  /// No description provided for @appStoreSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Apps'**
+  String get appStoreSync;
+
+  /// No description provided for @appStoreSyncSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Apps synced successfully'**
+  String get appStoreSyncSuccess;
+
+  /// No description provided for @appStoreSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to sync apps'**
+  String get appStoreSyncFailed;
+
+  /// No description provided for @appDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App Details'**
+  String get appDetailTitle;
+
+  /// No description provided for @appStatusRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get appStatusRunning;
+
+  /// No description provided for @appStatusStopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped'**
+  String get appStatusStopped;
+
+  /// No description provided for @appStatusError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get appStatusError;
+
+  /// No description provided for @appActionStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get appActionStart;
+
+  /// No description provided for @appActionStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get appActionStop;
+
+  /// No description provided for @appActionRestart.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get appActionRestart;
+
+  /// No description provided for @appActionUninstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Uninstall'**
+  String get appActionUninstall;
+
+  /// No description provided for @appServiceList.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get appServiceList;
+
+  /// No description provided for @appBaseInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Info'**
+  String get appBaseInfo;
+
+  /// No description provided for @appInfoName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get appInfoName;
+
+  /// No description provided for @appInfoVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get appInfoVersion;
+
+  /// No description provided for @appInfoStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get appInfoStatus;
+
+  /// No description provided for @appInfoCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created At'**
+  String get appInfoCreated;
+
+  /// No description provided for @appUninstallConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to uninstall this app? This action cannot be undone.'**
+  String get appUninstallConfirm;
+
+  /// No description provided for @appOperateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation successful'**
+  String get appOperateSuccess;
+
+  /// No description provided for @appOperateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation failed: {error}'**
+  String appOperateFailed(String error);
+
+  /// No description provided for @appInstallContainerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Container Name'**
+  String get appInstallContainerName;
+
+  /// No description provided for @appInstallCpuLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU Limit'**
+  String get appInstallCpuLimit;
+
+  /// No description provided for @appInstallMemoryLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory Limit'**
+  String get appInstallMemoryLimit;
+
+  /// No description provided for @appInstallPorts.
+  ///
+  /// In en, this message translates to:
+  /// **'Ports'**
+  String get appInstallPorts;
+
+  /// No description provided for @appInstallEnv.
+  ///
+  /// In en, this message translates to:
+  /// **'Environment Variables'**
+  String get appInstallEnv;
+
+  /// No description provided for @appInstallEnvKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Key'**
+  String get appInstallEnvKey;
+
+  /// No description provided for @appInstallEnvValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get appInstallEnvValue;
+
+  /// No description provided for @appInstallPortService.
+  ///
+  /// In en, this message translates to:
+  /// **'Service Port'**
+  String get appInstallPortService;
+
+  /// No description provided for @appInstallPortHost.
+  ///
+  /// In en, this message translates to:
+  /// **'Host Port'**
+  String get appInstallPortHost;
+
+  /// No description provided for @appTabInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get appTabInfo;
+
+  /// No description provided for @appTabConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Config'**
+  String get appTabConfig;
 }
 
 class _AppLocalizationsDelegate

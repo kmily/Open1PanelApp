@@ -1,0 +1,917 @@
+{
+  "module": "app",
+  "generatedAt": "2026-02-23T15:42:29.108776",
+  "summary": {
+    "endpointCount": 33,
+    "methodCount": 33
+  },
+  "endpoints": [
+    {
+      "path": "/apps/:key",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Search app by key",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "key",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "app key"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/checkupdate",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Get app list update",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/detail/:appId/:version/:type",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Search app detail by appid",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "appId",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "app id"
+            },
+            {
+              "name": "version",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "app 版本"
+            },
+            {
+              "name": "version",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "app 类型"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/details/:id",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Get app detail by id",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "appId",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "id"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/icon/:appId",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Get app icon by app_id",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "appId",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "app id"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "app icon"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/ignored/cancel",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Cancel Ignore Upgrade App",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/ignored/detail",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "List Upgrade Ignored App",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/install",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Install app",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/check",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Check app installed",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/conf",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Search default config by key",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/config/update",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update app config",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/conninfo",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Search app password by key",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/delete/check/:appInstallId",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Check before delete",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "appInstallId",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "App install id"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/ignore",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Ignore Upgrade App",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/info/:appInstallId",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Get app install info",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "appInstallId",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "App install id"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/list",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "List app installed",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/loadport",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Search app port by key",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/op",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Operate installed app",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/params/:appInstallId",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Search params by appInstallId",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "appInstallId",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/params/update",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Change app params",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/port/change",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Change app port",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Page app installed",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/sync",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Sync app installed",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/installed/update/versions",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Search app update version by install id",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "appInstallId",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/search",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "List apps",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/services/:key",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Search app service by key",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "key",
+              "in": "path",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/sync/local",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Sync local  app list",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/apps/sync/remote",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Sync remote app list",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/core/settings/apps/store/config",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Get appstore config",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/core/settings/apps/store/update",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update appstore config",
+          "description": "",
+          "tags": [
+            "App"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/app/launcher",
+      "methods": [
+        {
+          "method": "GET",
+          "summary": "Load app launcher",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/app/launcher/option",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Load app launcher options",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "path": "/dashboard/app/launcher/show",
+      "methods": [
+        {
+          "method": "POST",
+          "summary": "Update app Launcher",
+          "description": "",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [
+            {
+              "name": "request",
+              "in": "body",
+              "required": true,
+              "type": "unknown",
+              "description": "request"
+            }
+          ],
+          "requestBody": null,
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          },
+          "deprecated": false
+        }
+      ]
+    }
+  ]
+}

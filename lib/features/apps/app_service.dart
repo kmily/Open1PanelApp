@@ -34,6 +34,13 @@ class AppService extends BaseComponent {
     });
   }
 
+  Future<PageResult<AppInstallInfo>> searchInstalledApps(AppInstalledSearchRequest request) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      return api.searchInstalledApps(request);
+    });
+  }
+
   Future<void> installApp(AppInstallCreateRequest request) {
     return runGuarded(() async {
       final api = await _ensureApi();
@@ -64,6 +71,76 @@ class AppService extends BaseComponent {
     return runGuarded(() async {
       final api = await _ensureApi();
       await api.syncAppStatus();
+    });
+  }
+
+  Future<AppItem> getAppDetail(String appId, String version, String type) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      return api.getAppDetail(appId, version, type);
+    });
+  }
+
+  Future<AppInstallInfo> getAppInstallInfo(String appInstallId) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      return api.getAppInstallInfo(appInstallId);
+    });
+  }
+
+  Future<Map<String, dynamic>> getAppInstallConfig(String name, String key) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      return api.getAppInstallConfig(name, key);
+    });
+  }
+
+  Future<void> updateAppInstallConfig(Map<String, dynamic> config) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      await api.updateAppInstallConfig(config);
+    });
+  }
+
+  Future<void> syncRemoteApps() {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      await api.syncRemoteApps();
+    });
+  }
+
+  Future<void> syncLocalApps() {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      await api.syncLocalApps();
+    });
+  }
+
+  Future<AppUpdateResponse> checkAppUpdate() {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      return api.checkAppUpdate();
+    });
+  }
+
+  Future<List<AppVersion>> getAppUpdateVersions(String appInstallId) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      return api.getAppUpdateVersions(appInstallId);
+    });
+  }
+
+  Future<List<AppServiceResponse>> getAppServices(String key) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      return api.getAppServices(key);
+    });
+  }
+
+  Future<Map<String, dynamic>> getAppConnInfo(String name, String key) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      return api.getAppConnInfo(name, key);
     });
   }
 }

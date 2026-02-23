@@ -10,55 +10,56 @@
 
 ## 功能完整性清单
 
-基于 1PanelV2OpenAPI.json 的 App 标签共 30 个端点:
+基于 `app_api_analysis.md` 解析的 App 标签及相关端点 (共 33 个):
 
-### 应用商店
-1. GET /apps - 获取应用列表
-2. GET /apps/{id} - 获取应用详情
-3. POST /apps/search - 搜索应用
-4. GET /apps/categories - 获取应用分类
-5. GET /apps/recommend - 获取推荐应用
+### 应用商店 (App Store)
+1. POST /apps/search - 获取应用列表 (List apps)
+2. GET /apps/detail/:appId/:version/:type - 获取应用详情 (Search app detail by appid)
+3. GET /apps/details/:id - 获取应用详情 (Get app detail by id)
+4. GET /apps/icon/:appId - 获取应用图标 (Get app icon by app_id)
+5. GET /apps/:key - 根据 Key 搜索应用 (Search app by key)
+6. POST /apps/sync/local - 同步本地应用列表 (Sync local app list)
+7. POST /apps/sync/remote - 同步远程应用列表 (Sync remote app list)
+8. GET /apps/checkupdate - 获取应用列表更新 (Get app list update)
 
-### 应用安装
-6. POST /apps/install - 安装应用
-7. POST /apps/install/check - 检查安装条件
-8. GET /apps/install/params - 获取安装参数
-9. POST /apps/install/params/check - 检查安装参数
+### 应用安装 (App Installation)
+9. POST /apps/install - 安装应用 (Install app)
 
-### 已安装应用管理
-10. GET /apps/installed - 获取已安装应用列表
-11. GET /apps/installed/{id} - 获取已安装应用详情
-12. POST /apps/installed/search - 搜索已安装应用
-13. POST /apps/installed/sync - 同步已安装应用
+### 已安装应用管理 (Installed Apps Management)
+10. GET /apps/installed/list - 获取已安装应用列表 (List app installed)
+11. POST /apps/installed/search - 分页搜索已安装应用 (Page app installed)
+12. GET /apps/installed/info/:appInstallId - 获取安装信息 (Get app install info)
+13. POST /apps/installed/sync - 同步已安装应用 (Sync app installed)
+14. POST /apps/installed/check - 检查已安装应用 (Check app installed)
+15. GET /apps/installed/delete/check/:appInstallId - 删除前检查 (Check before delete)
 
-### 应用操作
-14. POST /apps/operate - 应用操作（启动/停止/重启）
-15. POST /apps/start - 启动应用
-16. POST /apps/stop - 停止应用
-17. POST /apps/restart - 重启应用
-18. POST /apps/reload - 重载应用
+### 应用操作 (App Operations)
+16. POST /apps/installed/op - 操作已安装应用 (Operate installed app)
 
-### 应用更新
-19. POST /apps/update - 更新应用
-20. POST /apps/update/check - 检查更新
-21. POST /apps/upgrade - 升级应用
+### 应用配置与参数 (App Configuration & Params)
+17. POST /apps/installed/conf - 获取默认配置 (Search default config by key)
+18. POST /apps/installed/config/update - 更新应用配置 (Update app config)
+19. GET /apps/installed/params/:appInstallId - 获取应用参数 (Search params by appInstallId)
+20. POST /apps/installed/params/update - 更新应用参数 (Change app params)
+21. POST /apps/installed/conninfo - 获取应用连接信息 (Search app password by key)
+22. POST /apps/installed/loadport - 获取应用端口 (Search app port by key)
+23. POST /apps/installed/port/change - 修改应用端口 (Change app port)
+24. GET /apps/services/:key - 获取应用服务 (Search app service by key)
 
-### 应用卸载
-22. POST /apps/uninstall - 卸载应用
-23. POST /apps/uninstall/check - 检查卸载条件
+### 应用更新与忽略 (App Updates & Ignore)
+25. POST /apps/installed/update/versions - 获取更新版本 (Search app update version by install id)
+26. POST /apps/installed/ignore - 忽略更新 (Ignore Upgrade App)
+27. POST /apps/ignored/cancel - 取消忽略更新 (Cancel Ignore Upgrade App)
+28. GET /apps/ignored/detail - 获取忽略更新列表 (List Upgrade Ignored App)
 
-### 应用配置
-24. GET /apps/config - 获取应用配置
-25. POST /apps/config/update - 更新应用配置
-26. POST /apps/config/check - 检查配置
+### 设置 (Settings)
+29. GET /core/settings/apps/store/config - 获取应用商店配置 (Get appstore config)
+30. POST /core/settings/apps/store/update - 更新应用商店配置 (Update appstore config)
 
-### 应用日志
-27. GET /apps/logs - 获取应用日志
-28. POST /apps/logs/clean - 清理应用日志
-
-### 其他
-29. POST /apps/backup - 备份应用
-30. POST /apps/restore - 恢复应用
+### 仪表盘 (Dashboard)
+31. GET /dashboard/app/launcher - 加载应用启动器 (Load app launcher)
+32. POST /dashboard/app/launcher/option - 加载应用启动器选项 (Load app launcher options)
+33. POST /dashboard/app/launcher/show - 更新应用启动器 (Update app Launcher)
 
 ## 业务流程与交互验证
 

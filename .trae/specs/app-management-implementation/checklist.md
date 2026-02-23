@@ -1,0 +1,10 @@
+- [x] `app_module_index.md` updated
+- [x] `app_module_architecture.md` updated
+- [x] `app_api_test.dart` created and passing
+- [x] App Store list view implemented
+- [x] App Detail view implemented
+- [x] App Install wizard implemented
+- [x] Installed App list view implemented
+- [x] App Operations (Start/Stop/Restart) working
+- [x] App Config editing working
+- [x] All tests passed

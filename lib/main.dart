@@ -12,7 +12,8 @@ import 'package:onepanelapp_app/l10n/generated/app_localizations.dart';
 // Feature Providers
 import 'features/dashboard/dashboard_provider.dart';
 import 'features/containers/containers_provider.dart';
-import 'features/apps/apps_provider.dart';
+import 'features/apps/providers/installed_apps_provider.dart';
+import 'features/apps/providers/app_store_provider.dart';
 import 'features/websites/websites_provider.dart';
 import 'features/server/server_provider.dart';
 import 'features/monitoring/monitoring_provider.dart';
@@ -50,7 +51,10 @@ void main() async {
         ),
         // Apps
         ChangeNotifierProvider(
-          create: (_) => AppsProvider(),
+          create: (_) => InstalledAppsProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AppStoreProvider(),
         ),
         // Websites
         ChangeNotifierProvider(

@@ -806,5 +806,48 @@
   "filesActionUp": "返回上级",
   "commonError": "发生错误",
   "commonCreateSuccess": "创建成功",
-  "commonCopySuccess": "复制成功"
+  "commonCopySuccess": "复制成功",
+  "appStoreTitle": "应用商店",
+  "appStoreInstall": "安装",
+  "appStoreInstalled": "已安装",
+  "appStoreUpdate": "更新",
+  "appStoreSearchHint": "搜索应用",
+  "appStoreSync": "同步应用",
+  "appStoreSyncSuccess": "同步应用列表成功",
+  "appStoreSyncFailed": "同步应用列表失败",
+  "appDetailTitle": "应用详情",
+  "appStatusRunning": "运行中",
+  "appStatusStopped": "已停止",
+  "appStatusError": "错误",
+  "appActionStart": "启动",
+  "appActionStop": "停止",
+  "appActionRestart": "重启",
+  "appActionUninstall": "卸载",
+  "appServiceList": "服务列表",
+  "appBaseInfo": "基本信息",
+  "appInfoName": "应用名称",
+  "appInfoVersion": "版本",
+  "appInfoStatus": "状态",
+  "appInfoCreated": "创建时间",
+  "appUninstallConfirm": "确定要卸载该应用吗？此操作不可恢复。",
+  "appOperateSuccess": "操作成功",
+  "appOperateFailed": "操作失败：{error}",
+  "@appOperateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "appInstallContainerName": "容器名称",
+  "appInstallCpuLimit": "CPU 限制",
+  "appInstallMemoryLimit": "内存限制",
+  "appInstallPorts": "端口",
+  "appInstallEnv": "环境变量",
+  "appInstallEnvKey": "键",
+  "appInstallEnvValue": "值",
+  "appInstallPortService": "服务端口",
+  "appInstallPortHost": "主机端口",
+  "appTabInfo": "信息",
+  "appTabConfig": "配置"
 }

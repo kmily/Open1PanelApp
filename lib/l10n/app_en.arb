@@ -858,5 +858,48 @@
   "filesActionUp": "Up",
   "commonError": "Error occurred",
   "commonCreateSuccess": "Created successfully",
-  "commonCopySuccess": "Copied successfully"
+  "commonCopySuccess": "Copied successfully",
+  "appStoreTitle": "App Store",
+  "appStoreInstall": "Install",
+  "appStoreInstalled": "Installed",
+  "appStoreUpdate": "Update",
+  "appStoreSearchHint": "Search apps",
+  "appStoreSync": "Sync Apps",
+  "appStoreSyncSuccess": "Apps synced successfully",
+  "appStoreSyncFailed": "Failed to sync apps",
+  "appDetailTitle": "App Details",
+  "appStatusRunning": "Running",
+  "appStatusStopped": "Stopped",
+  "appStatusError": "Error",
+  "appActionStart": "Start",
+  "appActionStop": "Stop",
+  "appActionRestart": "Restart",
+  "appActionUninstall": "Uninstall",
+  "appServiceList": "Services",
+  "appBaseInfo": "Basic Info",
+  "appInfoName": "Name",
+  "appInfoVersion": "Version",
+  "appInfoStatus": "Status",
+  "appInfoCreated": "Created At",
+  "appUninstallConfirm": "Are you sure you want to uninstall this app? This action cannot be undone.",
+  "appOperateSuccess": "Operation successful",
+  "appOperateFailed": "Operation failed: {error}",
+  "@appOperateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "appInstallContainerName": "Container Name",
+  "appInstallCpuLimit": "CPU Limit",
+  "appInstallMemoryLimit": "Memory Limit",
+  "appInstallPorts": "Ports",
+  "appInstallEnv": "Environment Variables",
+  "appInstallEnvKey": "Key",
+  "appInstallEnvValue": "Value",
+  "appInstallPortService": "Service Port",
+  "appInstallPortHost": "Host Port",
+  "appTabInfo": "Info",
+  "appTabConfig": "Config"
 }

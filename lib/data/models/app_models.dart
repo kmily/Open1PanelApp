@@ -56,6 +56,7 @@ class AppItem {
   final String? key;
   final int? limit;
   final String? name;
+  final String? readMe;
   final int? recommend;
   final String? resource;
   final String? status;
@@ -74,6 +75,7 @@ class AppItem {
     this.key,
     this.limit,
     this.name,
+    this.readMe,
     this.recommend,
     this.resource,
     this.status,
@@ -306,18 +308,29 @@ class AppInstalledCheckResponse {
 /// 应用已安装检查请求模型
 @JsonSerializable()
 class AppInstalledCheckRequest {
-  final String appId;
+  final String key;
   final String version;
   final String type;
 
   AppInstalledCheckRequest({
-    required this.appId,
+    required this.key,
     required this.version,
     required this.type,
   });
 
-  factory AppInstalledCheckRequest.fromJson(Map<String, dynamic> json) => _$AppInstalledCheckRequestFromJson(json);
-  Map<String, dynamic> toJson() => _$AppInstalledCheckRequestToJson(this);
+  factory AppInstalledCheckRequest.fromJson(Map<String, dynamic> json) {
+    return AppInstalledCheckRequest(
+      key: json['key'] as String,
+      version: json['version'] as String,
+      type: json['type'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'key': key,
+    'version': version,
+    'type': type,
+  };
 }
 
 /// 应用已安装忽略更新请求模型
@@ -447,30 +460,130 @@ class AppstoreUpdateRequest {
 }
 
 /// 应用安装信息模型
-@JsonSerializable()
 class AppInstallInfo {
-  final String? appId;
-  final String? appName;
-  final String? appVersion;
-  final String? description;
-  final String? icon;
-  final String? status;
-  final String? createdAt;
   final int? id;
+  final String? name; // install name (e.g. mysql-1)
+  final String? appName; // app type name (e.g. MySQL)
+  final String? appKey; // app key (e.g. mysql)
+  final String? version; // version
+  final String? status;
+  final String? container; // container name or ID
+  final String? appType; // type
+  final Map<String, dynamic>? env; // env variables
+  final String? icon;
+  final String? description;
+  final String? createdAt;
+  final int? appId;
+  final int? appDetailId;
+  final String? message;
+  final int? httpPort;
+  final int? httpsPort;
+  final String? path;
+  final bool? canUpdate;
+  final int? ready;
+  final int? total;
+  final String? appStatus;
+  final String? dockerCompose;
+  final String? webUI;
+  final bool? favorite;
+  final bool? isEdit;
+  final bool? linkDB;
+  final String? serviceName;
 
   AppInstallInfo({
-    this.appId,
-    this.appName,
-    this.appVersion,
-    this.description,
-    this.icon,
-    this.status,
-    this.createdAt,
     this.id,
+    this.name,
+    this.appName,
+    this.appKey,
+    this.version,
+    this.status,
+    this.container,
+    this.appType,
+    this.env,
+    this.icon,
+    this.description,
+    this.createdAt,
+    this.appId,
+    this.appDetailId,
+    this.message,
+    this.httpPort,
+    this.httpsPort,
+    this.path,
+    this.canUpdate,
+    this.ready,
+    this.total,
+    this.appStatus,
+    this.dockerCompose,
+    this.webUI,
+    this.favorite,
+    this.isEdit,
+    this.linkDB,
+    this.serviceName,
   });
 
-  factory AppInstallInfo.fromJson(Map<String, dynamic> json) => _$AppInstallInfoFromJson(json);
-  Map<String, dynamic> toJson() => _$AppInstallInfoToJson(this);
+  factory AppInstallInfo.fromJson(Map<String, dynamic> json) {
+    return AppInstallInfo(
+      id: json['id'] as int?,
+      name: json['name'] as String?,
+      appName: json['appName'] as String?,
+      appKey: json['appKey'] as String? ?? json['key'] as String?,
+      version: json['version'] as String?,
+      status: json['status'] as String?,
+      container: json['container'] as String?,
+      appType: json['appType'] as String? ?? json['type'] as String?,
+      env: json['env'] as Map<String, dynamic>?,
+      icon: json['icon'] as String?,
+      description: json['description'] as String?,
+      createdAt: json['createdAt'] as String?,
+      appId: json['appId'] as int?,
+      appDetailId: json['appDetailId'] as int?,
+      message: json['message'] as String?,
+      httpPort: json['httpPort'] as int?,
+      httpsPort: json['httpsPort'] as int?,
+      path: json['path'] as String?,
+      canUpdate: json['canUpdate'] as bool?,
+      ready: json['ready'] as int?,
+      total: json['total'] as int?,
+      appStatus: json['appStatus'] as String?,
+      dockerCompose: json['dockerCompose'] as String?,
+      webUI: json['webUI'] as String?,
+      favorite: json['favorite'] as bool?,
+      isEdit: json['isEdit'] as bool?,
+      linkDB: json['linkDB'] as bool?,
+      serviceName: json['serviceName'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'appName': appName,
+    'appKey': appKey,
+    'version': version,
+    'status': status,
+    'container': container,
+    'appType': appType,
+    'env': env,
+    'icon': icon,
+    'description': description,
+    'createdAt': createdAt,
+    'appId': appId,
+    'appDetailId': appDetailId,
+    'message': message,
+    'httpPort': httpPort,
+    'httpsPort': httpsPort,
+    'path': path,
+    'canUpdate': canUpdate,
+    'ready': ready,
+    'total': total,
+    'appStatus': appStatus,
+    'dockerCompose': dockerCompose,
+    'webUI': webUI,
+    'favorite': favorite,
+    'isEdit': isEdit,
+    'linkDB': linkDB,
+    'serviceName': serviceName,
+  };
 }
 
 /// 应用列表响应模型

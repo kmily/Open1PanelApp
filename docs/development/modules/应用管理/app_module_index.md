@@ -7,6 +7,8 @@ Open1PanelApp 的应用管理模块负责应用商店浏览、应用安装、配
 - 架构设计: docs/development/modules/应用管理/app_module_architecture.md
 - 页面设计: docs/development/modules/应用管理/app_pages.md
 - API设计: docs/development/modules/应用管理/app_api.md
+- API分析: docs/development/modules/应用管理/app_api_analysis.md
+- API数据: docs/development/modules/应用管理/app_api_analysis.json
 - 数据设计: docs/development/modules/应用管理/app_data.md
 - 开发计划: docs/development/modules/应用管理/app_plan.md
 - 运维手册: docs/development/modules/应用管理/app_ops.md

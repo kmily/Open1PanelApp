@@ -1,0 +1,6 @@
+- [ ] Compilation errors fixed
+- [ ] Backend source analyzed and discrepancies identified
+- [ ] `app_models.dart` updated to match backend DTOs
+- [ ] `app_v2.dart` updated to match backend Endpoints
+- [ ] Integration tests passed against test server
+- [ ] No file exceeds 1000 lines

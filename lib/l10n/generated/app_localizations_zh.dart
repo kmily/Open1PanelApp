@@ -2017,4 +2017,114 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get commonCopySuccess => '复制成功';
+
+  @override
+  String get appStoreTitle => '应用商店';
+
+  @override
+  String get appStoreInstall => '安装';
+
+  @override
+  String get appStoreInstalled => '已安装';
+
+  @override
+  String get appStoreUpdate => '更新';
+
+  @override
+  String get appStoreSearchHint => '搜索应用';
+
+  @override
+  String get appStoreSync => '同步应用';
+
+  @override
+  String get appStoreSyncSuccess => '同步应用列表成功';
+
+  @override
+  String get appStoreSyncFailed => '同步应用列表失败';
+
+  @override
+  String get appDetailTitle => '应用详情';
+
+  @override
+  String get appStatusRunning => '运行中';
+
+  @override
+  String get appStatusStopped => '已停止';
+
+  @override
+  String get appStatusError => '错误';
+
+  @override
+  String get appActionStart => '启动';
+
+  @override
+  String get appActionStop => '停止';
+
+  @override
+  String get appActionRestart => '重启';
+
+  @override
+  String get appActionUninstall => '卸载';
+
+  @override
+  String get appServiceList => '服务列表';
+
+  @override
+  String get appBaseInfo => '基本信息';
+
+  @override
+  String get appInfoName => '应用名称';
+
+  @override
+  String get appInfoVersion => '版本';
+
+  @override
+  String get appInfoStatus => '状态';
+
+  @override
+  String get appInfoCreated => '创建时间';
+
+  @override
+  String get appUninstallConfirm => '确定要卸载该应用吗？此操作不可恢复。';
+
+  @override
+  String get appOperateSuccess => '操作成功';
+
+  @override
+  String appOperateFailed(String error) {
+    return '操作失败：$error';
+  }
+
+  @override
+  String get appInstallContainerName => '容器名称';
+
+  @override
+  String get appInstallCpuLimit => 'CPU 限制';
+
+  @override
+  String get appInstallMemoryLimit => '内存限制';
+
+  @override
+  String get appInstallPorts => '端口';
+
+  @override
+  String get appInstallEnv => '环境变量';
+
+  @override
+  String get appInstallEnvKey => '键';
+
+  @override
+  String get appInstallEnvValue => '值';
+
+  @override
+  String get appInstallPortService => '服务端口';
+
+  @override
+  String get appInstallPortHost => '主机端口';
+
+  @override
+  String get appTabInfo => '信息';
+
+  @override
+  String get appTabConfig => '配置';
 }

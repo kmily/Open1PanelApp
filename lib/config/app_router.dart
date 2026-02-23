@@ -16,6 +16,10 @@ import 'package:onepanelapp_app/features/terminal/terminal_page.dart';
 import 'package:onepanelapp_app/features/dashboard/dashboard_page.dart';
 import 'package:onepanelapp_app/pages/settings/settings_page.dart';
 import 'package:onepanelapp_app/features/settings/system_settings_page.dart';
+import 'package:onepanelapp_app/features/apps/apps_page.dart';
+import 'package:onepanelapp_app/features/apps/app_detail_page.dart';
+import 'package:onepanelapp_app/features/apps/installed_app_detail_page.dart';
+import 'package:onepanelapp_app/data/models/app_models.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -34,6 +38,9 @@ class AppRoutes {
   static const String securityVerification = '/security-verification';
   static const String settings = '/settings';
   static const String systemSettings = '/system-settings';
+  static const String appStore = '/app-store';
+  static const String appDetail = '/app-detail';
+  static const String installedAppDetail = '/installed-app-detail';
 }
 
 class AppRouter {
@@ -82,8 +89,30 @@ class AppRouter {
       case AppRoutes.systemSettings:
         return MaterialPageRoute(builder: (_) => const SystemSettingsPage());
 
-      // Legacy routes redirect to the new shell.
+      case AppRoutes.appStore:
+        return MaterialPageRoute(
+            builder: (_) => const AppsPage(initialTabIndex: 1));
+
+      case AppRoutes.appDetail:
+        final arg = settings.arguments;
+        if (arg is AppItem) {
+          return MaterialPageRoute(builder: (_) => AppDetailPage(app: arg));
+        }
+        return MaterialPageRoute(builder: (_) => const NotFoundPage());
+
+      case AppRoutes.installedAppDetail:
+        final arg = settings.arguments;
+        if (arg is Map<String, dynamic> && arg.containsKey('appId')) {
+          return MaterialPageRoute(
+              builder: (_) =>
+                  InstalledAppDetailPage(appId: arg['appId'] as String));
+        }
+        return MaterialPageRoute(builder: (_) => const NotFoundPage());
+
       case '/apps':
+        return MaterialPageRoute(builder: (_) => const AppsPage());
+
+      // Legacy routes redirect to the new shell.
       case '/containers':
       case '/websites':
         return MaterialPageRoute(
@@ -91,8 +120,6 @@ class AppRouter {
       case '/about':
       case '/backups':
       case '/help':
-      case '/app-store':
-      case '/app-detail':
       case '/website-create':
       case '/container-create':
         return MaterialPageRoute(builder: (_) => const LegacyRedirectPage());

@@ -2058,4 +2058,115 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonCopySuccess => 'Copied successfully';
+
+  @override
+  String get appStoreTitle => 'App Store';
+
+  @override
+  String get appStoreInstall => 'Install';
+
+  @override
+  String get appStoreInstalled => 'Installed';
+
+  @override
+  String get appStoreUpdate => 'Update';
+
+  @override
+  String get appStoreSearchHint => 'Search apps';
+
+  @override
+  String get appStoreSync => 'Sync Apps';
+
+  @override
+  String get appStoreSyncSuccess => 'Apps synced successfully';
+
+  @override
+  String get appStoreSyncFailed => 'Failed to sync apps';
+
+  @override
+  String get appDetailTitle => 'App Details';
+
+  @override
+  String get appStatusRunning => 'Running';
+
+  @override
+  String get appStatusStopped => 'Stopped';
+
+  @override
+  String get appStatusError => 'Error';
+
+  @override
+  String get appActionStart => 'Start';
+
+  @override
+  String get appActionStop => 'Stop';
+
+  @override
+  String get appActionRestart => 'Restart';
+
+  @override
+  String get appActionUninstall => 'Uninstall';
+
+  @override
+  String get appServiceList => 'Services';
+
+  @override
+  String get appBaseInfo => 'Basic Info';
+
+  @override
+  String get appInfoName => 'Name';
+
+  @override
+  String get appInfoVersion => 'Version';
+
+  @override
+  String get appInfoStatus => 'Status';
+
+  @override
+  String get appInfoCreated => 'Created At';
+
+  @override
+  String get appUninstallConfirm =>
+      'Are you sure you want to uninstall this app? This action cannot be undone.';
+
+  @override
+  String get appOperateSuccess => 'Operation successful';
+
+  @override
+  String appOperateFailed(String error) {
+    return 'Operation failed: $error';
+  }
+
+  @override
+  String get appInstallContainerName => 'Container Name';
+
+  @override
+  String get appInstallCpuLimit => 'CPU Limit';
+
+  @override
+  String get appInstallMemoryLimit => 'Memory Limit';
+
+  @override
+  String get appInstallPorts => 'Ports';
+
+  @override
+  String get appInstallEnv => 'Environment Variables';
+
+  @override
+  String get appInstallEnvKey => 'Key';
+
+  @override
+  String get appInstallEnvValue => 'Value';
+
+  @override
+  String get appInstallPortService => 'Service Port';
+
+  @override
+  String get appInstallPortHost => 'Host Port';
+
+  @override
+  String get appTabInfo => 'Info';
+
+  @override
+  String get appTabConfig => 'Config';
 }

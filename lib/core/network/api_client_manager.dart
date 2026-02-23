@@ -63,7 +63,7 @@ class ApiClientManager {
 
   Future<AppV2Api> getAppApi() async {
     final client = await getCurrentClient();
-    return AppV2Api(client.dio);
+    return AppV2Api(client);
   }
 
   Future<ContainerV2Api> getContainerApi() async {
