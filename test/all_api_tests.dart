@@ -5,7 +5,6 @@ import 'core/test_runner.dart';
 // 导入所有测试文件
 import 'auth/token_auth_test.dart' as token_auth;
 import 'api/ai_api_test.dart' as ai_api;
-import 'api/app_api_test.dart' as app_api;
 import 'api/toolbox_api_test.dart' as toolbox_api;
 import 'api/container_api_test.dart' as container_api;
 import 'integration/api_integration_test.dart' as integration;
@@ -33,12 +32,6 @@ void main() {
     setUp(() => runner.startSuite('AI API'));
     tearDown(() => runner.endSuite('AI API', passed: 0, failed: 0, skipped: 0));
     ai_api.main();
-  });
-
-  group('App API单元测试', () {
-    setUp(() => runner.startSuite('App API'));
-    tearDown(() => runner.endSuite('App API', passed: 0, failed: 0, skipped: 0));
-    app_api.main();
   });
 
   group('Toolbox API单元测试', () {

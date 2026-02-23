@@ -6,6 +6,7 @@ import 'package:onepanelapp_app/data/models/app_models.dart';
 import 'package:onepanelapp_app/features/apps/providers/app_store_provider.dart';
 import 'package:onepanelapp_app/shared/widgets/app_card.dart';
 
+import 'package:onepanelapp_app/features/apps/widgets/app_icon.dart';
 import 'app_install_dialog.dart';
 
 class AppStoreView extends StatefulWidget {
@@ -163,7 +164,7 @@ class _AppStoreViewState extends State<AppStoreView> {
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 400,
-                    mainAxisExtent: 160,
+                    mainAxisExtent: 200,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
                   ),
@@ -185,6 +186,7 @@ class _AppStoreViewState extends State<AppStoreView> {
       BuildContext context, AppItem app, AppLocalizations l10n) {
     return AppCard(
       title: app.name ?? '',
+      leading: AppIcon(app: app, size: 40),
       subtitle: Text(
         app.description ?? '',
         maxLines: 2,

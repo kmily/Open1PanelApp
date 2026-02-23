@@ -338,14 +338,20 @@ class AppInstalledCheckRequest {
 class AppInstalledIgnoreUpgradeRequest {
   final int appInstallId;
   final String reason;
+  final String scope;
 
   AppInstalledIgnoreUpgradeRequest({
     required this.appInstallId,
     required this.reason,
+    this.scope = 'project',
   });
 
   factory AppInstalledIgnoreUpgradeRequest.fromJson(Map<String, dynamic> json) => _$AppInstalledIgnoreUpgradeRequestFromJson(json);
-  Map<String, dynamic> toJson() => _$AppInstalledIgnoreUpgradeRequestToJson(this);
+  Map<String, dynamic> toJson() => {
+    'appID': appInstallId,
+    'reason': reason,
+    'scope': scope,
+  };
 }
 
 /// 应用安装操作请求模型
@@ -531,7 +537,7 @@ class AppInstallInfo {
       status: json['status'] as String?,
       container: json['container'] as String?,
       appType: json['appType'] as String? ?? json['type'] as String?,
-      env: json['env'] as Map<String, dynamic>?,
+      env: json['env'] is Map ? json['env'] as Map<String, dynamic>? : null,
       icon: json['icon'] as String?,
       description: json['description'] as String?,
       createdAt: json['createdAt'] as String?,

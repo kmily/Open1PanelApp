@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppCard extends StatelessWidget {
   final String title;
   final Widget? subtitle;
+  final Widget? leading;
   final Widget? child;
   final Widget? trailing;
   final EdgeInsetsGeometry? padding;
@@ -13,6 +14,7 @@ class AppCard extends StatelessWidget {
     super.key,
     required this.title,
     this.subtitle,
+    this.leading,
     this.child,
     this.trailing,
     this.padding,
@@ -44,28 +46,47 @@ class AppCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (leading != null) ...[
+                    leading!,
+                    const SizedBox(width: 12),
+                  ],
                   Expanded(
-                    child: Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                title,
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: colorScheme.onSurface,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (subtitle != null) ...[
+                          const SizedBox(height: 4),
+                          DefaultTextStyle(
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ) ?? TextStyle(),
+                            child: subtitle!,
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  if (trailing != null) trailing!,
+                  if (trailing != null) ...[
+                    const SizedBox(width: 8),
+                    trailing!,
+                  ],
                 ],
               ),
-              if (subtitle != null) ...[
-                const SizedBox(height: 4),
-                DefaultTextStyle(
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ) ?? TextStyle(),
-                  child: subtitle!,
-                ),
-              ],
               if (child != null) ...[
                 const SizedBox(height: 16),
                 DefaultTextStyle(

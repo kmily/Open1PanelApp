@@ -1,0 +1,184 @@
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../data/models/app_models.dart';
+import '../app_service.dart';
+
+class AppIcon extends StatefulWidget {
+  final AppItem app;
+  final double size;
+
+  const AppIcon({
+    super.key,
+    required this.app,
+    this.size = 40,
+  });
+
+  @override
+  State<AppIcon> createState() => _AppIconState();
+}
+
+class _AppIconState extends State<AppIcon> with AutomaticKeepAliveClientMixin {
+  static final Map<String, Uint8List> _cache = {};
+  Uint8List? _iconBytes;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadIcon();
+  }
+
+  @override
+  void didUpdateWidget(covariant AppIcon oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.app.key != widget.app.key || oldWidget.app.id != widget.app.id) {
+      _loadIcon();
+    }
+  }
+
+  Future<void> _loadIcon() async {
+    final key = widget.app.key;
+    final id = widget.app.id?.toString();
+
+    if (key == null && id == null) {
+      return;
+    }
+
+    // 1. Check static cache
+    if (key != null && _cache.containsKey(key)) {
+      setState(() {
+        _iconBytes = _cache[key];
+        _isLoading = false;
+      });
+      return;
+    }
+
+    if (id != null && _cache.containsKey(id)) {
+      setState(() {
+        _iconBytes = _cache[id];
+        _isLoading = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // 2. Fetch from service
+      // Use key first, then id
+      
+      Uint8List? bytes;
+      
+      try {
+        if (key != null) {
+          final response = await context.read<AppService>().getAppIcon(key);
+          if (response.data != null && response.data!.isNotEmpty) {
+            bytes = Uint8List.fromList(response.data!);
+          }
+        }
+      } catch (e) {
+        // If key fetch fails, we will try ID below if available
+      }
+
+      if (bytes == null && id != null && id != key) {
+         if (!mounted) return;
+         try {
+          final response = await context.read<AppService>().getAppIcon(id);
+          if (response.data != null && response.data!.isNotEmpty) {
+            bytes = Uint8List.fromList(response.data!);
+          }
+         } catch (e) {
+           // Both failed
+         }
+      }
+
+      if (bytes != null && bytes.isNotEmpty) {
+        // 3. Cache bytes
+        if (key != null) _cache[key] = bytes;
+        if (id != null) _cache[id] = bytes;
+
+        if (mounted) {
+          setState(() {
+            _iconBytes = bytes;
+            _isLoading = false;
+          });
+        }
+      } else {
+        // 4. Fetch failed or null data
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
+
+    if (_iconBytes != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8), // Optional: rounded corners for icon
+        child: Image.memory(
+          _iconBytes!,
+          width: widget.size,
+          height: widget.size,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => _buildDefaultIcon(),
+        ),
+      );
+    }
+
+    if (_isLoading) {
+      return SizedBox(
+        width: widget.size,
+        height: widget.size,
+        child: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
+    }
+
+    return _buildDefaultIcon();
+  }
+
+  Widget _buildDefaultIcon() {
+    final name = widget.app.name ?? '?';
+    final letter = name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?';
+
+    return Container(
+      width: widget.size,
+      height: widget.size,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        letter,
+        style: TextStyle(
+          fontSize: widget.size * 0.5,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}

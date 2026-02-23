@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/i18n/l10n_x.dart';
 import '../../../data/models/app_models.dart';
-import '../../../core/config/api_constants.dart';
 import 'app_service.dart';
 import 'widgets/app_install_dialog.dart';
+import 'widgets/app_icon.dart';
 
 class AppDetailPage extends StatefulWidget {
   final AppItem app;
@@ -47,6 +46,7 @@ class _AppDetailPageState extends State<AppDetailPage> {
           _app = detail;
           _readme = detail.readMe;
           _isLoading = false;
+          _error = null;
         });
       }
     } catch (e) {
@@ -64,19 +64,6 @@ class _AppDetailPageState extends State<AppDetailPage> {
       context: context,
       builder: (context) => AppInstallDialog(app: _app),
     );
-  }
-
-  String get _iconUrl {
-    if (_app.icon != null && _app.icon!.startsWith('http')) {
-      return _app.icon!;
-    }
-    // Construct icon URL if it's not a full URL
-    // Assuming the icon can be fetched via /apps/icon/:key
-    // or we might need to use the base URL from ApiConstants
-    if (_app.key != null) {
-      return ApiConstants.buildApiPath('/apps/icon/${_app.key}');
-    }
-    return '';
   }
 
   @override
@@ -106,35 +93,43 @@ class _AppDetailPageState extends State<AppDetailPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(context.l10n.commonLoadFailedTitle),
-            const SizedBox(height: 8),
-            Text(_error!),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () {
-                setState(() {
-                  _isLoading = true;
-                  _error = null;
-                });
-                _loadDetail();
-              },
-              child: Text(context.l10n.commonRetry),
-            ),
-          ],
-        ),
-      );
-    }
-
+    // Even if error occurs, we show what we have, plus an error banner
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (_error != null)
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.errorContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber, color: theme.colorScheme.onErrorContainer),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _error!,
+                      style: TextStyle(color: theme.colorScheme.onErrorContainer),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () {
+                      setState(() {
+                        _isLoading = true;
+                        _error = null;
+                      });
+                      _loadDetail();
+                    },
+                  ),
+                ],
+              ),
+            ),
           _buildHeader(context, theme),
           const SizedBox(height: 24),
           Text(
@@ -163,27 +158,7 @@ class _AppDetailPageState extends State<AppDetailPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_iconUrl.isNotEmpty)
-          CachedNetworkImage(
-            imageUrl: _iconUrl,
-            width: 80,
-            height: 80,
-            placeholder: (context, url) => Container(
-              color: theme.colorScheme.surfaceContainerHighest,
-              child: const Icon(Icons.image),
-            ),
-            errorWidget: (context, url, error) => Container(
-              color: theme.colorScheme.surfaceContainerHighest,
-              child: const Icon(Icons.broken_image),
-            ),
-          )
-        else
-          Container(
-            width: 80,
-            height: 80,
-            color: theme.colorScheme.surfaceContainerHighest,
-            child: const Icon(Icons.apps, size: 40),
-          ),
+        AppIcon(app: _app, size: 80),
         const SizedBox(width: 16),
         Expanded(
           child: Column(

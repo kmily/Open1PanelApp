@@ -13,6 +13,7 @@ import 'package:onepanelapp_app/l10n/generated/app_localizations.dart';
 import 'features/dashboard/dashboard_provider.dart';
 import 'features/containers/containers_provider.dart';
 import 'features/apps/providers/installed_apps_provider.dart';
+import 'features/apps/app_service.dart';
 import 'features/apps/providers/app_store_provider.dart';
 import 'features/websites/websites_provider.dart';
 import 'features/server/server_provider.dart';
@@ -50,6 +51,9 @@ void main() async {
           create: (_) => ContainersProvider(),
         ),
         // Apps
+        Provider<AppService>(
+          create: (_) => AppService(),
+        ),
         ChangeNotifierProvider(
           create: (_) => InstalledAppsProvider(),
         ),

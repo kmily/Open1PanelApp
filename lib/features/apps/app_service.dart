@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import '../../api/v2/app_v2.dart';
 import '../../core/services/base_component.dart';
 import '../../data/models/app_models.dart';
@@ -8,6 +9,13 @@ class AppService extends BaseComponent {
     super.clientManager,
     super.permissionResolver,
   }) : _api = api;
+
+  Future<Response<List<int>>> getAppIcon(String appId) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      return api.getAppIcon(appId);
+    });
+  }
 
   AppV2Api? _api;
 

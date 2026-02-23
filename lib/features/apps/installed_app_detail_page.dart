@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:onepanelapp_app/core/theme/app_theme.dart';
 import 'package:onepanelapp_app/data/models/app_models.dart';
 import 'package:onepanelapp_app/features/apps/app_service.dart';
 import 'package:onepanelapp_app/features/apps/providers/installed_apps_provider.dart';
@@ -84,6 +83,7 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
     final l10n = AppLocalizations.of(context)!;
     final provider = context.read<InstalledAppsProvider>();
     final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
 
     try {
       if (operation == 'uninstall') {
@@ -109,7 +109,7 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
 
         await provider.uninstallApp(widget.appId);
         if (mounted) {
-          Navigator.pop(context); // Close detail page
+          navigator.pop(); // Close detail page
           scaffoldMessenger.showSnackBar(
             SnackBar(content: Text(l10n.appOperateSuccess)),
           );

@@ -57,13 +57,39 @@ class AppV2Api {
       data: request.toJson(),
     );
     final data = response.data as Map<String, dynamic>;
-    return AppInstallInfo.fromJson(data['data'] as Map<String, dynamic>);
+    final innerData = data['data'];
+    
+    if (innerData is Map<String, dynamic>) {
+      return AppInstallInfo.fromJson(innerData);
+    }
+    
+    // Handle case where it returns just an ID (int or String)
+    if (innerData is int || innerData is String) {
+      return AppInstallInfo(
+        id: int.tryParse(innerData.toString()),
+        name: request.name,
+        status: 'Installing',
+      );
+    }
+
+    // If we can't parse it, throw or return empty
+    throw DioException(
+      requestOptions: response.requestOptions,
+      error: 'Unexpected response format for installApp: $innerData',
+    );
   }
 
   /// 卸载应用
   Future<void> uninstallApp(String appInstallId) async {
-    await _client.delete(
-      ApiConstants.buildApiPath('/apps/uninstall/$appInstallId'),
+    await operateApp(
+      AppInstalledOperateRequest(
+        installId: int.tryParse(appInstallId) ?? 0,
+        operate: 'delete',
+        deleteDB: true,
+        deleteImage: true,
+        deleteBackup: true,
+        forceDelete: true,
+      ),
     );
   }
 
@@ -199,7 +225,11 @@ class AppV2Api {
       ApiConstants.buildApiPath('/apps/installed/delete/check/$appInstallId'),
     );
     final data = response.data as Map<String, dynamic>;
-    return data['data'] as Map<String, dynamic>;
+    final innerData = data['data'];
+    if (innerData == null) {
+      return {};
+    }
+    return innerData as Map<String, dynamic>;
   }
 
   /// 忽略应用更新
@@ -347,6 +377,7 @@ class AppV2Api {
   Future<void> syncLocalApps() async {
     await _client.post(
       ApiConstants.buildApiPath('/apps/sync/local'),
+      data: {},
     );
   }
 
@@ -354,6 +385,7 @@ class AppV2Api {
   Future<void> syncRemoteApps() async {
     await _client.post(
       ApiConstants.buildApiPath('/apps/sync/remote'),
+      data: {},
     );
   }
 }

@@ -59,8 +59,12 @@ class _AppInstallDialogState extends State<AppInstallDialog> {
     _containerNameController.dispose();
     _cpuQuotaController.dispose();
     _memoryLimitController.dispose();
-    for (var entry in _services) entry.dispose();
-    for (var entry in _params) entry.dispose();
+    for (var entry in _services) {
+      entry.dispose();
+    }
+    for (var entry in _params) {
+      entry.dispose();
+    }
     super.dispose();
   }
 
@@ -178,7 +182,7 @@ class _AppInstallDialogState extends State<AppInstallDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return AlertDialog(
+    return AlertDialog.adaptive(
       title: Text('${l10n.appStoreInstall} ${widget.app.name}'),
       scrollable: true,
       content: SizedBox(

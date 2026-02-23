@@ -1,0 +1,6 @@
+- [x] AppService is provided in `main.dart`
+- [x] App Store list items do not show overflow warning (visual or calculated)
+- [x] App Detail Page loads without `ProviderNotFoundException`
+- [x] App Icons are displayed in Detail Page
+- [x] Error messages in Detail Page are scrollable
+- [x] `flutter test test/widget_test/app_detail_page_test.dart` passes

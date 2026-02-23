@@ -1,0 +1,47 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:onepanelapp_app/core/network/dio_client.dart';
+import 'package:onepanelapp_app/api/v2/app_v2.dart';
+import 'package:onepanelapp_app/core/config/api_constants.dart';
+import 'package:onepanelapp_app/data/models/app_models.dart';
+import 'core/test_config_manager.dart';
+
+void main() {
+  late DioClient client;
+  late AppV2Api api;
+
+  setUp(() async {
+    await TestEnvironment.initialize();
+    client = DioClient(baseUrl: TestEnvironment.baseUrl, apiKey: TestEnvironment.apiKey);
+    api = AppV2Api(client);
+  });
+
+  test('Verify App Icon Endpoint', () async {
+    // 1. Search for OpenResty to get ID and Key
+    final search = await api.searchApps(AppSearchRequest(page: 1, pageSize: 1, name: 'openresty'));
+    if (search.items.isEmpty) {
+      print('OpenResty not found');
+      return;
+    }
+    final app = search.items.first;
+    print('App: ${app.name}, ID: ${app.id}, Key: ${app.key}');
+
+    // 2. Try getting icon by ID
+    try {
+      print('Trying icon by ID: ${app.id}');
+      final res1 = await api.getAppIcon(app.id.toString());
+      print('Icon by ID status: ${res1.statusCode}, Data length: ${res1.data?.length}');
+    } catch (e) {
+      print('Icon by ID failed: $e');
+    }
+
+    // 3. Try getting icon by Key
+    try {
+      print('Trying icon by Key: ${app.key}');
+      final res2 = await api.getAppIcon(app.key!);
+      print('Icon by Key status: ${res2.statusCode}, Data length: ${res2.data?.length}');
+    } catch (e) {
+      print('Icon by Key failed: $e');
+    }
+  });
+}
