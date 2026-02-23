@@ -655,29 +655,6 @@ class FilesProvider extends ChangeNotifier {
     return await _service.batchCheckFiles(paths);
   }
 
-  Future<FileSearchResult> searchInFiles({
-    required String pattern,
-    bool? caseSensitive,
-    bool? wholeWord,
-    bool? regex,
-  }) async {
-    appLogger.dWithPackage('files_provider', 'searchInFiles: pattern=$pattern, path=${_data.currentPath}');
-    try {
-      final result = await _service.searchInFiles(
-        path: _data.currentPath,
-        pattern: pattern,
-        caseSensitive: caseSensitive,
-        wholeWord: wholeWord,
-        regex: regex,
-      );
-      appLogger.iWithPackage('files_provider', 'searchInFiles: 搜索完成, 匹配数=${result.totalMatches}');
-      return result;
-    } catch (e, stackTrace) {
-      appLogger.eWithPackage('files_provider', 'searchInFiles: 搜索失败', error: e, stackTrace: stackTrace);
-      rethrow;
-    }
-  }
-
   Future<void> changeFileMode(String path, int mode, {bool? sub}) async {
     appLogger.dWithPackage('files_provider', 'changeFileMode: path=$path, mode=$mode, sub=$sub');
     try {

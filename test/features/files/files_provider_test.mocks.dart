@@ -79,20 +79,9 @@ class _FakeFileWgetResult_4 extends _i1.SmartFake
         );
 }
 
-class _FakeFileSearchResult_5 extends _i1.SmartFake
-    implements _i2.FileSearchResult {
-  _FakeFileSearchResult_5(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
-class _FakeFileEncodingResult_6 extends _i1.SmartFake
+class _FakeFileEncodingResult_5 extends _i1.SmartFake
     implements _i2.FileEncodingResult {
-  _FakeFileEncodingResult_6(
+  _FakeFileEncodingResult_5(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -101,9 +90,9 @@ class _FakeFileEncodingResult_6 extends _i1.SmartFake
         );
 }
 
-class _FakeFileDepthSizeInfo_7 extends _i1.SmartFake
+class _FakeFileDepthSizeInfo_6 extends _i1.SmartFake
     implements _i2.FileDepthSizeInfo {
-  _FakeFileDepthSizeInfo_7(
+  _FakeFileDepthSizeInfo_6(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -112,9 +101,9 @@ class _FakeFileDepthSizeInfo_7 extends _i1.SmartFake
         );
 }
 
-class _FakeFileProperties_8 extends _i1.SmartFake
+class _FakeFileProperties_7 extends _i1.SmartFake
     implements _i2.FileProperties {
-  _FakeFileProperties_8(
+  _FakeFileProperties_7(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -123,9 +112,9 @@ class _FakeFileProperties_8 extends _i1.SmartFake
         );
 }
 
-class _FakeFileUserGroupResponse_9 extends _i1.SmartFake
+class _FakeFileUserGroupResponse_8 extends _i1.SmartFake
     implements _i2.FileUserGroupResponse {
-  _FakeFileUserGroupResponse_9(
+  _FakeFileUserGroupResponse_8(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -134,9 +123,9 @@ class _FakeFileUserGroupResponse_9 extends _i1.SmartFake
         );
 }
 
-class _FakeFileBatchCheckResult_10 extends _i1.SmartFake
+class _FakeFileBatchCheckResult_9 extends _i1.SmartFake
     implements _i2.FileBatchCheckResult {
-  _FakeFileBatchCheckResult_10(
+  _FakeFileBatchCheckResult_9(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -731,49 +720,6 @@ class MockFilesService extends _i1.Mock implements _i3.FilesService {
       ) as _i4.Future<List<_i2.FileInfo>>);
 
   @override
-  _i4.Future<_i2.FileSearchResult> searchInFiles({
-    required String? path,
-    required String? pattern,
-    bool? caseSensitive,
-    bool? wholeWord,
-    bool? regex,
-    List<String>? fileTypes,
-    int? maxResults,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #searchInFiles,
-          [],
-          {
-            #path: path,
-            #pattern: pattern,
-            #caseSensitive: caseSensitive,
-            #wholeWord: wholeWord,
-            #regex: regex,
-            #fileTypes: fileTypes,
-            #maxResults: maxResults,
-          },
-        ),
-        returnValue:
-            _i4.Future<_i2.FileSearchResult>.value(_FakeFileSearchResult_5(
-          this,
-          Invocation.method(
-            #searchInFiles,
-            [],
-            {
-              #path: path,
-              #pattern: pattern,
-              #caseSensitive: caseSensitive,
-              #wholeWord: wholeWord,
-              #regex: regex,
-              #fileTypes: fileTypes,
-              #maxResults: maxResults,
-            },
-          ),
-        )),
-      ) as _i4.Future<_i2.FileSearchResult>);
-
-  @override
   _i4.Future<void> convertFile({
     required String? path,
     required String? fromEncoding,
@@ -827,7 +773,7 @@ class MockFilesService extends _i1.Mock implements _i3.FilesService {
           },
         ),
         returnValue:
-            _i4.Future<_i2.FileEncodingResult>.value(_FakeFileEncodingResult_6(
+            _i4.Future<_i2.FileEncodingResult>.value(_FakeFileEncodingResult_5(
           this,
           Invocation.method(
             #convertFileEncoding,
@@ -850,7 +796,7 @@ class MockFilesService extends _i1.Mock implements _i3.FilesService {
           [paths],
         ),
         returnValue:
-            _i4.Future<_i2.FileDepthSizeInfo>.value(_FakeFileDepthSizeInfo_7(
+            _i4.Future<_i2.FileDepthSizeInfo>.value(_FakeFileDepthSizeInfo_6(
           this,
           Invocation.method(
             #getDepthSize,
@@ -876,7 +822,7 @@ class MockFilesService extends _i1.Mock implements _i3.FilesService {
           #getFileProperties,
           [path],
         ),
-        returnValue: _i4.Future<_i2.FileProperties>.value(_FakeFileProperties_8(
+        returnValue: _i4.Future<_i2.FileProperties>.value(_FakeFileProperties_7(
           this,
           Invocation.method(
             #getFileProperties,
@@ -942,7 +888,7 @@ class MockFilesService extends _i1.Mock implements _i3.FilesService {
           [],
         ),
         returnValue: _i4.Future<_i2.FileUserGroupResponse>.value(
-            _FakeFileUserGroupResponse_9(
+            _FakeFileUserGroupResponse_8(
           this,
           Invocation.method(
             #getUserGroup,
@@ -959,7 +905,7 @@ class MockFilesService extends _i1.Mock implements _i3.FilesService {
           [paths],
         ),
         returnValue: _i4.Future<_i2.FileBatchCheckResult>.value(
-            _FakeFileBatchCheckResult_10(
+            _FakeFileBatchCheckResult_9(
           this,
           Invocation.method(
             #batchCheckFiles,

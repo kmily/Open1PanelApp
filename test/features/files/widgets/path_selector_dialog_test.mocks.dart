@@ -58,20 +58,9 @@ class _FakeFileBatchCheckResult_2 extends _i1.SmartFake
         );
 }
 
-class _FakeFileSearchResult_3 extends _i1.SmartFake
-    implements _i3.FileSearchResult {
-  _FakeFileSearchResult_3(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
-class _FakeFileUserGroupResponse_4 extends _i1.SmartFake
+class _FakeFileUserGroupResponse_3 extends _i1.SmartFake
     implements _i3.FileUserGroupResponse {
-  _FakeFileUserGroupResponse_4(
+  _FakeFileUserGroupResponse_3(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -80,9 +69,9 @@ class _FakeFileUserGroupResponse_4 extends _i1.SmartFake
         );
 }
 
-class _FakeFileProperties_5 extends _i1.SmartFake
+class _FakeFileProperties_4 extends _i1.SmartFake
     implements _i3.FileProperties {
-  _FakeFileProperties_5(
+  _FakeFileProperties_4(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -703,40 +692,6 @@ class MockFilesProvider extends _i1.Mock implements _i4.FilesProvider {
       ) as _i5.Future<_i3.FileBatchCheckResult>);
 
   @override
-  _i5.Future<_i3.FileSearchResult> searchInFiles({
-    required String? pattern,
-    bool? caseSensitive,
-    bool? wholeWord,
-    bool? regex,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #searchInFiles,
-          [],
-          {
-            #pattern: pattern,
-            #caseSensitive: caseSensitive,
-            #wholeWord: wholeWord,
-            #regex: regex,
-          },
-        ),
-        returnValue:
-            _i5.Future<_i3.FileSearchResult>.value(_FakeFileSearchResult_3(
-          this,
-          Invocation.method(
-            #searchInFiles,
-            [],
-            {
-              #pattern: pattern,
-              #caseSensitive: caseSensitive,
-              #wholeWord: wholeWord,
-              #regex: regex,
-            },
-          ),
-        )),
-      ) as _i5.Future<_i3.FileSearchResult>);
-
-  @override
   _i5.Future<void> changeFileMode(
     String? path,
     int? mode, {
@@ -783,7 +738,7 @@ class MockFilesProvider extends _i1.Mock implements _i4.FilesProvider {
           [],
         ),
         returnValue: _i5.Future<_i3.FileUserGroupResponse>.value(
-            _FakeFileUserGroupResponse_4(
+            _FakeFileUserGroupResponse_3(
           this,
           Invocation.method(
             #getUserGroup,
@@ -808,7 +763,7 @@ class MockFilesProvider extends _i1.Mock implements _i4.FilesProvider {
           #getFileProperties,
           [path],
         ),
-        returnValue: _i5.Future<_i3.FileProperties>.value(_FakeFileProperties_5(
+        returnValue: _i5.Future<_i3.FileProperties>.value(_FakeFileProperties_4(
           this,
           Invocation.method(
             #getFileProperties,

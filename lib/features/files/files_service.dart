@@ -420,29 +420,6 @@ class FilesService {
     return response.data!;
   }
 
-  Future<FileSearchResult> searchInFiles({
-    required String path,
-    required String pattern,
-    bool? caseSensitive,
-    bool? wholeWord,
-    bool? regex,
-    List<String>? fileTypes,
-    int? maxResults,
-  }) async {
-    appLogger.dWithPackage('files', 'searchInFiles: path=$path, pattern=$pattern');
-    final api = await _getApi();
-    final response = await api.searchInFiles(FileSearchInRequest(
-      path: path,
-      pattern: pattern,
-      caseSensitive: caseSensitive,
-      wholeWord: wholeWord,
-      regex: regex,
-      fileTypes: fileTypes,
-      maxResults: maxResults,
-    ));
-    return response.data!;
-  }
-
   Future<void> convertFile({
     required String path,
     required String fromEncoding,

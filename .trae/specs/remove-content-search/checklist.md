@@ -1,0 +1,7 @@
+- [x] "Content Search" feature removed from `FilesPage` UI
+- [x] `FileContentSearchPage` file deleted
+- [x] `searchInFiles` method removed from `FilesProvider`, `FilesService`, and `FileV2Api`
+- [x] `FileSearchInRequest` model deleted
+- [x] Content search test case removed from `file_api_test.dart`
+- [x] Mock files regenerated
+- [x] `FilePreviewRequest` model restored and build verified

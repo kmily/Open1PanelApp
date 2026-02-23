@@ -8,7 +8,6 @@ import 'package:onepanelapp_app/data/models/file_models.dart';
 import 'package:onepanelapp_app/features/files/files_provider.dart';
 import 'package:onepanelapp_app/features/files/file_preview_page.dart';
 import 'package:onepanelapp_app/features/files/file_editor_page.dart';
-import 'package:onepanelapp_app/features/files/file_content_search_page.dart';
 import 'package:onepanelapp_app/features/files/favorites_page.dart';
 import 'package:onepanelapp_app/features/files/recycle_bin_page.dart';
 import 'package:onepanelapp_app/features/files/upload_history_page.dart';
@@ -941,21 +940,6 @@ class _FilesViewState extends State<FilesView> {
               onTap: () {
                 Navigator.pop(sheetContext);
                 showSearchDialog(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.find_in_page_outlined),
-              title: Text(sheetContext.l10n.filesContentSearch),
-              onTap: () {
-                Navigator.pop(sheetContext);
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => ChangeNotifierProvider.value(
-                      value: provider,
-                      child: const FileContentSearchPage(),
-                    ),
-                  ),
-                );
               },
             ),
             ListTile(

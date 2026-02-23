@@ -689,24 +689,6 @@ class FileV2Api {
     );
   }
 
-  /// 文件搜索
-  ///
-  /// 在文件系统中搜索文件
-  /// @param request 搜索请求
-  /// @return 搜索结果
-  Future<Response<FileSearchResult>> searchInFiles(FileSearchInRequest request) async {
-    final response = await _client.post(
-      ApiConstants.buildApiPath('/files/search/in'),
-      data: request.toJson(),
-    );
-    return Response(
-      data: FileSearchResult.fromJson(response.data as Map<String, dynamic>),
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      requestOptions: response.requestOptions,
-    );
-  }
-
   /// 转换文件
   ///
   /// 转换文件编码
