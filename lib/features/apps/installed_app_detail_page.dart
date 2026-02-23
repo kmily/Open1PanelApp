@@ -101,10 +101,9 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
 
       // 4. Fetch Config
       Map<String, dynamic>? config;
-      if (_appInfo!.name != null && appKey != null) {
+      if (_appInfo!.id != null) {
         try {
-          config =
-              await _appService.getAppInstallConfig(_appInfo!.name!, appKey);
+          config = await _appService.getAppInstallParams(_appInfo!.id.toString());
         } catch (e) {
           debugPrint('Failed to load config: $e');
         }
@@ -260,7 +259,7 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
       if (mounted) {
         Navigator.pop(context); // Close loading
         scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text(l10n.commonLoadFailedTitle)),
+          SnackBar(content: Text('${l10n.commonLoadFailedTitle}: $e')),
         );
       }
     }
@@ -326,40 +325,81 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
       return Center(child: Text(l10n.commonEmpty));
     }
 
+    final envs = _appConfig?['env'] as Map<String, dynamic>? ?? _appInfo?.env;
+    final compose = _appConfig?['dockerCompose'] as String? ?? _appInfo?.dockerCompose;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _appConfig!.entries.map((e) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Text(
-                        e.key,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 2,
-                      child: SelectableText(e.value?.toString() ?? ''),
-                    ),
-                  ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Ports'),
+          if (_appInfo?.httpPort != null || _appInfo?.httpsPort != null)
+            Card(
+              child: ListTile(
+                title: Text(
+                  [
+                    if (_appInfo?.httpPort != null) '${_appInfo!.httpPort} (HTTP)',
+                    if (_appInfo?.httpsPort != null) '${_appInfo!.httpsPort} (HTTPS)',
+                  ].join(', '),
                 ),
-              );
-            }).toList(),
-          ),
-        ),
+                leading: const Icon(Icons.router),
+              ),
+            )
+          else
+             const Text('No port info'),
+          
+          const SizedBox(height: 16),
+          _buildSectionTitle('Environment'),
+          if (envs != null && envs.isNotEmpty)
+            Card(
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: envs.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final key = envs.keys.elementAt(index);
+                  final value = envs[key];
+                  return ListTile(
+                    title: Text(key, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                    subtitle: Text(value?.toString() ?? '', style: const TextStyle(fontFamily: 'monospace')),
+                  );
+                },
+              ),
+            )
+          else
+            Text(l10n.commonEmpty),
+
+          const SizedBox(height: 16),
+          _buildSectionTitle('Compose'),
+          if (compose != null && compose.isNotEmpty)
+            Card(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: SelectableText(
+                  compose,
+                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                ),
+              ),
+            )
+          else
+            Text(l10n.commonEmpty),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+            ),
       ),
     );
   }
@@ -409,7 +449,18 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
             Card(
               child: Padding(
                  padding: const EdgeInsets.all(16),
-                 child: MarkdownBody(data: _storeDetail!.readMe!),
+                 child: MarkdownBody(
+                   data: _storeDetail!.readMe!,
+                   imageBuilder: (uri, title, alt) {
+                     if (uri.scheme == 'http' || uri.scheme == 'https') {
+                       return Image.network(uri.toString());
+                     }
+                     return Tooltip(
+                       message: 'Image not supported: $uri',
+                       child: const Icon(Icons.broken_image, size: 16, color: Colors.grey),
+                     );
+                   },
+                 ),
               ),
             ),
             const SizedBox(height: 24),

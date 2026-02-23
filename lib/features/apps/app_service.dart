@@ -103,6 +103,13 @@ class AppService extends BaseComponent {
     });
   }
 
+  Future<Map<String, dynamic>> getAppInstallParams(String appInstallId) {
+    return runGuarded(() async {
+      final api = await _ensureApi();
+      return api.getAppInstallParams(appInstallId);
+    });
+  }
+
   Future<void> updateAppInstallConfig(Map<String, dynamic> config) {
     return runGuarded(() async {
       final api = await _ensureApi();

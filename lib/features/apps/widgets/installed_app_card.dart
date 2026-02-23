@@ -23,6 +23,29 @@ class InstalledAppCard extends StatelessWidget {
     required this.onUninstall,
   });
 
+  String _getAge(String? createdAt) {
+    if (createdAt == null || createdAt.isEmpty) return '';
+    try {
+      final created = DateTime.parse(createdAt);
+      final now = DateTime.now();
+      final difference = now.difference(created);
+      
+      if (difference.inDays > 365) {
+        return '${(difference.inDays / 365).floor()} years';
+      } else if (difference.inDays > 30) {
+        return '${(difference.inDays / 30).floor()} months';
+      } else if (difference.inDays > 0) {
+        return '${difference.inDays} days';
+      } else if (difference.inHours > 0) {
+        return '${difference.inHours} hours';
+      } else {
+        return '${difference.inMinutes} minutes';
+      }
+    } catch (e) {
+      return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -35,12 +58,14 @@ class InstalledAppCard extends StatelessWidget {
     if (app.httpsPort != null && app.httpsPort != 0) ports.add('${app.httpsPort} (HTTPS)');
     final portsString = ports.join(', ');
 
+    final age = _getAge(app.createdAt);
+
     return AppCard(
       leading: AppIcon(
         appId: app.appId,
         appKey: app.appKey,
         iconUrl: app.icon,
-        size: 48,
+        size: 56,
       ),
       title: app.appName ?? app.name ?? '未命名应用',
       subtitle: Column(
@@ -54,7 +79,24 @@ class InstalledAppCard extends StatelessWidget {
                 fontSize: 13,
               ),
             ),
-          Text(app.version ?? '未知版本'),
+          const SizedBox(height: 4),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              _InfoTag(
+                label: app.version ?? 'Unknown',
+                icon: Icons.info_outline,
+                colorScheme: colorScheme,
+              ),
+              if (age.isNotEmpty)
+                _InfoTag(
+                  label: age,
+                  icon: Icons.access_time,
+                  colorScheme: colorScheme,
+                ),
+            ],
+          ),
         ],
       ),
       trailing: _StatusChip(
@@ -71,21 +113,24 @@ class InstalledAppCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (app.container != null && app.container!.isNotEmpty)
+          const Divider(height: 24),
+          if (app.container != null && app.container!.isNotEmpty) ...[
             _InfoRow(
               label: l10n.appInstallContainerName,
               value: app.container!,
               colorScheme: colorScheme,
             ),
+            const SizedBox(height: 8),
+          ],
           if (portsString.isNotEmpty) ...[
-            const SizedBox(height: 4),
             _InfoRow(
               label: l10n.appInstallPorts,
               value: portsString,
               colorScheme: colorScheme,
             ),
+            const SizedBox(height: 12),
           ],
-          const SizedBox(height: 12),
+          
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -156,6 +201,44 @@ class InstalledAppCard extends StatelessWidget {
   }
 }
 
+class _InfoTag extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final ColorScheme colorScheme;
+
+  const _InfoTag({
+    required this.label,
+    required this.icon,
+    required this.colorScheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Icon(icon, size: 12, color: colorScheme.onSurfaceVariant),
+          // const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// 状态标签
 class _StatusChip extends StatelessWidget {
   final String status;
@@ -173,58 +256,14 @@ class _StatusChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Text(
         status,
         style: TextStyle(
           color: color,
           fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-}
-
-/// 操作按钮
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _ActionButton({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 18),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -249,26 +288,75 @@ class _InfoRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 70,
+          width: 80,
           child: Text(
             label,
             style: TextStyle(
-              color: colorScheme.outline,
-              fontSize: 12,
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 13,
             ),
           ),
         ),
         Expanded(
-          child: SelectableText(
+          child: Text(
             value,
             style: TextStyle(
               color: colorScheme.onSurface,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontSize: 13,
+              fontFamily: 'monospace',
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+/// 操作按钮
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            border: Border.all(color: color.withValues(alpha: 0.5)),
+            borderRadius: BorderRadius.circular(8),
+            color: color.withValues(alpha: 0.05),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: color),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

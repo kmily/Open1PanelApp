@@ -302,6 +302,18 @@ void main() {
       }
     });
 
+    test('GET /apps/installed/params/:id - Get Install Params', () async {
+      if (!hasApiKey || installedAppId == null) return;
+      try {
+        final params = await api.getAppInstallParams(installedAppId.toString());
+        logResponse('/apps/installed/params', params);
+        expect(params, isNotNull);
+        resultCollector.addSuccess('Get Install Params', Duration.zero);
+      } catch (e) {
+        resultCollector.addFailure('Get Install Params', e.toString(), Duration.zero);
+      }
+    });
+
     test('POST /apps/installed/conninfo - Get Conn Info', () async {
       if (!hasApiKey || targetApp == null) return;
       try {

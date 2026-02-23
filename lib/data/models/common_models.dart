@@ -101,11 +101,19 @@ class PageResult<T> extends Equatable {
   });
 
   factory PageResult.fromJson(Map<String, dynamic> json, T Function(dynamic) fromJsonT) {
+    var itemsJson = json['items'];
+    List<T> itemsList = [];
+    
+    if (itemsJson is List) {
+      itemsList = itemsJson.map((item) => fromJsonT(item)).toList();
+    } else if (itemsJson is Map) {
+      // Handle case where items is a Map (e.g. empty map or associative array)
+      // For now, treat as empty list to avoid crash, as we expect a List
+      itemsList = [];
+    }
+
     return PageResult(
-      items: (json['items'] as List?)
-          ?.map((item) => fromJsonT(item))
-          .toList() ??
-          [],
+      items: itemsList,
       total: json['total'] as int? ?? 0,
       page: json['page'] as int? ?? 1,
       pageSize: json['pageSize'] as int? ?? 20,

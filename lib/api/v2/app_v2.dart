@@ -234,7 +234,7 @@ class AppV2Api {
     return AppInstalledCheckResponse.fromJson(data['data'] as Map<String, dynamic>);
   }
 
-  /// 获取应用安装配置
+  /// 获取应用安装配置（旧版/默认配置）
   Future<Map<String, dynamic>> getAppInstallConfig(String name, String key) async {
     final response = await _client.post<dynamic>(
       ApiConstants.buildApiPath('/apps/installed/conf'),

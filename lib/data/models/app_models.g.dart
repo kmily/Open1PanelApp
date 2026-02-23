@@ -266,7 +266,7 @@ Map<String, dynamic> _$AppInstalledInfoRequestToJson(
 AppInstalledCheckResponse _$AppInstalledCheckResponseFromJson(
         Map<String, dynamic> json) =>
     AppInstalledCheckResponse(
-      exist: json['exist'] as bool? ?? false,
+      exist: json['exist'] as bool,
       message: json['message'] as String?,
     );
 
@@ -298,6 +298,7 @@ AppInstalledIgnoreUpgradeRequest _$AppInstalledIgnoreUpgradeRequestFromJson(
     AppInstalledIgnoreUpgradeRequest(
       appInstallId: (json['appInstallId'] as num).toInt(),
       reason: json['reason'] as String,
+      scope: json['scope'] as String? ?? 'project',
     );
 
 Map<String, dynamic> _$AppInstalledIgnoreUpgradeRequestToJson(
@@ -305,6 +306,7 @@ Map<String, dynamic> _$AppInstalledIgnoreUpgradeRequestToJson(
     <String, dynamic>{
       'appInstallId': instance.appInstallId,
       'reason': instance.reason,
+      'scope': instance.scope,
     };
 
 AppInstalledOperateRequest _$AppInstalledOperateRequestFromJson(
@@ -409,68 +411,6 @@ Map<String, dynamic> _$AppstoreUpdateRequestToJson(
         AppstoreUpdateRequest instance) =>
     <String, dynamic>{
       'defaultDomain': instance.defaultDomain,
-    };
-
-AppInstallInfo _$AppInstallInfoFromJson(Map<String, dynamic> json) =>
-    AppInstallInfo(
-      id: (json['id'] as num?)?.toInt(),
-      name: json['name'] as String?,
-      version: json['version'] as String?,
-      status: json['status'] as String?,
-      appKey: json['appKey'] as String?,
-      appName: json['appName'] as String?,
-      container: json['container'] as String?,
-      icon: json['icon'] as String?,
-      description: json['description'] as String?,
-      createdAt: json['createdAt'] as String?,
-      appId: (json['appId'] as num?)?.toInt(),
-      appDetailId: (json['appDetailId'] as num?)?.toInt(),
-      message: json['message'] as String?,
-      httpPort: (json['httpPort'] as num?)?.toInt(),
-      httpsPort: (json['httpsPort'] as num?)?.toInt(),
-      path: json['path'] as String?,
-      canUpdate: json['canUpdate'] as bool?,
-      ready: (json['ready'] as num?)?.toInt(),
-      total: (json['total'] as num?)?.toInt(),
-      appType: json['appType'] as String?,
-      appStatus: json['appStatus'] as String?,
-      dockerCompose: json['dockerCompose'] as String?,
-      webUI: json['webUI'] as String?,
-      favorite: json['favorite'] as bool?,
-      isEdit: json['isEdit'] as bool?,
-      linkDB: json['linkDB'] as bool?,
-      serviceName: json['serviceName'] as String?,
-    );
-
-Map<String, dynamic> _$AppInstallInfoToJson(AppInstallInfo instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'version': instance.version,
-      'status': instance.status,
-      'appKey': instance.appKey,
-      'appName': instance.appName,
-      'container': instance.container,
-      'icon': instance.icon,
-      'description': instance.description,
-      'createdAt': instance.createdAt,
-      'appId': instance.appId,
-      'appDetailId': instance.appDetailId,
-      'message': instance.message,
-      'httpPort': instance.httpPort,
-      'httpsPort': instance.httpsPort,
-      'path': instance.path,
-      'canUpdate': instance.canUpdate,
-      'ready': instance.ready,
-      'total': instance.total,
-      'appType': instance.appType,
-      'appStatus': instance.appStatus,
-      'dockerCompose': instance.dockerCompose,
-      'webUI': instance.webUI,
-      'favorite': instance.favorite,
-      'isEdit': instance.isEdit,
-      'linkDB': instance.linkDB,
-      'serviceName': instance.serviceName,
     };
 
 AppListResponse _$AppListResponseFromJson(Map<String, dynamic> json) =>
