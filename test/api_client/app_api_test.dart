@@ -305,8 +305,8 @@ void main() {
     test('GET /apps/installed/params/:id - Get Install Params', () async {
       if (!hasApiKey || installedAppId == null) return;
       try {
-        final params = await api.getAppInstallParams(installedAppId.toString());
-        logResponse('/apps/installed/params', params);
+        final params = await api.getAppInstallParams(installedAppId!);
+        logResponse('/apps/installed/params', params.toJson());
         expect(params, isNotNull);
         resultCollector.addSuccess('Get Install Params', Duration.zero);
       } catch (e) {
@@ -349,12 +349,30 @@ void main() {
     test('POST /apps/installed/params/update - Update Params', () async {
       if (!hasApiKey || installedAppId == null) return;
       try {
-         final params = await api.getAppInstallParams(installedAppId.toString());
-         logResponse('getAppInstallParams', params);
-         await api.updateAppParams({
+         final config = await api.getAppInstallParams(installedAppId!);
+         logResponse('getAppInstallParams', config.toJson());
+         
+         // Construct update request: transform params list to map
+         final paramsMap = <String, dynamic>{};
+         for (var p in config.params) {
+           paramsMap[p.key] = p.value;
+         }
+
+         final updateReq = <String, dynamic>{
            'installId': installedAppId,
-           'params': params,
-         });
+           'cpuQuota': config.cpuQuota,
+           'memoryLimit': config.memoryLimit,
+           'memoryUnit': config.memoryUnit,
+           'containerName': config.containerName,
+           'allowPort': config.allowPort,
+           'dockerCompose': config.dockerCompose,
+           'hostMode': config.hostMode,
+           'type': config.type,
+           'webUI': config.webUI,
+           'params': paramsMap,
+         };
+
+         await api.updateAppParams(updateReq);
          resultCollector.addSuccess('Update Params', Duration.zero);
       } catch (e) {
         resultCollector.addFailure('Update Params', e.toString(), Duration.zero);

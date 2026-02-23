@@ -3,6 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 import 'package:onepanelapp_app/config/app_router.dart';
 import 'package:onepanelapp_app/core/i18n/l10n_x.dart';
+import 'package:onepanelapp_app/data/models/app_config_models.dart';
 import 'package:onepanelapp_app/data/models/app_models.dart';
 import 'package:onepanelapp_app/features/apps/app_service.dart';
 import 'package:onepanelapp_app/features/apps/providers/installed_apps_provider.dart';
@@ -32,7 +33,7 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
   AppInstallInfo? _appInfo;
   AppItem? _storeDetail;
   List<AppServiceResponse>? _services;
-  Map<String, dynamic>? _appConfig;
+  AppConfig? _appConfig;
   bool _loading = true;
   String? _error;
 
@@ -100,7 +101,7 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
       }
 
       // 4. Fetch Config
-      Map<String, dynamic>? config;
+      AppConfig? config;
       if (_appInfo!.id != null) {
         try {
           config = await _appService.getAppInstallParams(_appInfo!.id.toString());
@@ -321,12 +322,13 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
       );
     }
 
-    if (_appConfig == null || _appConfig!.isEmpty) {
+    if (_appConfig == null) {
       return Center(child: Text(l10n.commonEmpty));
     }
 
-    final envs = _appConfig?['env'] as Map<String, dynamic>? ?? _appInfo?.env;
-    final compose = _appConfig?['dockerCompose'] as String? ?? _appInfo?.dockerCompose;
+    final envs = _appInfo?.env;
+    final compose = _appConfig!.dockerCompose;
+    final containerName = _appConfig!.containerName;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -350,6 +352,17 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
              const Text('No port info'),
           
           const SizedBox(height: 16),
+          if (containerName.isNotEmpty) ...[
+            _buildSectionTitle('Container Name'),
+            Card(
+              child: ListTile(
+                title: Text(containerName, style: const TextStyle(fontFamily: 'monospace')),
+                leading: const Icon(Icons.layers),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+          
           _buildSectionTitle('Environment'),
           if (envs != null && envs.isNotEmpty)
             Card(
@@ -373,7 +386,7 @@ class _InstalledAppDetailPageState extends State<InstalledAppDetailPage> {
 
           const SizedBox(height: 16),
           _buildSectionTitle('Compose'),
-          if (compose != null && compose.isNotEmpty)
+          if (compose.isNotEmpty)
             Card(
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
               child: Padding(

@@ -11,16 +11,32 @@ class DockerV2Api {
 
   // --- Images ---
 
+  List<T> _parseList<T>(dynamic data, T Function(Map<String, dynamic>) fromJson) {
+    if (data is List) {
+      return data.map((e) => fromJson(e as Map<String, dynamic>)).toList();
+    }
+    if (data is Map<String, dynamic>) {
+      if (data['data'] is List) {
+        return (data['data'] as List)
+            .map((e) => fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+      if (data['items'] is List) {
+        return (data['items'] as List)
+            .map((e) => fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+    }
+    return [];
+  }
+
   /// List all images
   Future<Response<List<DockerImage>>> listImages() async {
     final response = await _client.get(
       ApiConstants.buildApiPath('/containers/image/all'),
     );
     return Response(
-      data: (response.data as List?)
-              ?.map((e) => DockerImage.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
+      data: _parseList(response.data, DockerImage.fromJson),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -51,10 +67,7 @@ class DockerV2Api {
       ApiConstants.buildApiPath('/containers/network'),
     );
     return Response(
-      data: (response.data as List?)
-              ?.map((e) => DockerNetwork.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
+      data: _parseList(response.data, DockerNetwork.fromJson),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,
@@ -85,10 +98,7 @@ class DockerV2Api {
       ApiConstants.buildApiPath('/containers/volume'),
     );
     return Response(
-      data: (response.data as List?)
-              ?.map((e) => DockerVolume.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
+      data: _parseList(response.data, DockerVolume.fromJson),
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
       requestOptions: response.requestOptions,

@@ -3,6 +3,8 @@ import '../../core/network/dio_client.dart';
 import '../../data/models/app_models.dart';
 import '../../core/config/api_constants.dart';
 
+import '../../data/models/app_config_models.dart';
+
 /// 1Panel V2 API - 应用管理接口
 class AppV2Api {
   final DioClient _client;
@@ -10,6 +12,7 @@ class AppV2Api {
   AppV2Api(this._client);
 
   List<T> _parseListData<T>(dynamic dataField, T Function(Map<String, dynamic>) fromJson) {
+    if (dataField == null) return [];
     if (dataField is List) {
       return dataField.map((e) => fromJson(e as Map<String, dynamic>)).toList();
     }
@@ -17,6 +20,11 @@ class AppV2Api {
       final items = dataField['items'];
       if (items is List) {
         return items.map((e) => fromJson(e as Map<String, dynamic>)).toList();
+      }
+      // Handle potential nested data structure
+      final innerData = dataField['data'];
+      if (innerData is List) {
+        return innerData.map((e) => fromJson(e as Map<String, dynamic>)).toList();
       }
     }
     return [];
@@ -159,8 +167,23 @@ class AppV2Api {
     final response = await _client.get<dynamic>(
       ApiConstants.buildApiPath('/apps/detail/$appId/$version/$type'),
     );
-    final data = response.data as Map<String, dynamic>;
-    return AppItem.fromJson(data['data'] as Map<String, dynamic>);
+    final data = response.data;
+    if (data is! Map<String, dynamic>) {
+       throw DioException(
+         requestOptions: response.requestOptions, 
+         error: 'Invalid response format: Expected Map, got ${data.runtimeType}',
+         type: DioExceptionType.badResponse,
+       );
+    }
+    final innerData = data['data'];
+    if (innerData is! Map<String, dynamic>) {
+       throw DioException(
+         requestOptions: response.requestOptions, 
+         error: 'App detail not found or invalid format',
+         type: DioExceptionType.badResponse,
+       );
+    }
+    return AppItem.fromJson(innerData);
   }
 
   /// 获取应用详情（通过ID）
@@ -310,13 +333,13 @@ class AppV2Api {
     );
   }
 
-  /// 获取应用安装参数
-  Future<Map<String, dynamic>> getAppInstallParams(String appInstallId) async {
+  /// 获取应用安装配置（通过ID）
+  Future<AppConfig> getAppInstallParams(int id) async {
     final response = await _client.get<dynamic>(
-      ApiConstants.buildApiPath('/apps/installed/params/$appInstallId'),
+      ApiConstants.buildApiPath('/apps/installed/params/$id'),
     );
     final data = response.data as Map<String, dynamic>;
-    return data['data'] as Map<String, dynamic>;
+    return AppConfig.fromJson(data['data'] as Map<String, dynamic>);
   }
 
   /// 搜索已安装应用
@@ -325,9 +348,17 @@ class AppV2Api {
       ApiConstants.buildApiPath('/apps/installed/search'),
       data: request.toJson(),
     );
-    final data = response.data as Map<String, dynamic>;
+    final data = response.data;
+    if (data is! Map<String, dynamic>) {
+       // Return empty result instead of crashing
+       return PageResult(items: [], total: 0);
+    }
+    final innerData = data['data'];
+    if (innerData is! Map<String, dynamic>) {
+       return PageResult(items: [], total: 0);
+    }
     return PageResult.fromJson(
-      data['data'] as Map<String, dynamic>,
+      innerData,
       (dynamic item) => AppInstallInfo.fromJson(item as Map<String, dynamic>),
     );
   }

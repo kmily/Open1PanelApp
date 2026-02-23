@@ -3,6 +3,8 @@ import '../../api/v2/app_v2.dart';
 import '../../core/services/base_component.dart';
 import '../../data/models/app_models.dart';
 
+import '../../data/models/app_config_models.dart';
+
 class AppService extends BaseComponent {
   AppService({
     AppV2Api? api,
@@ -103,10 +105,10 @@ class AppService extends BaseComponent {
     });
   }
 
-  Future<Map<String, dynamic>> getAppInstallParams(String appInstallId) {
+  Future<AppConfig> getAppInstallParams(String appInstallId) {
     return runGuarded(() async {
       final api = await _ensureApi();
-      return api.getAppInstallParams(appInstallId);
+      return api.getAppInstallParams(int.parse(appInstallId));
     });
   }
 

@@ -1,0 +1,4 @@
+- [x] Docker API parsing issue fixed (Map vs List)
+- [x] App Management page layout fixed (No double bottom bar)
+- [x] App Store API error handling improved (No JSON errors)
+- [x] App Card styling improved (Clear boundaries)
