@@ -1,6 +1,5 @@
-import 'package:dio/dio.dart';
-import 'package:crypto/crypto.dart';
-import 'dart:convert';
+import 'package:onepanelapp_app/core/network/dio_client.dart';
+import 'package:onepanelapp_app/core/network/network_exceptions.dart';
 import 'package:onepanelapp_app/core/services/logger/logger_service.dart';
 
 class ServerConnectionResult {
@@ -37,8 +36,9 @@ class ServerConnectionService {
   }) async {
     final stopwatch = Stopwatch()..start();
 
-    // 验证 URL 格式
-    if (!_isValidUrl(serverUrl)) {
+    // 清理并验证 URL 格式
+    final cleanUrl = _normalizeUrl(serverUrl);
+    if (!_isValidUrl(cleanUrl)) {
       stopwatch.stop();
       return ServerConnectionResult(
         success: false,
@@ -49,30 +49,16 @@ class ServerConnectionService {
     }
 
     try {
-      final dio = Dio(BaseOptions(
-        baseUrl: serverUrl,
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ));
+      // 使用统一的 DioClient，包含认证拦截器
+      final dioClient = DioClient(
+        baseUrl: cleanUrl,
+        apiKey: apiKey,
+      );
 
-      final timestamp = (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString();
-      final authString = '1panel$apiKey$timestamp';
-      final bytes = utf8.encode(authString);
-      final digest = md5.convert(bytes);
-      final token = digest.toString();
+      appLogger.dWithPackage(_package, '开始连接测试: $cleanUrl');
 
-      appLogger.dWithPackage(_package, '开始连接测试: $serverUrl');
-
-      final response = await dio.get(
+      final response = await dioClient.get(
         '/api/v2/dashboard/base/os',
-        options: Options(headers: {
-          '1Panel-Token': token,
-          '1Panel-Timestamp': timestamp,
-        }),
       );
 
       stopwatch.stop();
@@ -96,42 +82,39 @@ class ServerConnectionService {
         errorType: ServerConnectionErrorType.serverError,
         responseTime: stopwatch.elapsed,
       );
-    } on DioException catch (e) {
+    } on NetworkConnectionException catch (e) {
       stopwatch.stop();
-      appLogger.wWithPackage(_package, '连接测试失败: ${e.type}', error: e);
+      appLogger.wWithPackage(_package, '连接测试失败: 网络连接错误', error: e);
 
-      String errorMessage;
-      ServerConnectionErrorType errorType;
-
-      switch (e.type) {
-        case DioExceptionType.connectionTimeout:
-        case DioExceptionType.sendTimeout:
-        case DioExceptionType.receiveTimeout:
-          errorMessage = 'serverConnectionTestTimeout';
-          errorType = ServerConnectionErrorType.timeout;
-          break;
-        case DioExceptionType.connectionError:
-          errorMessage = _getDetailedConnectionError(e);
-          errorType = ServerConnectionErrorType.connectionError;
-          break;
-        case DioExceptionType.badResponse:
-          if (e.response?.statusCode == 401) {
-            errorMessage = 'serverConnectionTestInvalidKey';
-            errorType = ServerConnectionErrorType.authenticationFailed;
-          } else {
-            errorMessage = 'serverConnectionTestServerDown';
-            errorType = ServerConnectionErrorType.serverError;
-          }
-          break;
-        default:
-          errorMessage = 'serverConnectionTestServerDown';
-          errorType = ServerConnectionErrorType.unknown;
-      }
+      final errorMessage = _getDetailedConnectionErrorFromMessage(e.message);
+      final errorType = errorMessage == 'serverConnectionTestTimeout'
+          ? ServerConnectionErrorType.timeout
+          : ServerConnectionErrorType.connectionError;
 
       return ServerConnectionResult(
         success: false,
         errorMessage: errorMessage,
         errorType: errorType,
+        responseTime: stopwatch.elapsed,
+      );
+    } on AuthException catch (e) {
+      stopwatch.stop();
+      appLogger.wWithPackage(_package, '连接测试失败: 认证失败', error: e);
+
+      return ServerConnectionResult(
+        success: false,
+        errorMessage: 'serverConnectionTestInvalidKey',
+        errorType: ServerConnectionErrorType.authenticationFailed,
+        responseTime: stopwatch.elapsed,
+      );
+    } on ServerException catch (e) {
+      stopwatch.stop();
+      appLogger.wWithPackage(_package, '连接测试失败: 服务器错误', error: e);
+
+      return ServerConnectionResult(
+        success: false,
+        errorMessage: 'serverConnectionTestServerDown',
+        errorType: ServerConnectionErrorType.serverError,
         responseTime: stopwatch.elapsed,
       );
     } catch (e) {
@@ -146,6 +129,16 @@ class ServerConnectionService {
     }
   }
 
+  /// 标准化 URL（移除末尾斜杠，避免双斜杠问题）
+  String _normalizeUrl(String url) {
+    String normalized = url.trim();
+    // 移除 URL 末尾的斜杠
+    while (normalized.endsWith('/')) {
+      normalized = normalized.substring(0, normalized.length - 1);
+    }
+    return normalized;
+  }
+
   /// 验证 URL 格式
   bool _isValidUrl(String url) {
     try {
@@ -156,19 +149,19 @@ class ServerConnectionService {
     }
   }
 
-  /// 获取详细的连接错误信息
-  String _getDetailedConnectionError(DioException error) {
-    final message = error.message?.toLowerCase() ?? '';
+  /// 获取详细的连接错误信息（从异常消息中）
+  String _getDetailedConnectionErrorFromMessage(String message) {
+    final lowerMessage = message.toLowerCase();
 
-    if (message.contains('connection refused')) {
+    if (lowerMessage.contains('connection refused')) {
       return 'serverConnectionTestServerDown';
-    } else if (message.contains('host') && message.contains('not found')) {
+    } else if (lowerMessage.contains('host') && lowerMessage.contains('not found')) {
       return 'serverConnectionTestInvalidUrl';
-    } else if (message.contains('network') && message.contains('unreachable')) {
-      return 'errorConnectionTestTimeout';
-    } else if (message.contains('timeout')) {
+    } else if (lowerMessage.contains('network') && lowerMessage.contains('unreachable')) {
       return 'serverConnectionTestTimeout';
-    } else if (message.contains('ssl') || message.contains('certificate')) {
+    } else if (lowerMessage.contains('timeout')) {
+      return 'serverConnectionTestTimeout';
+    } else if (lowerMessage.contains('ssl') || lowerMessage.contains('certificate')) {
       return 'errorSslError';
     }
 
