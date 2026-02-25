@@ -36,8 +36,9 @@ class ServerConnectionService {
   }) async {
     final stopwatch = Stopwatch()..start();
 
-    // 验证 URL 格式
-    if (!_isValidUrl(serverUrl)) {
+    // 清理并验证 URL 格式
+    final cleanUrl = _normalizeUrl(serverUrl);
+    if (!_isValidUrl(cleanUrl)) {
       stopwatch.stop();
       return ServerConnectionResult(
         success: false,
@@ -50,11 +51,11 @@ class ServerConnectionService {
     try {
       // 使用统一的 DioClient，包含认证拦截器
       final dioClient = DioClient(
-        baseUrl: serverUrl,
+        baseUrl: cleanUrl,
         apiKey: apiKey,
       );
 
-      appLogger.dWithPackage(_package, '开始连接测试: $serverUrl');
+      appLogger.dWithPackage(_package, '开始连接测试: $cleanUrl');
 
       final response = await dioClient.get(
         '/api/v2/dashboard/base/os',
@@ -126,6 +127,16 @@ class ServerConnectionService {
         responseTime: stopwatch.elapsed,
       );
     }
+  }
+
+  /// 标准化 URL（移除末尾斜杠，避免双斜杠问题）
+  String _normalizeUrl(String url) {
+    String normalized = url.trim();
+    // 移除 URL 末尾的斜杠
+    while (normalized.endsWith('/')) {
+      normalized = normalized.substring(0, normalized.length - 1);
+    }
+    return normalized;
   }
 
   /// 验证 URL 格式
